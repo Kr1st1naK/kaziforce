@@ -1,0 +1,39 @@
+# Environments
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+
+# Secrets
+.env
+
+# Data (raw/processed data tracked via README pointers, not committed directly —
+# see data/README.md. Remove specific lines below if you DO want small files tracked.)
+data/raw/**/*.csv
+data/raw/**/*.json
+data/processed/**/*
+!data/**/README.md
+!data/**/.gitkeep
+
+# Model artifacts / caches
+*.pt
+*.bin
+.cache/
+huggingface/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/

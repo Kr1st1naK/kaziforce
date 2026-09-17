@@ -1,0 +1,37 @@
+# KaziForce — pinned dependencies
+# Verified as a mutually compatible set via `pip install --dry-run` (Python 3.12).
+# Install order matters for torch — see README.md "Environment Setup" before running
+# `pip install -r requirements.txt` directly, or use the two-step install described there.
+
+# --- Data handling ---
+pandas==3.0.5
+numpy==2.5.3
+scikit-learn==1.9.1
+scipy==1.18.1
+
+# --- Knowledge graph ---
+networkx==3.6.1
+
+# --- Semantic similarity matching ---
+# NOTE: install CPU-only torch FIRST (see README) to avoid pulling ~5GB of unused
+# NVIDIA/CUDA packages. sentence-transformers depends on torch but does not
+# require a specific build, so the CPU wheel satisfies it.
+sentence-transformers==6.0.1
+transformers==5.17.0
+
+# --- Backend / API ---
+flask==3.1.3
+
+# --- Frontend / demo interface ---
+streamlit==1.64.0
+
+# --- Database ---
+psycopg2-binary==2.9.13
+pgvector==0.5.0
+
+# --- Config / environment ---
+python-dotenv==1.2.3
+
+# --- Dev tooling (not required to run the app, but expected by CI) ---
+pytest==8.3.3
+ruff==0.7.4
