@@ -27,8 +27,14 @@ huggingface/
 .vscode/
 .idea/
 
-# Streamlit
-.streamlit/secrets.toml
+# Python packaging
+*.egg-info/
+build/
+dist/
+
+# Web app (apps/web)
+node_modules/
+.next/
 
 # Test / coverage
 .pytest_cache/

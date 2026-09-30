@@ -15,17 +15,33 @@ import ast
 import json
 import re
 import unicodedata
+import os
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-# Resolve paths from this file, never from CWD 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-RAW_JOB_CSV = REPO_ROOT / "data/raw/jobSkillData/all_job_post.csv"
-ESCO_DIR = REPO_ROOT / "data/raw/esco"
-PROCESSED_DIR = REPO_ROOT / "data/processed"
-VOCABULARY_DIR = REPO_ROOT / "data/vocabulary"
+
+def _find_data_dir() -> Path:
+    """Locate the repo-level data/ directory.
+
+    Honours KAZIFORCE_DATA_DIR if set; otherwise walks up from this file
+    (never from CWD) to the first ancestor containing data/README.md.
+    """
+    override = os.getenv("KAZIFORCE_DATA_DIR")
+    if override:
+        return Path(override).resolve()
+    for parent in Path(__file__).resolve().parents:
+        if (parent / "data" / "README.md").exists():
+            return parent / "data"
+    raise FileNotFoundError("data/ directory not found; set KAZIFORCE_DATA_DIR.")
+
+
+DATA_DIR = _find_data_dir()
+RAW_JOB_CSV = DATA_DIR / "raw/jobSkillData/all_job_post.csv"
+ESCO_DIR = DATA_DIR / "raw/esco"
+PROCESSED_DIR = DATA_DIR / "processed"
+VOCABULARY_DIR = DATA_DIR / "vocabulary"
 
 # Source loaders
 
@@ -42,7 +58,7 @@ def load_job_corpus(path: Path = RAW_JOB_CSV) -> pd.DataFrame:
         return pd.read_csv(path, encoding="utf-8-sig")
 
 
-def load_webmasters_data(path: Path = REPO_ROOT / "data/raw/webmasters") -> pd.DataFrame:
+def load_webmasters_data(path: Path = DATA_DIR / "raw/webmasters") -> pd.DataFrame:
     """Load Webmasters Kenya worker/job dataset (primary source).
 
     TODO: implement once industry partner data is provided.
@@ -64,10 +80,10 @@ def load_esco_data(path: Path = ESCO_DIR) -> dict[str, pd.DataFrame]:
     raise NotImplementedError
 
 
-def load_synthetic_data(path: Path = REPO_ROOT / "data/raw/synthetic") -> pd.DataFrame:
+def load_synthetic_data(path: Path = DATA_DIR / "raw/synthetic") -> pd.DataFrame:
     """Load generated synthetic worker profiles (fallback source).
 
-    TODO: implement once src/data/synthetic.py is written.
+    TODO: implement once kaziforce_api/data/synthetic.py is written.
     """
     raise NotImplementedError
 

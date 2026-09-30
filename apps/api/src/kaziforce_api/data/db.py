@@ -21,7 +21,7 @@ def get_connection():
 
 
 if __name__ == "__main__":
-    # Quick manual test: python -m src.data.db
+    # Quick manual test: python -m kaziforce_api.data.db
     conn = get_connection()
     with conn.cursor() as cur:
         cur.execute("SELECT version();")

@@ -1,2 +1,2 @@
 # Notebooks
-Exploratory analysis only — production logic belongs in src/, not here.
+Exploratory analysis only — production logic belongs in apps/api or packages/, not here.
