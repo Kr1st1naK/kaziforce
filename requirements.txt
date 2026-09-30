@@ -3,11 +3,18 @@
 # Install order matters for torch — see README.md "Environment Setup" before running
 # `pip install -r requirements.txt` directly, or use the two-step install described there.
 
+# Intel (x86_64) Macs: PyTorch's last macOS x86_64 wheel is torch 2.2.2, which is
+# built against NumPy 1.x and is too old for transformers 5.x. Those machines get
+# an older, verified-compatible stack via the environment markers below; every
+# other platform (Linux/CI, Apple Silicon, Windows) uses the current pins.
+
 # --- Data handling ---
 pandas==3.0.5
-numpy==2.5.3
+numpy==2.5.3; sys_platform != "darwin" or platform_machine != "x86_64"
+numpy==1.26.4; sys_platform == "darwin" and platform_machine == "x86_64"
 scikit-learn==1.9.1
-scipy==1.18.1
+scipy==1.18.1; sys_platform != "darwin" or platform_machine != "x86_64"
+scipy==1.17.1; sys_platform == "darwin" and platform_machine == "x86_64"
 
 # --- Knowledge graph ---
 networkx==3.6.1
@@ -16,8 +23,11 @@ networkx==3.6.1
 # NOTE: install CPU-only torch FIRST (see README) to avoid pulling ~5GB of unused
 # NVIDIA/CUDA packages. sentence-transformers depends on torch but does not
 # require a specific build, so the CPU wheel satisfies it.
-sentence-transformers==6.0.1
-transformers==5.17.0
+sentence-transformers==6.0.1; sys_platform != "darwin" or platform_machine != "x86_64"
+transformers==5.17.0; sys_platform != "darwin" or platform_machine != "x86_64"
+sentence-transformers==5.7.0; sys_platform == "darwin" and platform_machine == "x86_64"
+transformers==4.57.6; sys_platform == "darwin" and platform_machine == "x86_64"
+torch==2.2.2; sys_platform == "darwin" and platform_machine == "x86_64"
 
 # --- Backend / API ---
 flask==3.1.3
