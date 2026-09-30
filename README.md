@@ -107,7 +107,7 @@ flask --app kaziforce_api.app run
 pytest -v
 
 # Lint
-ruff check apps/api packages tests
+ruff check apps/api packages scripts tests
 ```
 
 ## Development workflow
