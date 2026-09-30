@@ -1,8 +1,8 @@
 # Kenya-specific informal trade vocabulary
 Status: not yet built.
-Three-layer validation: LLM candidate generation -> Jiji.co.ke cross-check ->
-Mandla dictionary cross-check -> manual review.
-See src/knowledge_graph/vocabulary.py
+Validation: LLM candidate generation -> ESCO cross-reference -> manual review.
+See `src/knowledge_graph/vocabulary.py`.
+
 | #  | Occupational area                         | Example informal terminology to investigate |
 | -- | ----------------------------------------- | ------------------------------------------- |
 | 1  | Electrician                               | fundi wa umeme                              |
