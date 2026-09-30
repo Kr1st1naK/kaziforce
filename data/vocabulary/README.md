@@ -1,7 +1,7 @@
 # Kenya-specific informal trade vocabulary
 Status: not yet built.
 Validation: LLM candidate generation -> ESCO cross-reference -> manual review.
-See `src/knowledge_graph/vocabulary.py`.
+See `packages/knowledge-graph/src/kaziforce_kg/vocabulary.py`.
 
 | #  | Occupational area                         | Example informal terminology to investigate |
 | -- | ----------------------------------------- | ------------------------------------------- |
