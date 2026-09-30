@@ -1,4 +1,4 @@
-# PHASE 1 — Data-source decision
+# PHASE 1 — Data-source decision (Done)
 Now
 Meet Webmasters.
 Determine exactly what data they can provide.
