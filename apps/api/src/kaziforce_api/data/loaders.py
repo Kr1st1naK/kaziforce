@@ -177,14 +177,16 @@ def preprocess_jobs(df: pd.DataFrame, out_dir: Path = PROCESSED_DIR) -> dict:
     df["job_skill_count"] = df["job_skill_list"].apply(len)
 
     # --- Deduplicate ---
-    before = len(df); df = df.drop_duplicates(keep="first").copy()
+    before = len(df)
+    df = df.drop_duplicates(keep="first").copy()
     report["dropped_exact_duplicates"] = before - len(df)
 
     dups = df[df.duplicated(subset=["job_id"], keep=False)].copy()
     if len(dups):
         dups.to_csv(out_dir / "duplicate_job_ids.csv", index=False)
 
-    before = len(df); df = df.drop_duplicates(subset=["job_id"], keep="first").copy()
+    before = len(df)
+    df = df.drop_duplicates(subset=["job_id"], keep="first").copy()
     report["dropped_duplicate_job_id"] = before - len(df)
 
     before = len(df)
