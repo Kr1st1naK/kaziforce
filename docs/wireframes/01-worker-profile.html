@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Wireframe 01 — Create Your Worker Profile</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #ffffff; }
+  body { font-family: Arial, Helvetica, sans-serif; color: #000000; }
+  .canvas { width: 1440px; height: 1024px; overflow: hidden; background: #ffffff; padding: 48px 0; }
+  .panel { width: 820px; margin: 0 auto; border: 2px solid #000000; padding: 32px 40px; }
+  h1 { font-size: 28px; font-weight: bold; margin: 0 0 8px 0; }
+  .note { font-size: 14px; color: #555555; margin: 0 0 24px 0; }
+  .field { margin-bottom: 20px; }
+  .label { font-size: 15px; font-weight: bold; margin-bottom: 6px; }
+  .input { height: 42px; border: 1.5px solid #000000; background: #f2f2f2; padding: 0 12px; font-size: 14px; color: #666666; display: flex; align-items: center; justify-content: space-between; }
+  .textarea { height: 104px; align-items: flex-start; padding-top: 10px; }
+  .prefix { height: 100%; display: flex; align-items: center; padding-right: 12px; margin-right: 12px; border-right: 1.5px solid #000000; color: #000000; font-weight: bold; }
+  .actions { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; padding-top: 20px; border-top: 1.5px dashed #999999; }
+  .link { font-size: 16px; text-decoration: underline; }
+  .button { border: 2px solid #000000; background: #cccccc; padding: 12px 32px; font-size: 16px; font-weight: bold; }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="panel">
+    <h1>Create Your Worker Profile</h1>
+    <p class="note">[Short instruction text]</p>
+
+    <div class="field">
+      <div class="label">Full name</div>
+      <div class="input">[Text input]</div>
+    </div>
+
+    <div class="field">
+      <div class="label">Skills</div>
+      <div class="input textarea">[Skills text area — e.g. fundi wa stima, wiring]</div>
+    </div>
+
+    <div class="field">
+      <div class="label">Biography</div>
+      <div class="input textarea">[Biography text area]</div>
+    </div>
+
+    <div class="field">
+      <div class="label">Location</div>
+      <div class="input"><span>[Select or type location]</span><span>▼</span></div>
+    </div>
+
+    <div class="field">
+      <div class="label">Availability</div>
+      <div class="input"><span>[Full-time / Part-time / Weekends]</span><span>▼</span></div>
+    </div>
+
+    <div class="field">
+      <div class="label">Rate expectation</div>
+      <div class="input" style="justify-content: flex-start;"><span class="prefix">KES</span><span>[Number input]</span></div>
+    </div>
+
+    <div class="actions">
+      <span class="link">Cancel</span>
+      <span class="button">Submit Profile</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

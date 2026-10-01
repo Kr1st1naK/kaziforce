@@ -3,7 +3,7 @@ Sprint 1: smoke test to confirm the test suite and CI pipeline actually run.
 Replace/extend once real scoring logic exists (Sprint 3-4).
 """
 
-from src.matching.hybrid import HybridWeights, combine
+from kaziforce_api.matching.hybrid import HybridWeights, combine
 
 
 def test_combine_equal_weights():

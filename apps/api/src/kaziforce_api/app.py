@@ -1,8 +1,8 @@
 """
-Flask API — handles requests between the Streamlit frontend and the
-recommendation engine.
+Flask REST API — handles JSON requests between the Next.js web app
+(apps/web) and the recommendation engine.
 
-Run with: flask --app src/app/api.py run
+Run with: flask --app kaziforce_api.app run
 """
 
 from flask import Flask, jsonify

@@ -17,24 +17,29 @@ taxonomy and extended with Kenya-specific informal trade vocabulary — with
 rule-based and semantic similarity matching, to produce explainable worker–job
 recommendations that work from the moment a worker or job joins the platform.
 
-Full proposal: see `docs/proposal.pdf` (or the linked document).
+Full proposal: see `docs/proposal/kaziforce-proposal.docx`.
 
 ## Project structure
 
 ```
 kaziforce/
-├── src/
-│   ├── knowledge_graph/   # ESCO backbone + Kenya vocabulary extension, graph construction
-│   ├── matching/          # rule-based, semantic, and hybrid scoring
-│   ├── explainability/    # graph traversal path extraction, explanation generation
-│   ├── data/              # loaders, preprocessing, database connection
-│   └── app/               # Flask API + Streamlit demo interface
-├── data/                  # not committed — see data/README.md
+├── apps/
+│   ├── web/                      # Next.js/React/TypeScript interface (not yet scaffolded)
+│   └── api/                      # Flask REST API + hybrid recommendation engine
+│       └── src/kaziforce_api/
+│           ├── app.py            # Flask entry point
+│           ├── matching/         # rule-based, semantic, and hybrid scoring
+│           ├── explainability/   # graph traversal path extraction, explanation generation
+│           └── data/             # loaders, preprocessing, database connection
+├── packages/
+│   └── knowledge-graph/          # ESCO backbone + Kenya vocabulary extension (import: kaziforce_kg)
+│       └── src/kaziforce_kg/
+├── data/                         # not committed — see data/README.md
 ├── tests/
-├── docs/
-├── notebooks/             # exploratory work
-├── scripts/               # one-off utilities (e.g. ESCO download)
-└── .github/               # CI workflow + issue templates
+├── docs/                         # proposal, diagrams, architecture notes
+├── notebooks/                    # exploratory work
+├── scripts/                      # one-off utilities (e.g. ESCO download)
+└── .github/                      # CI workflow + issue templates
 ```
 
 ## Environment setup
@@ -59,7 +64,8 @@ NVIDIA/CUDA packages that `sentence-transformers` would otherwise install by def
 pip install torch --index-url https://download.pytorch.org/whl/cpu
 ```
 
-Then install everything else:
+Then install everything else (this also installs `apps/api` and
+`packages/knowledge-graph` in editable mode):
 ```bash
 pip install -r requirements.txt
 ```
@@ -79,32 +85,42 @@ cp .env.example .env
 3. Go to Project Settings → Database → Connection string (URI), copy it into
    `DATABASE_URL` in your `.env`.
 
-**Option B — Local PostgreSQL via CLI**
-```bash
-createdb kaziforce
-psql kaziforce -c "CREATE EXTENSION IF NOT EXISTS vector;"
-```
-Then set `DATABASE_URL=postgresql://<user>:<pass>@localhost:5432/kaziforce` in `.env`.
+**Option B — Local PostgreSQL via CLI** (PostgreSQL 13+)
 
-Test the connection:
+Install pgvector for your PostgreSQL version. Homebrew's `pgvector` bottle only
+targets PostgreSQL 17/18; for other versions build it from source:
 ```bash
-python -m src.data.db
+git clone --branch v0.8.6 https://github.com/pgvector/pgvector.git /tmp/pgvector
+cd /tmp/pgvector && PG_CONFIG=$(which pg_config) make && PG_CONFIG=$(which pg_config) make install
+```
+
+As a PostgreSQL superuser, create a non-superuser app role that owns the database:
+```bash
+psql -d postgres -c "CREATE ROLE kaziforce_app LOGIN PASSWORD '<password>';"
+createdb -O kaziforce_app kaziforce
+psql kaziforce -c "CREATE EXTENSION IF NOT EXISTS vector;"
+psql kaziforce -c "REVOKE CREATE ON SCHEMA public FROM PUBLIC; GRANT USAGE, CREATE ON SCHEMA public TO kaziforce_app;"
+```
+Then set `DATABASE_URL=postgresql://kaziforce_app:<password>@localhost:5432/kaziforce` in `.env`.
+
+Test the connection, then create the schema (proposal Figure 4.6) from the
+versioned migrations in `apps/api/src/kaziforce_api/data/migrations/`:
+```bash
+python -m kaziforce_api.data.db
+python -m kaziforce_api.data.migrate          # safe to re-run; --status lists applied migrations
 ```
 
 ## Running things
 
 ```bash
 # API
-flask --app src/app/api.py run
-
-# Demo interface
-streamlit run src/app/streamlit_app.py
+flask --app kaziforce_api.app run
 
 # Tests
 pytest -v
 
 # Lint
-ruff check src/ tests/
+ruff check apps/api packages scripts tests
 ```
 
 ## Development workflow
@@ -121,7 +137,7 @@ Commit convention: `feat:`, `fix:`, `docs:`, `chore:`, `test:` prefixes.
 ## Tech stack
 
 Python · NetworkX · Sentence Transformers (all-MiniLM-L6-v2) · scikit-learn ·
-Flask · Streamlit · PostgreSQL + pgvector
+Flask · Next.js/React/TypeScript · PostgreSQL + pgvector
 
 ## License
 
