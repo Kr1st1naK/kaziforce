@@ -85,16 +85,29 @@ cp .env.example .env
 3. Go to Project Settings → Database → Connection string (URI), copy it into
    `DATABASE_URL` in your `.env`.
 
-**Option B — Local PostgreSQL via CLI**
-```bash
-createdb kaziforce
-psql kaziforce -c "CREATE EXTENSION IF NOT EXISTS vector;"
-```
-Then set `DATABASE_URL=postgresql://<user>:<pass>@localhost:5432/kaziforce` in `.env`.
+**Option B — Local PostgreSQL via CLI** (PostgreSQL 13+)
 
-Test the connection:
+Install pgvector for your PostgreSQL version. Homebrew's `pgvector` bottle only
+targets PostgreSQL 17/18; for other versions build it from source:
+```bash
+git clone --branch v0.8.6 https://github.com/pgvector/pgvector.git /tmp/pgvector
+cd /tmp/pgvector && PG_CONFIG=$(which pg_config) make && PG_CONFIG=$(which pg_config) make install
+```
+
+As a PostgreSQL superuser, create a non-superuser app role that owns the database:
+```bash
+psql -d postgres -c "CREATE ROLE kaziforce_app LOGIN PASSWORD '<password>';"
+createdb -O kaziforce_app kaziforce
+psql kaziforce -c "CREATE EXTENSION IF NOT EXISTS vector;"
+psql kaziforce -c "REVOKE CREATE ON SCHEMA public FROM PUBLIC; GRANT USAGE, CREATE ON SCHEMA public TO kaziforce_app;"
+```
+Then set `DATABASE_URL=postgresql://kaziforce_app:<password>@localhost:5432/kaziforce` in `.env`.
+
+Test the connection, then create the schema (proposal Figure 4.6) from the
+versioned migrations in `apps/api/src/kaziforce_api/data/migrations/`:
 ```bash
 python -m kaziforce_api.data.db
+python -m kaziforce_api.data.migrate          # safe to re-run; --status lists applied migrations
 ```
 
 ## Running things
@@ -107,7 +120,7 @@ flask --app kaziforce_api.app run
 pytest -v
 
 # Lint
-ruff check apps/api packages tests
+ruff check apps/api packages scripts tests
 ```
 
 ## Development workflow

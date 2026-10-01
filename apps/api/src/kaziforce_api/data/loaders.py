@@ -38,8 +38,9 @@ def _find_data_dir() -> Path:
 
 
 DATA_DIR = _find_data_dir()
-RAW_JOB_CSV = DATA_DIR / "raw/jobSkillData/all_job_post.csv"
+RAW_JOB_CSV = DATA_DIR / "raw/job_skill_set/all_job_post.csv"
 ESCO_DIR = DATA_DIR / "raw/esco"
+SYNTHETIC_DIR = DATA_DIR / "raw/synthetic"
 PROCESSED_DIR = DATA_DIR / "processed"
 VOCABULARY_DIR = DATA_DIR / "vocabulary"
 
@@ -66,26 +67,58 @@ def load_webmasters_data(path: Path = DATA_DIR / "raw/webmasters") -> pd.DataFra
     raise NotImplementedError
 
 
+ESCO_FILES = {
+    "occupations": "occupations_en.csv",
+    "skills": "skills_en.csv",
+    "occupation_skill_relations": "occupationSkillRelations_en.csv",
+    "broader_skill_relations": "broaderRelationsSkillPillar_en.csv",
+}
+
+
 def load_esco_data(path: Path = ESCO_DIR) -> dict[str, pd.DataFrame]:
-    """Load ESCO taxonomy backbone (occupations, skills, hierarchies, labels).
+    """Load the ESCO taxonomy subset written by scripts/download_esco.py.
 
-    Expected files in `path`:
-        occupations_en.csv
-        skills_en.csv
-        occupationSkillRelations_en.csv
-        skillHierarchy_en.csv
-
-    TODO: implement after ESCO download.
+    Returns a dict keyed as ESCO_FILES. altLabels cells are newline-separated.
     """
-    raise NotImplementedError
+    missing = [f for f in ESCO_FILES.values() if not (Path(path) / f).exists()]
+    if missing:
+        raise FileNotFoundError(
+            f"ESCO files missing from {path}: {missing}. Run: python scripts/download_esco.py"
+        )
+    return {key: pd.read_csv(Path(path) / f) for key, f in ESCO_FILES.items()}
 
 
-def load_synthetic_data(path: Path = DATA_DIR / "raw/synthetic") -> pd.DataFrame:
-    """Load generated synthetic worker profiles (fallback source).
+SYNTHETIC_FILES = {"workers": "workers.csv", "jobs": "jobs.csv"}
+_SYNTHETIC_LIST_COLUMNS = {"workers": "skills", "jobs": "required_skills"}
 
-    TODO: implement once kaziforce_api/data/synthetic.py is written.
+
+def load_synthetic_data(
+    path: Path = SYNTHETIC_DIR, regenerate: bool = False, **generator_kwargs
+) -> dict[str, pd.DataFrame]:
+    """Load synthetic worker profiles and job postings (fallback source).
+
+    Generates them with kaziforce_api.data.synthetic and saves to `path` if they
+    don't exist yet (or if regenerate=True). Returns {"workers", "jobs"} with
+    skill columns as Python lists.
     """
-    raise NotImplementedError
+    from kaziforce_api.data.synthetic import generate_synthetic_data
+
+    path = Path(path)
+    if regenerate or not all((path / f).exists() for f in SYNTHETIC_FILES.values()):
+        path.mkdir(parents=True, exist_ok=True)
+        for key, df in generate_synthetic_data(**generator_kwargs).items():
+            out = df.copy()
+            col = _SYNTHETIC_LIST_COLUMNS[key]
+            out[col] = out[col].apply(json.dumps)
+            out.to_csv(path / SYNTHETIC_FILES[key], index=False)
+
+    data = {}
+    for key, f in SYNTHETIC_FILES.items():
+        df = pd.read_csv(path / f)
+        col = _SYNTHETIC_LIST_COLUMNS[key]
+        df[col] = df[col].apply(json.loads)
+        data[key] = df
+    return data
 
 
 # Text cleaning primitives

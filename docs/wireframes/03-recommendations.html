@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Wireframe 03 — Your Matches</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #ffffff; }
+  body { font-family: Arial, Helvetica, sans-serif; color: #000000; }
+  .canvas { width: 1440px; height: 1024px; overflow: hidden; background: #ffffff; padding: 48px 0; }
+  .panel { width: 1000px; margin: 0 auto; border: 2px solid #000000; padding: 32px 40px; }
+  h1 { font-size: 28px; font-weight: bold; margin: 0 0 8px 0; }
+  .note { font-size: 14px; color: #555555; margin: 0 0 24px 0; }
+  .card { display: flex; align-items: stretch; border: 1.5px solid #000000; margin-bottom: 24px; height: 200px; }
+  .rank { width: 110px; border-right: 1.5px solid #000000; background: #e6e6e6; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; }
+  .body { flex: 1; padding: 24px 28px; display: flex; flex-direction: column; justify-content: center; }
+  .name { font-size: 20px; font-weight: bold; margin-bottom: 14px; }
+  .line { height: 14px; background: #d9d9d9; margin-bottom: 10px; }
+  .snippet-label { font-size: 13px; color: #666666; margin-bottom: 8px; }
+  .side { width: 250px; border-left: 1.5px solid #000000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; }
+  .score { font-size: 36px; font-weight: bold; }
+  .score-label { font-size: 13px; color: #555555; margin-top: -14px; }
+  .button { border: 2px solid #000000; background: #cccccc; padding: 10px 22px; font-size: 15px; font-weight: bold; }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="panel">
+    <h1>Your Matches</h1>
+    <p class="note">[Short instruction text]</p>
+
+    <div class="card">
+      <div class="rank">#1</div>
+      <div class="body">
+        <div class="name">[Worker name / Job title]</div>
+        <div class="snippet-label">[Key details: skills, location, availability, rate/budget]</div>
+        <div class="line" style="width: 92%;"></div>
+        <div class="line" style="width: 85%;"></div>
+        <div class="line" style="width: 55%;"></div>
+      </div>
+      <div class="side">
+        <div class="score">78%</div>
+        <div class="score-label">Composite score</div>
+        <div class="button">View Explanation</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="rank">#2</div>
+      <div class="body">
+        <div class="name">[Worker name / Job title]</div>
+        <div class="snippet-label">[Key details: skills, location, availability, rate/budget]</div>
+        <div class="line" style="width: 88%;"></div>
+        <div class="line" style="width: 90%;"></div>
+        <div class="line" style="width: 48%;"></div>
+      </div>
+      <div class="side">
+        <div class="score">71%</div>
+        <div class="score-label">Composite score</div>
+        <div class="button">View Explanation</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="rank">#3</div>
+      <div class="body">
+        <div class="name">[Worker name / Job title]</div>
+        <div class="snippet-label">[Key details: skills, location, availability, rate/budget]</div>
+        <div class="line" style="width: 94%;"></div>
+        <div class="line" style="width: 80%;"></div>
+        <div class="line" style="width: 60%;"></div>
+      </div>
+      <div class="side">
+        <div class="score">64%</div>
+        <div class="score-label">Composite score</div>
+        <div class="button">View Explanation</div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
