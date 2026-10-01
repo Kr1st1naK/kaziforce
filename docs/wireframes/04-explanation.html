@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Wireframe 04 — Why This Match?</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #ffffff; }
+  body { font-family: Arial, Helvetica, sans-serif; color: #000000; }
+  .canvas { width: 1440px; height: 1024px; overflow: hidden; background: #ffffff; padding: 48px 0; }
+  .panel { width: 1000px; margin: 0 auto; border: 2px solid #000000; padding: 32px 40px; }
+  h1 { font-size: 28px; font-weight: bold; margin: 0 0 20px 0; }
+  .section { border: 1.5px solid #000000; padding: 20px 24px; margin-bottom: 22px; }
+  .section-title { font-size: 16px; font-weight: bold; margin: 0 0 14px 0; }
+  .summary { display: flex; justify-content: space-between; align-items: center; font-size: 18px; }
+  .summary strong { font-size: 26px; }
+  .bar-row { margin-bottom: 16px; }
+  .bar-row:last-child { margin-bottom: 0; }
+  .bar-label { font-size: 15px; margin-bottom: 6px; }
+  .bar-track { height: 26px; border: 1.5px solid #000000; background: #f2f2f2; }
+  .bar-fill { height: 100%; background: #999999; }
+  ul { margin: 0; padding-left: 22px; font-size: 15px; line-height: 2; }
+  .tag { font-size: 13px; color: #555555; border: 1px solid #999999; padding: 1px 8px; margin-left: 8px; }
+  .trace { font-family: "Courier New", Courier, monospace; font-size: 15px; white-space: normal; overflow-wrap: break-word; word-break: break-word; max-width: 100%; background: #f2f2f2; border: 1px dashed #999999; padding: 14px 16px; line-height: 1.8; }
+  .actions { display: flex; justify-content: flex-start; margin-top: 4px; }
+  .button { border: 2px solid #000000; background: #cccccc; padding: 12px 32px; font-size: 16px; font-weight: bold; }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="panel">
+    <h1>Why This Match?</h1>
+
+    <div class="section">
+      <div class="summary">
+        <span>[Worker name] &nbsp;↔&nbsp; [Job title]</span>
+        <span>Composite score: <strong>78%</strong></span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Score Breakdown</div>
+      <div class="bar-row">
+        <div class="bar-label">Rule-Based Score: 82%</div>
+        <div class="bar-track"><div class="bar-fill" style="width: 82%;"></div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Semantic Score: 74%</div>
+        <div class="bar-track"><div class="bar-fill" style="width: 74%;"></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Matched Skills</div>
+      <ul>
+        <li>fundi wa stima → Electrical Installation <span class="tag">informal → formal mapping</span></li>
+        <li>[Matched skill] <span class="tag">direct match</span></li>
+        <li>[Matched skill] <span class="tag">direct match</span></li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Relationship Path</div>
+      <div class="trace">
+        Worker skill ("fundi wa stima") → mapped to → Electrical Installation<br>
+        → Job requirement ([Job title])
+      </div>
+    </div>
+
+    <div class="actions">
+      <span class="button">Back to Matches</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>
