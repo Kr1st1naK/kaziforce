@@ -22,6 +22,7 @@ COLUMNS = [
     "area_id", "esco_uri", "esco_label", "alias", "language", "register", "status",
     "kg_included", "dictionary_check", "dictionary_source", "entry_url", "gloss_note",
     "sense_ok", "usage_evidence_url", "validated_by", "notes",
+    "proposed_sense_ok", "proposed_status", "confidence", "proposed_reason", "decision_date",
 ]
 ALLOWED = {
     "language": {"sw", "en", "code-switched"},
@@ -30,6 +31,9 @@ ALLOWED = {
     "kg_included": {"yes", "no", "undecided"},
     "dictionary_check": {"found_exact", "found_components", "not_found", "not_checked"},
     "sense_ok": {"yes", "no", "unclear"},
+    "proposed_sense_ok": {"yes", "no", "unclear", ""},
+    "proposed_status": {"recommend_accept", "recommend_reject", "needs_human", ""},
+    "confidence": {"high", "medium", ""},
 }
 
 

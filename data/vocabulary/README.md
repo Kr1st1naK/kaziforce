@@ -1,5 +1,5 @@
 # Kenya-specific informal trade vocabulary
-Validation: Candidate terms were generated partly with an LLM and checked against dictionaries for lexical validity, then reviewed by the author for sense and register. No independent speaker validation or usage survey was carried out.
+Validation: Candidate terms were generated partly with an LLM and checked against dictionaries for lexical validity, then reviewed by the author for sense and register. No independent speaker validation or usage survey was carried out. Dictionary agreement shows that a term is valid Swahili, not that it is in common informal use.
 
 <!-- See `packages/knowledge-graph/src/kaziforce_kg/vocabulary.py`. -->
 
@@ -25,3 +25,11 @@ Validation: Candidate terms were generated partly with an LLM and checked agains
 | 18 | Driver                                    | dereva                                      |
 | 19 | Delivery / courier worker                 | Utoaji / courier mfanyikazi and Mfanyikazi wa uwasilishaji/courier                    |
 | 20 | General construction / maintenance worker | fundi wa ujenzi / mfanyikazi wa ujenzi / matengenezo ya jumla        |
+
+## Shortlist (approved 2026-10-05)
+
+Areas used for the vocabulary, the KG and the synthetic data: 1 Electrician, 2 Plumber,
+3 Carpenter, 4 Mason / bricklayer, 7 Motor-vehicle mechanic, 10 Mobile-phone repairer,
+11 Tailor / dressmaker, 12 Hairdresser / barber, 15 Laundry worker, 16 Cook / catering worker.
+Slots 11–12 are left empty. Area-level decisions are in `area_esco_map.csv` (`shortlisted`,
+`proposed`, `selected`); alias records are in `aliases.csv`.
