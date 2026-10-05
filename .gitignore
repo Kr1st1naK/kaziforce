@@ -12,6 +12,7 @@ __pycache__/
 # see data/README.md. Remove specific lines below if you DO want small files tracked.)
 data/raw/**/*.csv
 data/raw/**/*.json
+data/raw/**/*.jsonl
 data/processed/**/*
 !data/**/README.md
 !data/**/.gitkeep
