@@ -143,6 +143,36 @@ def clean_text(x) -> str:
     return x.strip()
 
 
+# Emails, partial emails and @handles: anything attached to "@" (a lone " @ " meaning "at" stays).
+_EMAIL_RE = re.compile(r"[\w.+-]*@[\w-]+(?:\.[\w-]+)*|[\w.+-]+@(?=\s|$)")
+_URL_RE = re.compile(r"(?:https?://|www\.)\S+", re.IGNORECASE)
+_PHONE_RE = re.compile(
+    r"(?<![\w$])(?:\+?\d{1,3}[\s.-]?)?(?:\(\d{3}\)|\d{3})[\s.-]\d{3}[\s.-]\d{4}(?!\d)"  # (555) 555-5555
+    r"|(?<![\w$])\+?\d{10,13}(?!\d)"  # bare 10-13 digit runs
+)
+
+
+def clean_profile_text(x, uppercase_ratio: float = 0.7) -> str:
+    """Clean free text from job postings or worker profiles for matching.
+
+    Builds on clean_text(), then removes contact details (emails, URLs, phone
+    numbers), lowercases text that is mostly upper case (the Job Skill Set
+    descriptions are), and joins lines into one paragraph. Returns "" for
+    missing values.
+    """
+    x = clean_text(x)
+    if not isinstance(x, str):
+        return ""
+    for pattern in (_EMAIL_RE, _URL_RE, _PHONE_RE):
+        x = pattern.sub(" ", x)
+    letters = [c for c in x if c.isalpha()]
+    if letters and sum(c.isupper() for c in letters) / len(letters) > uppercase_ratio:
+        x = x.lower()
+    x = re.sub(r"\s+", " ", x)
+    x = _PUNCT_SPACE_RE.sub(r"\1", x)
+    return x.strip()
+
+
 def parse_skill_set(s) -> list[str]:
     if pd.isna(s):
         return []
