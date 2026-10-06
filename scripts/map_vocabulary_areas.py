@@ -9,8 +9,10 @@ names come from the README table, split on "/"; elliptical names are expanded
 via NAME_EXPANSIONS. Occupations whose labels only contain an area keyword are
 listed as "related" for context; they are not matches.
 
-No candidate is chosen here: areas with several matches stay "multiple" and the
-`selected` column is left for the author.
+No candidate is chosen here: areas with several matches stay "multiple". The
+manual columns `shortlisted`, `proposed`, `proposed_reason` and `selected` are
+filled outside this script (proposals by Claude, `selected` by the author) and
+are carried over from the existing CSV when it is regenerated.
 
 Outputs (committed):
     data/vocabulary/area_esco_map.csv   one row per (area, candidate occupation)
@@ -56,7 +58,10 @@ RELATED_KEYWORDS: dict[int, str] = {
 COLUMNS = [
     "area_id", "area", "mapping_status", "exact_match_count", "match_type",
     "esco_uri", "esco_label", "isco_code", "esco_vocabulary_area", "matched_label", "selected",
+    "shortlisted", "proposed", "proposed_reason",
 ]
+MANUAL_ROW_COLUMNS = ["selected", "proposed", "proposed_reason"]  # keyed on area_id + esco_uri
+MANUAL_AREA_COLUMNS = ["shortlisted"]  # keyed on area_id
 
 
 def _norm(label: str) -> str:
@@ -118,6 +123,23 @@ def build_map(occupations: pd.DataFrame, areas: dict[int, str]) -> pd.DataFrame:
     ).reset_index(drop=True)
 
 
+def carry_over_manual_columns(new: pd.DataFrame, old: pd.DataFrame) -> pd.DataFrame:
+    """Copy manual columns from a previous area_esco_map.csv into a regenerated one."""
+    new = new.copy()
+    new[MANUAL_ROW_COLUMNS + MANUAL_AREA_COLUMNS] = ""
+    old = old.astype(str).replace("nan", "")
+    row_key = list(zip(new["area_id"].astype(str), new["esco_uri"].fillna("").astype(str)))
+    for col in MANUAL_ROW_COLUMNS:
+        if col in old:
+            values = dict(zip(zip(old["area_id"], old["esco_uri"]), old[col]))
+            new[col] = [values.get(k, "") for k in row_key]
+    for col in MANUAL_AREA_COLUMNS:
+        if col in old:
+            values = old.drop_duplicates("area_id").set_index("area_id")[col].to_dict()
+            new[col] = new["area_id"].astype(str).map(values).fillna("")
+    return new
+
+
 def skill_summary(area_map: pd.DataFrame, relations: pd.DataFrame) -> pd.DataFrame:
     """Essential-skill overlap between areas, for the shortlist (not a mapping decision).
 
@@ -151,6 +173,8 @@ def main() -> None:
 
     esco = load_esco_data(args.esco_dir)
     area_map = build_map(esco["occupations"], read_areas())
+    old = pd.read_csv(args.out, dtype=str) if args.out.exists() else pd.DataFrame(columns=COLUMNS)
+    area_map = carry_over_manual_columns(area_map, old)
     area_map.to_csv(args.out, index=False)
     status = area_map.drop_duplicates("area_id")[["area_id", "area", "mapping_status", "exact_match_count"]]
     print(status.to_string(index=False))

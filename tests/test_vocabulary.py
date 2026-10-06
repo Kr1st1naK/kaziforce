@@ -204,3 +204,35 @@ def test_no_excluded_alias_equivalent_to_included_alias(aliases):
     included = {normalize_alias(r["alias"]) for r in aliases if r["kg_included"] == "yes"}
     excluded = {normalize_alias(r["alias"]) for r in aliases if r["kg_included"] == "no"}
     assert not included & excluded
+
+
+# area_esco_map.csv: shortlist and ESCO proposals
+
+def test_every_shortlisted_area_has_a_proposed_exact_match(area_map):
+    shortlisted = {r["area_id"] for r in area_map if r["shortlisted"] == "yes"}
+    proposed = {r["area_id"] for r in area_map if r["proposed"] == "yes"}
+    assert len(shortlisted) == 10 and shortlisted <= proposed
+    for row in area_map:
+        if row["proposed"] == "yes":
+            assert row["match_type"].startswith("exact") and row["proposed_reason"], row["esco_label"]
+        assert row["proposed"] in {"yes", ""} and row["selected"] in {"yes", ""}
+
+
+def test_regenerating_the_area_map_keeps_manual_columns():
+    import importlib.util
+
+    import pandas as pd
+
+    spec = importlib.util.spec_from_file_location(
+        "map_vocabulary_areas", Path(__file__).resolve().parents[1] / "scripts" / "map_vocabulary_areas.py"
+    )
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    new = pd.DataFrame({"area_id": [1, 1, 2], "esco_uri": ["u1", "u2", "u3"]})
+    old = pd.DataFrame({"area_id": ["1", "2"], "esco_uri": ["u2", "u3"], "selected": ["yes", ""],
+                        "proposed": ["yes", "yes"], "proposed_reason": ["r1", "r2"],
+                        "shortlisted": ["yes", "no"]})
+    out = module.carry_over_manual_columns(new, old)
+    assert list(out["selected"]) == ["", "yes", ""]
+    assert list(out["proposed_reason"]) == ["", "r1", "r2"]
+    assert list(out["shortlisted"]) == ["yes", "yes", "no"]
