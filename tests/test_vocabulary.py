@@ -236,3 +236,36 @@ def test_regenerating_the_area_map_keeps_manual_columns():
     assert list(out["selected"]) == ["", "yes", ""]
     assert list(out["proposed_reason"]) == ["", "r1", "r2"]
     assert list(out["shortlisted"]) == ["yes", "yes", "no"]
+
+
+# usage_evidence.csv: held-out candidates only, no personal data
+
+USAGE = VOCAB_DIR / "usage_evidence.csv"
+
+
+def test_usage_evidence_has_only_the_agreed_fields_and_no_contact_details():
+    import re
+
+    with open(USAGE, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        assert reader.fieldnames == ["alias", "url", "page_title", "accessed_on"]
+        rows = list(reader)
+    phone = re.compile(r"(\+?254|\b0)[17]\d{8}\b|\d{3}[\s-]\d{3}[\s-]\d{3,4}")
+    for row in rows:
+        text = " ".join(row.values())
+        assert "@" not in text and not phone.search(text), row["alias"]
+        assert row["url"] == "none" or row["url"].startswith("https://")
+        assert re.fullmatch(r"\d{4}-\d{2}-\d{2}", row["accessed_on"])
+    per_alias = defaultdict(int)
+    for row in rows:
+        per_alias[row["alias"]] += 1
+    assert all(n <= 2 for n in per_alias.values())
+
+
+def test_usage_evidence_urls_match_aliases_csv(aliases):
+    with open(USAGE, newline="", encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    for alias in {r["alias"] for r in rows}:
+        urls = [r["url"] for r in rows if r["alias"] == alias and r["url"] != "none"]
+        recorded = next(r["usage_evidence_url"] for r in aliases if r["alias"] == alias)
+        assert recorded == (" ; ".join(urls) or "none")
