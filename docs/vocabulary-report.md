@@ -3,9 +3,15 @@
 Sprint 2, Tasks A and A2 (S2-3/S2-4/S2-5 groundwork). Branch `sprint-2/vocabulary`.
 First prepared 2026-10-05; updated 2026-10-06 for the author's decisions and the review step.
 
-**Nothing here is accepted.** Every alias is `pending_review` or `rejected`; `kg_included` is
-`undecided` everywhere; `selected` in `area_esco_map.csv` is empty. All outcomes below are
-proposals for the author, who applies decisions with `scripts/apply_vocabulary_decisions.py` (§9).
+> **Status 2026-10-06:** the author's decisions have since been applied (files in
+> `data/vocabulary/decisions/`): 16 aliases accepted (14 in the KG; fundi wa stima and mshonaji
+> held out), 5 rejected, 25 pending, and ESCO selections made for all 10 shortlisted areas.
+> The sections below describe the state *before* those decisions.
+
+At the time of writing, nothing was accepted: every alias was `pending_review` or `rejected`,
+`kg_included` was `undecided` everywhere and `selected` in `area_esco_map.csv` was empty. All
+outcomes below are proposals for the author, who applies decisions with
+`scripts/apply_vocabulary_decisions.py` (§9).
 The one-line-per-alias view is `docs/vocabulary-review-sheet.md`.
 
 ## 1. What was checked
