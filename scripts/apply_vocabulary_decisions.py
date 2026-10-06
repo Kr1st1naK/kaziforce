@@ -12,12 +12,16 @@ Decisions file (CSV) columns:
     esco_uri   optional; for "select", the occupation to select; for "accepted"
                in an area with several selected occupations, which one applies
     notes      optional; appended to the alias row's notes
+    kg_included  optional; yes | no | undecided. yes/no only with decision
+               = accepted (no = held out of the KG); blank leaves it unchanged
 
 Area rows are applied first and replace the area's selection: approve_proposed
 copies `proposed` into `selected`; select marks one candidate row.
 
-Alias rows set status, validated_by and decision_date. On accepted, the script
-also copies proposed_sense_ok into sense_ok and sets esco_uri/esco_label from
+Alias rows set status and (if given) kg_included. Accepted and rejected rows
+are stamped with validated_by and decision_date; pending_review clears both.
+On accepted, the script also copies proposed_sense_ok into sense_ok and sets
+esco_uri/esco_label from
 the area's selected occupation; it refuses if the area has no selected
 occupation, or several and the row names none of them. On rejected, register
 becomes "rejected" (the old register is kept in notes) and a reason is needed,
@@ -43,6 +47,7 @@ AREA_MAP = REPO_ROOT / "data/vocabulary/area_esco_map.csv"
 
 AREA_DECISIONS = {"approve_proposed", "select"}
 ALIAS_DECISIONS = {"accepted", "rejected", "pending_review"}
+KG_VALUES = {"yes", "no", "undecided", ""}
 
 
 class DecisionError(ValueError):
@@ -122,6 +127,13 @@ def apply_decisions(decisions: list[dict], aliases: list[dict], area_map: list[d
             errors.append(f"{label}: matches {len(matches)} rows in aliases.csv")
             continue
         row, note = matches[0], d.get("notes", "").strip()
+        kg = (d.get("kg_included") or "").strip()
+        if kg not in KG_VALUES:
+            errors.append(f"{label}: kg_included must be yes, no or undecided, got {kg!r}")
+            continue
+        if kg in {"yes", "no"} and decision != "accepted":
+            errors.append(f"{label}: kg_included={kg} needs decision accepted")
+            continue
 
         if decision == "accepted":
             selected = [r for r in area_map if r["area_id"] == area and r.get("selected") == "yes"]
@@ -148,7 +160,13 @@ def apply_decisions(decisions: list[dict], aliases: list[dict], area_map: list[d
                 note = f"{note} Previous register: {row['register']}.".strip()
                 row["register"] = "rejected"
 
-        row["status"], row["validated_by"], row["decision_date"] = decision, validated_by, decision_date
+        # Only final decisions are stamped; returning an alias to pending clears the stamp.
+        stamped = decision in {"accepted", "rejected"}
+        row["status"] = decision
+        row["validated_by"] = validated_by if stamped else ""
+        row["decision_date"] = decision_date if stamped else ""
+        if kg:
+            row["kg_included"] = kg
         if note:
             row["notes"] = f"{row['notes']} Decision note ({decision_date}): {note}".strip()
         log.append(f"{label}: {decision}")

@@ -131,3 +131,29 @@ def test_cli_writes_nothing_on_error_and_never_changes_row_counts(tmp_path):
     with open(aliases, newline="", encoding="utf-8") as f:
         rows = list(csv.DictReader(f))
     assert len(rows) == 3 and rows[0]["status"] == "accepted"
+
+
+def test_kg_included_is_set_only_with_acceptance():
+    aliases, _ = _apply([
+        {"scope": "area", "area_id": "2", "decision": "approve_proposed"},
+        {"scope": "alias", "area_id": "2", "alias": "fundi bomba", "decision": "accepted", "kg_included": "no"},
+        {"scope": "alias", "area_id": "2", "alias": "plumber", "decision": "pending_review"},
+    ])
+    assert aliases[0]["kg_included"] == "no"
+    assert "kg_included" not in aliases[2] or aliases[2]["kg_included"] in {"", "undecided"}
+    with pytest.raises(apply_mod.DecisionError, match="needs decision accepted"):
+        _apply([{"scope": "alias", "area_id": "2", "alias": "plumber", "decision": "rejected",
+                 "notes": "x", "kg_included": "yes"}])
+    with pytest.raises(apply_mod.DecisionError, match="kg_included must be"):
+        _apply([{"scope": "alias", "area_id": "2", "alias": "plumber", "decision": "pending_review",
+                 "kg_included": "maybe"}])
+
+
+def test_only_final_decisions_are_stamped():
+    aliases = _aliases()
+    aliases[2].update(validated_by="author", decision_date="2026-10-01")
+    aliases, _ = _apply([{"scope": "alias", "area_id": "2", "alias": "plumber", "decision": "pending_review",
+                          "notes": "keep for now"}], aliases)
+    row = aliases[2]
+    assert (row["status"], row["validated_by"], row["decision_date"]) == ("pending_review", "", "")
+    assert "keep for now" in row["notes"]

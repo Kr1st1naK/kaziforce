@@ -109,5 +109,6 @@ def test_committed_proposals_respect_author_rejections():
     with open(SCRIPTS.parent / "data/vocabulary/aliases.csv", newline="", encoding="utf-8") as f:
         rows = list(csv.DictReader(f))
     assert all(r["proposed_status"] == "recommend_reject" for r in rows if r["status"] == "rejected")
-    assert all(r["status"] != "accepted" for r in rows)
+    # Only the author's apply step accepts aliases, and it always records who and when.
+    assert all(r["validated_by"] and r["decision_date"] for r in rows if r["status"] == "accepted")
     assert all(r["confidence"] == "" for r in rows if r["proposed_status"] == "needs_human")
