@@ -13,6 +13,9 @@ __pycache__/
 data/raw/**/*.csv
 data/raw/**/*.json
 data/raw/**/*.jsonl
+# The synthetic dataset is small, generated and frozen (splits, ground truth): track it.
+!data/raw/synthetic/**/*.csv
+!data/raw/synthetic/*.json
 data/processed/**/*
 !data/**/README.md
 !data/**/.gitkeep
