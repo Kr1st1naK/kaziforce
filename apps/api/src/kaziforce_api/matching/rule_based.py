@@ -2,8 +2,13 @@
 Rule-based matching component.
 
 Scores a worker-job pair on: skill overlap, location, budget, and
-availability, using weights tuned via sensitivity analysis on the
-validation subset (see proposal Section 3.2.3, Equation 3.1).
+availability.
+
+The weights are assigned a priori from domain reasoning and are deliberately
+NOT tuned against the evaluation labels. The reference relevance labels are
+occupational (same area) and ignore location, budget and availability, so
+tuning against them would drive those weights to zero as an artefact of the
+labelling rather than as a finding.
 """
 
 from dataclasses import dataclass
