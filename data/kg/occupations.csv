@@ -1,0 +1,12 @@
+uri,label,isco_code
+http://data.europa.eu/esco/occupation/90f75f67-495d-49fa-ab57-2f320e251d7e,cook,5120.1
+http://data.europa.eu/esco/occupation/099c6bb0-22d3-4c5d-8bf5-70910af381ef,hairdresser,5141.1
+http://data.europa.eu/esco/occupation/4e0c14d6-b170-40f1-bcdc-703c0b92109b,barber,5141.1.1
+http://data.europa.eu/esco/occupation/05f321f8-055b-407d-bf19-e0ddabda56b7,bricklayer,7112.1
+http://data.europa.eu/esco/occupation/2a22ff9e-de3b-408d-b312-5034896cc4f4,carpenter,7115.1
+http://data.europa.eu/esco/occupation/ed3cf43d-c2c1-4c46-82fc-1375e27e0290,plumber,7126.8
+http://data.europa.eu/esco/occupation/4ad4024e-d1d3-4dea-b6d1-2c7948111dce,vehicle technician,7231.10
+http://data.europa.eu/esco/occupation/4910419f-b4af-4f59-b544-9dbebc8a74f0,electrician,7411.1
+http://data.europa.eu/esco/occupation/f0f6d531-eb96-4bad-84ff-8e2999ea68e6,mobile phone repair technician,7422.3.1
+http://data.europa.eu/esco/occupation/978ae3a2-0831-415a-8396-b84dde656fc5,tailor,7531.5
+http://data.europa.eu/esco/occupation/0da51178-e386-4534-ae71-15ba789ad756,laundry worker,8157.1

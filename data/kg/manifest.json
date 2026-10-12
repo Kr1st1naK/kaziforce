@@ -1,0 +1,32 @@
+{
+  "builder": "scripts/build_kg_inputs.py",
+  "esco": {
+    "source": "https://ec.europa.eu/esco/api",
+    "language": "en",
+    "subset_downloaded_at": "2026-09-30T05:56:41+00:00",
+    "broader_labels_source": "https://ec.europa.eu/esco/api/resource/concept",
+    "broader_labels_fetched_at": "2026-10-12T18:24:36+00:00",
+    "broader_labels_fallback_version": "v1.2.1",
+    "broader_labels_from_fallback": 1
+  },
+  "counts": {
+    "occupations.csv": 11,
+    "occupation_broader.csv": 1,
+    "skills.csv": 379,
+    "occupation_skills.csv": 507,
+    "skill_broader.csv": 379,
+    "skill_groups.csv": 140
+  },
+  "inputs_sha256": {
+    "area_esco_map.csv": "af26e0ae59486512d6786a384412ce1fa9bfdf3b309cd960a50d8f5b99d686be",
+    "area_skill_pools.csv": "eeea40e039306cc430d0560a3ebcd42c93dfef5b6a689f08016cd2467833858f"
+  },
+  "outputs_sha256": {
+    "occupations.csv": "ba44f7920983600cf0c0e4e004449a4a4c12afc64eb3af52b305c1e8f6865602",
+    "occupation_broader.csv": "e11c1769197216ddd766dea784e809e3cb5d000a077d5da7130364291cb6410a",
+    "skills.csv": "7bdc38efcd1e6782fa96a059b602868afb3a3fee2e965ee794069d6cf8e41596",
+    "occupation_skills.csv": "0b33c72c734b0ff0df9f5bd2c18466f1ef817b83bb1b584130ca064346442cae",
+    "skill_broader.csv": "c446584b244b858b8b3c7eac38464424eebd3ef4a23139fc71ae780497a573f8",
+    "skill_groups.csv": "4b4f6bfa1a078bacaebcc09176723368a9b9f771530d26fcb0de48d75e91cc51"
+  }
+}

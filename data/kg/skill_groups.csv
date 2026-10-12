@@ -1,0 +1,141 @@
+uri,label,scheme,label_source
+http://data.europa.eu/esco/isced-f/0031,personal skills and development,isced_f,default
+http://data.europa.eu/esco/isced-f/0211,audio-visual techniques and media production,isced_f,default
+http://data.europa.eu/esco/isced-f/0212,"fashion, interior and industrial design",isced_f,default
+http://data.europa.eu/esco/isced-f/0413,management and administration,isced_f,default
+http://data.europa.eu/esco/isced-f/0416,wholesale and retail sales,isced_f,default
+http://data.europa.eu/esco/isced-f/0511,biology,isced_f,default
+http://data.europa.eu/esco/isced-f/0531,chemistry,isced_f,default
+http://data.europa.eu/esco/isced-f/0533,physics,isced_f,default
+http://data.europa.eu/esco/isced-f/0612,database and network design and administration,isced_f,default
+http://data.europa.eu/esco/isced-f/0613,software and applications development and analysis,isced_f,default
+http://data.europa.eu/esco/isced-f/0712,environmental protection technology,isced_f,default
+http://data.europa.eu/esco/isced-f/0713,electricity and energy,isced_f,default
+http://data.europa.eu/esco/isced-f/0714,electronics and automation,isced_f,default
+http://data.europa.eu/esco/isced-f/0715,mechanics and metal trades,isced_f,default
+http://data.europa.eu/esco/isced-f/0716,"motor vehicles, ships and aircraft",isced_f,default
+http://data.europa.eu/esco/isced-f/0721,food processing,isced_f,default
+http://data.europa.eu/esco/isced-f/0722,"materials (glass, paper, plastic and wood)",isced_f,default
+http://data.europa.eu/esco/isced-f/0723,"textiles (clothes, footwear and leather)",isced_f,default
+http://data.europa.eu/esco/isced-f/0732,building and civil engineering,isced_f,default
+http://data.europa.eu/esco/isced-f/0914,medical diagnostic and treatment technology,isced_f,default
+http://data.europa.eu/esco/isced-f/0915,therapy and rehabilitation,isced_f,default
+http://data.europa.eu/esco/isced-f/1011,domestic services,isced_f,default
+http://data.europa.eu/esco/isced-f/1012,hair and beauty services,isced_f,default
+http://data.europa.eu/esco/isced-f/1021,community sanitation,isced_f,default
+http://data.europa.eu/esco/isced-f/1022,occupational health and safety,isced_f,default
+http://data.europa.eu/esco/isced-f/1041,transport services,isced_f,default
+http://data.europa.eu/esco/skill/A1.1.0,adapt to change,esco_skill_group,default
+http://data.europa.eu/esco/skill/A1.12.3,provide high quality client service,esco_skill_group,default
+http://data.europa.eu/esco/skill/A1.16.0,work independently,esco_skill_group,default
+http://data.europa.eu/esco/skill/A1.3.0,attend to hygiene,esco_skill_group,default
+http://data.europa.eu/esco/skill/A1.5.0,deal with uncertainty,esco_skill_group,default
+http://data.europa.eu/esco/skill/S1.1.1,negotiating and managing contracts and agreements,esco_skill_group,default
+http://data.europa.eu/esco/skill/S1.1.3,responding to complaints,esco_skill_group,default
+http://data.europa.eu/esco/skill/S1.11.0,designing systems and products,esco_skill_group,default
+http://data.europa.eu/esco/skill/S1.11.3,developing recipes or menus,esco_skill_group,default
+http://data.europa.eu/esco/skill/S1.12.1,creating visual displays and decorations,esco_skill_group,default
+http://data.europa.eu/esco/skill/S1.13.3,technical or academic writing,esco_skill_group,default
+http://data.europa.eu/esco/skill/S1.2.0,liaising and networking,esco_skill_group,default
+http://data.europa.eu/esco/skill/S1.2.3,developing professional relationships or networks,esco_skill_group,default
+http://data.europa.eu/esco/skill/S1.3.3,training on operational procedures,esco_skill_group,default
+http://data.europa.eu/esco/skill/S1.4.2,presenting research or technical information,esco_skill_group,default
+http://data.europa.eu/esco/skill/S1.5.3,advising on products and services,esco_skill_group,v1.2.1
+http://data.europa.eu/esco/skill/S1.6.1,selling products or services,esco_skill_group,default
+http://data.europa.eu/esco/skill/S1.6.2,"promoting products, services, or programs",esco_skill_group,default
+http://data.europa.eu/esco/skill/S1.6.3,purchasing goods or services,esco_skill_group,default
+http://data.europa.eu/esco/skill/S1.7.2,engaging with others to identify needs,esco_skill_group,default
+http://data.europa.eu/esco/skill/S1.7.3,listening and asking questions,esco_skill_group,default
+http://data.europa.eu/esco/skill/S1.8.1,working in teams,esco_skill_group,default
+http://data.europa.eu/esco/skill/S1.8.5,following instructions and procedures,esco_skill_group,default
+http://data.europa.eu/esco/skill/S1.9.1,developing solutions,esco_skill_group,default
+http://data.europa.eu/esco/skill/S2.1.3,interpreting technical documentation and diagrams,esco_skill_group,default
+http://data.europa.eu/esco/skill/S2.2.5,maintaining operational records,esco_skill_group,default
+http://data.europa.eu/esco/skill/S2.2.6,"documenting technical designs, procedures, problems or activities",esco_skill_group,default
+http://data.europa.eu/esco/skill/S2.2.7,reporting incidents and defects,esco_skill_group,default
+http://data.europa.eu/esco/skill/S2.4.2,entering and transforming information,esco_skill_group,default
+http://data.europa.eu/esco/skill/S2.5.0,measuring physical properties,esco_skill_group,default
+http://data.europa.eu/esco/skill/S2.5.1,measuring dimensions and related properties,esco_skill_group,default
+http://data.europa.eu/esco/skill/S2.6.3,estimating resource needs,esco_skill_group,default
+http://data.europa.eu/esco/skill/S2.7.0,analysing and evaluating information and data,esco_skill_group,default
+http://data.europa.eu/esco/skill/S2.7.6,"evaluating systems, programmes, equipment and products",esco_skill_group,default
+http://data.europa.eu/esco/skill/S2.8.1,"monitoring, inspecting and testing equipment, systems and products",esco_skill_group,default
+http://data.europa.eu/esco/skill/S2.8.2,monitoring operational activities,esco_skill_group,default
+http://data.europa.eu/esco/skill/S2.8.3,monitoring financial and economic resources and activity,esco_skill_group,default
+http://data.europa.eu/esco/skill/S2.8.4,monitoring safety or security,esco_skill_group,default
+http://data.europa.eu/esco/skill/S2.9.0,monitoring developments in area of expertise,esco_skill_group,default
+http://data.europa.eu/esco/skill/S3.3.1,complying with health and safety procedures,esco_skill_group,default
+http://data.europa.eu/esco/skill/S3.3.3,complying with legal and organisational guidelines,esco_skill_group,default
+http://data.europa.eu/esco/skill/S3.3.5,maintaining and enforcing physical security,esco_skill_group,default
+http://data.europa.eu/esco/skill/S3.4.1,providing information to the public and clients,esco_skill_group,default
+http://data.europa.eu/esco/skill/S3.4.4,providing general assistance to people,esco_skill_group,default
+http://data.europa.eu/esco/skill/S3.5.1,preparing food and drinks,esco_skill_group,default
+http://data.europa.eu/esco/skill/S3.6.2,assisting with personal needs,esco_skill_group,default
+http://data.europa.eu/esco/skill/S3.6.4,styling hair and providing beauty treatments,esco_skill_group,default
+http://data.europa.eu/esco/skill/S4.0.0,management skills,esco_skill_group,default
+http://data.europa.eu/esco/skill/S4.1.0,developing objectives and strategies,esco_skill_group,default
+http://data.europa.eu/esco/skill/S4.1.5,developing health programmes,esco_skill_group,default
+http://data.europa.eu/esco/skill/S4.2.2,planning and scheduling events and activities,esco_skill_group,default
+http://data.europa.eu/esco/skill/S4.3.3,allocating and controlling physical resources,esco_skill_group,default
+http://data.europa.eu/esco/skill/S4.4.2,executing financial transactions,esco_skill_group,default
+http://data.europa.eu/esco/skill/S4.4.3,performing general clerical and administrative tasks,esco_skill_group,default
+http://data.europa.eu/esco/skill/S4.8.1,supervising a team or group,esco_skill_group,default
+http://data.europa.eu/esco/skill/S4.9.0,making decisions,esco_skill_group,default
+http://data.europa.eu/esco/skill/S5.1.0,programming computer systems,esco_skill_group,default
+http://data.europa.eu/esco/skill/S5.2.1,setting up computer systems,esco_skill_group,default
+http://data.europa.eu/esco/skill/S5.2.3,resolving computer problems,esco_skill_group,default
+http://data.europa.eu/esco/skill/S5.5.0,accessing and analysing digital data,esco_skill_group,default
+http://data.europa.eu/esco/skill/S5.6.3,using computer aided design and drawing tools,esco_skill_group,default
+http://data.europa.eu/esco/skill/S5.7.0,using digital tools to control machinery,esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.1.1,sorting materials or products,esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.1.2,marking materials or objects for identification,esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.1.3,packaging objects,esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.11.1,"cleaning tools, equipment, workpieces and vehicles",esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.11.2,cleaning interior and exterior of buildings,esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.12.0,washing and maintaining textiles and clothing,esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.13.1,handling and disposing of hazardous materials,esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.13.2,disposing of non-hazardous waste or debris,esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.2.1,"loading and unloading goods and, materials",esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.2.2,"moving or lifting materials, equipment, or supplies",esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.2.3,storing goods and materials,esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.3.1,preparing mixtures or solutions,esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.5.0,assembling and fabricating products,esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.5.3,assembling electrical and electronic products,esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.5.6,fabricating garments and textile products,esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.5.7,fabricating food and related products,esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.6.2,making patterns and templates,esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.7.0,using hand tools,esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.7.1,cutting materials and drilling holes,esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.7.2,shaping materials to create products,esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.7.3,smoothing surfaces of objects or equipment,esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.7.4,using precision hand tools,esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.7.5,"hammering, nailing and riveting",esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.8.1,positioning tools or equipment,esco_skill_group,default
+http://data.europa.eu/esco/skill/S6.8.2,positioning workpieces or materials,esco_skill_group,default
+http://data.europa.eu/esco/skill/S7.1.0,building and repairing structures,esco_skill_group,default
+http://data.europa.eu/esco/skill/S7.1.1,installing structural masonry materials,esco_skill_group,default
+http://data.europa.eu/esco/skill/S7.1.2,installing metal structural components,esco_skill_group,default
+http://data.europa.eu/esco/skill/S7.1.3,installing wooden structural components,esco_skill_group,default
+http://data.europa.eu/esco/skill/S7.1.4,installing concrete components,esco_skill_group,default
+http://data.europa.eu/esco/skill/S7.1.5,installing roofing,esco_skill_group,default
+http://data.europa.eu/esco/skill/S7.1.6,"joining parts using soldering, welding or brazing techniques",esco_skill_group,default
+http://data.europa.eu/esco/skill/S7.2.1,"installing heating, ventilation and air conditioning equipment",esco_skill_group,default
+http://data.europa.eu/esco/skill/S7.2.2,installing plumbing or piping equipment or systems,esco_skill_group,default
+http://data.europa.eu/esco/skill/S7.2.3,installing insulation materials,esco_skill_group,default
+http://data.europa.eu/esco/skill/S7.3.1,applying material to fill gaps in surfaces,esco_skill_group,default
+http://data.europa.eu/esco/skill/S7.3.3,applying protective or decorative solutions or coatings,esco_skill_group,default
+http://data.europa.eu/esco/skill/S8.0.0,working with machinery and specialised equipment,esco_skill_group,default
+http://data.europa.eu/esco/skill/S8.2.0,driving vehicles,esco_skill_group,default
+http://data.europa.eu/esco/skill/S8.4.3,operating pumping systems or equipment,esco_skill_group,default
+http://data.europa.eu/esco/skill/S8.5.0,operating machinery for the manufacture of products,esco_skill_group,default
+http://data.europa.eu/esco/skill/S8.5.3,"operating machinery for the manufacture and treatment of textiles, fur and leather products",esco_skill_group,default
+http://data.europa.eu/esco/skill/S8.5.4,operating food processing machinery,esco_skill_group,default
+http://data.europa.eu/esco/skill/S8.5.7,"operating metal, plastic or rubber forming equipment",esco_skill_group,default
+http://data.europa.eu/esco/skill/S8.5.8,"operating cutting, grinding and smoothing machinery",esco_skill_group,default
+http://data.europa.eu/esco/skill/S8.6.3,operating scientific and laboratory equipment,esco_skill_group,default
+http://data.europa.eu/esco/skill/S8.6.4,operating communications equipment,esco_skill_group,default
+http://data.europa.eu/esco/skill/S8.6.6,using precision measuring equipment,esco_skill_group,default
+http://data.europa.eu/esco/skill/S8.7.1,repairing and installing mechanical equipment,esco_skill_group,default
+http://data.europa.eu/esco/skill/S8.7.2,maintaining mechanical equipment,esco_skill_group,default
+http://data.europa.eu/esco/skill/S8.8.1,"installing and repairing electrical, electronic and precision equipment",esco_skill_group,default
+http://data.europa.eu/esco/skill/S8.8.2,"maintaining electrical, electronic and precision equipment",esco_skill_group,default
