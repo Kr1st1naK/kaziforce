@@ -9,7 +9,7 @@
 > - **Weights:** rule-based weights and α/β are assigned a priori and are **not** tuned against the labels, because the same-area labels ignore location, budget and availability. S4-4 is dropped.
 > - **pgvector:** dropped; embeddings are cached in memory. S4-2 is dropped.
 
-Prepared 2026-10-02 from a Scrum Master view for a solo developer. No BMAD Scrum Master persona is installed, so the plan follows the proposal's own Scrum framing (§3.4). Scope source of truth: `docs/proposal/kaziforce-proposal.docx`, Ch. 3 (methodology, data, model training, validation) and Ch. 4 (FR/NFR/DR/IR).
+Prepared 2026-10-02 from a Scrum Master view for a solo developer. No BMAD Scrum Master persona is installed, so the plan follows the proposal's own Scrum framing (§3.4). Scope source of truth: the project proposal (not published in this repository), Ch. 3 (methodology, data, model training, validation) and Ch. 4 (FR/NFR/DR/IR).
 
 ## 1. Timeline
 

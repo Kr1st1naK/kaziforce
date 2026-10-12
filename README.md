@@ -17,8 +17,6 @@ taxonomy and extended with Kenya-specific informal trade vocabulary — with
 rule-based and semantic similarity matching, to produce explainable worker–job
 recommendations that work from the moment a worker or job joins the platform.
 
-Full proposal: see `docs/proposal/kaziforce-proposal.docx`.
-
 ## Project structure
 
 ```
