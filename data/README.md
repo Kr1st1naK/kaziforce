@@ -8,9 +8,11 @@ directory documents structure and provenance instead.
 | `raw/webmasters/` | Industry partner (Webmasters Kenya) | Not provided — partner supplied requirements documentation only (proposal §3.2.1) | — |
 | `raw/job_skill_set/` | Job Skill Set (Mutlu, 2024), CC BY-SA 4.0 — supplementary job-side corpus | Present (1,167 postings; formal white-collar categories only — see its README) | Manual Kaggle download, see `raw/job_skill_set/README.md` |
 | `raw/esco/` | ESCO public API — informal-trade subset (24 ISCO-08 unit groups) | Downloaded 2026-09-30: 128 occupations, 1,821 skills, 4,746 occupation–skill relations | `python scripts/download_esco.py` |
-| `raw/synthetic/` | Generated programmatically, grounded in KNBS (KNOCS/ISCO-08) + ESCO | First version: 12 workers, 12 jobs across 8 occupations | `load_synthetic_data(regenerate=True)` |
-| `processed/` | Cleaned, ESCO-mapped, vocabulary-mapped output of `apps/api/src/kaziforce_api/data/loaders.py` | — | `preprocess_jobs(load_job_corpus())` |
-| `vocabulary/` | Kenya-specific informal trade term mappings | Candidate terms listed; not yet validated | — |
+| `raw/kaikki/` | kaikki.org Swahili extract of Wiktionary (CC BY-SA 4.0 / GFDL) — dictionary checks for vocabulary aliases | Downloaded 2026-10-05 (file dated 2026-10-03), 21,306 entries | Download the Swahili file, see `raw/kaikki/README.md` |
+| `raw/sw_wiktionary/` | Swahili Wiktionary pages (CC BY-SA 4.0): second dictionary source for vocabulary aliases | Fetched 2026-10-06: 85 titles, 46 Swahili entries | `python scripts/fetch_sw_wiktionary.py`, see `raw/sw_wiktionary/README.md` |
+| `raw/synthetic/` | Generated from the frozen vocabulary + ESCO skill pools (committed: tracked despite the raw-data rule, so splits and ground truth stay frozen) | Version 2, seed 42: 156 worker groups / 528 worker rows, 280 jobs (80 synthetic + 200 Job Skill Set distractors), labels in `ground_truth/` | `python scripts/build_synthetic_dataset.py`, see `raw/synthetic/README.md` |
+| `processed/` | Cleaned and deduplicated Job Skill Set output of `preprocess_jobs()` in `apps/api/src/kaziforce_api/data/loaders.py` (skills are normalised but not mapped to ESCO) | Not generated; nothing depends on it | `preprocess_jobs(load_job_corpus())` |
+| `vocabulary/` | Kenya-specific informal trade term mappings (committed: `aliases.csv`, `area_esco_map.csv`, `dictionary_evidence.csv`) | Frozen 2026-10-06 (commit `dc033d8`): 46 alias rows: 16 accepted (14 in the KG, 2 withheld: *fundi wa stima*, *mshonaji*), 25 pending review, 5 rejected. 10 areas shortlisted | `python scripts/map_vocabulary_areas.py`; `python scripts/fetch_sw_wiktionary.py`; `python scripts/check_vocabulary_dictionary.py` |
 
 `raw/esco/download_manifest.json` records the exact download date, ISCO groups,
 row counts, and any skill URIs the API failed to return.

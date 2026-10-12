@@ -1,31 +1,31 @@
 installation:
   version: 6.12.0
   installDate: 2026-09-17T08:55:48.455Z
-  lastUpdated: 2026-09-17T08:55:48.455Z
+  lastUpdated: 2026-10-01T21:29:12.318Z
   installShims: false
 modules:
   - name: core
     version: 6.12.0
     installDate: 2026-09-17T08:55:46.370Z
-    lastUpdated: 2026-09-17T08:55:48.447Z
+    lastUpdated: 2026-10-01T21:29:12.302Z
     source: built-in
     npmPackage: null
     repoUrl: null
   - name: bmm
     version: 6.12.0
     installDate: 2026-09-17T08:55:46.823Z
-    lastUpdated: 2026-09-17T08:55:48.449Z
+    lastUpdated: 2026-10-01T21:29:12.306Z
     source: built-in
     npmPackage: null
     repoUrl: null
   - name: tea
-    version: v1.26.0
+    version: v1.27.2
     installDate: 2026-09-17T08:55:48.281Z
-    lastUpdated: 2026-09-17T08:55:48.455Z
+    lastUpdated: 2026-10-01T21:29:12.318Z
     source: external
     npmPackage: bmad-method-test-architecture-enterprise
     repoUrl: https://github.com/bmad-code-org/bmad-method-test-architecture-enterprise
     channel: stable
-    sha: 9c6ca208bcfb99dad244e88f8df7cb4f26e5ff21
+    sha: d99ad29c62697c152e3393351406686d5bcd323c
 ides:
   - claude-code

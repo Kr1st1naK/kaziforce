@@ -1,0 +1,33 @@
+scope,area_id,alias,decision,esco_uri,notes,kg_included
+area,1,,approve_proposed,,,
+area,2,,approve_proposed,,,
+area,3,,approve_proposed,,,
+area,4,,approve_proposed,,,
+area,7,,approve_proposed,,,
+area,10,,approve_proposed,,,
+area,11,,approve_proposed,,,
+area,12,,approve_proposed,,,
+area,15,,approve_proposed,,,
+area,16,,approve_proposed,,,
+alias,1,fundi wa umeme,accepted,,,yes
+alias,1,fundi wa stima,accepted,,Held out of the KG (unseen-term test),no
+alias,2,fundi bomba,accepted,,,yes
+alias,3,fundi wa mbao,accepted,,,yes
+alias,3,fundi seremala,pending_review,,"standard Swahili, usage evidence Tanzanian only",
+alias,4,mwashi,accepted,,,yes
+alias,5,mchoraji,rejected,,,
+alias,7,fundi wa magari,accepted,,,yes
+alias,9,vifaa / umeme repairer,rejected,,,
+alias,10,fundi wa simu,accepted,,,yes
+alias,11,fundi wa nguo,accepted,,,yes
+alias,12,kinyozi,accepted,http://data.europa.eu/esco/occupation/4e0c14d6-b170-40f1-bcdc-703c0b92109b,,yes
+alias,15,mama fua,accepted,,Accepted for Laundry only; the dictionary sense also covers cleaning (area 14),yes
+alias,16,mpishi,accepted,,,yes
+alias,19,utoaji,rejected,,"Activity noun (issuing / money withdrawal), not a worker",
+alias,6,mtambuzaji,rejected,,,
+alias,6,msuluhishi,rejected,,,
+alias,7,makanika,accepted,,,yes
+alias,11,mshonaji,accepted,,,yes
+alias,12,msusi,accepted,http://data.europa.eu/esco/occupation/099c6bb0-22d3-4c5d-8bf5-70910af381ef,,yes
+alias,15,dobi,accepted,,,yes
+alias,16,mpikaji,accepted,,,yes

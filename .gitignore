@@ -12,6 +12,10 @@ __pycache__/
 # see data/README.md. Remove specific lines below if you DO want small files tracked.)
 data/raw/**/*.csv
 data/raw/**/*.json
+data/raw/**/*.jsonl
+# The synthetic dataset is small, generated and frozen (splits, ground truth): track it.
+!data/raw/synthetic/**/*.csv
+!data/raw/synthetic/*.json
 data/processed/**/*
 !data/**/README.md
 !data/**/.gitkeep
@@ -44,5 +48,11 @@ htmlcov/
 # Jupyter
 .ipynb_checkpoints/
 
-# Local agent tooling (BMAD skills installed per machine)
+# Local agent tooling (BMAD installed per machine; skills hard-code {project-root}/_bmad,
+# so the folders stay at the top level but are not published)
 .claude/skills/
+_bmad/
+_bmad-output/
+
+# Course handouts from the supervisor: never commit to this public repo
+docs/course/

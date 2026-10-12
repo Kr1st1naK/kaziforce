@@ -17,128 +17,144 @@ taxonomy and extended with Kenya-specific informal trade vocabulary — with
 rule-based and semantic similarity matching, to produce explainable worker–job
 recommendations that work from the moment a worker or job joins the platform.
 
-Full proposal: see `docs/proposal/kaziforce-proposal.docx`.
-
 ## Project structure
 
 ```
 kaziforce/
 ├── apps/
 │   ├── web/                      # Next.js/React/TypeScript interface (not yet scaffolded)
-│   └── api/                      # Flask REST API + hybrid recommendation engine
+│   └── api/                      # Flask REST API + recommendation engine
 │       └── src/kaziforce_api/
 │           ├── app.py            # Flask entry point
 │           ├── matching/         # rule-based, semantic, and hybrid scoring
-│           ├── explainability/   # graph traversal path extraction, explanation generation
-│           └── data/             # loaders, preprocessing, database connection
+│           ├── explainability/   # explanation generation
+│           └── data/             # loaders, synthetic data generator, DB connection and migrations
 ├── packages/
 │   └── knowledge-graph/          # ESCO backbone + Kenya vocabulary extension (import: kaziforce_kg)
 │       └── src/kaziforce_kg/
-├── data/                         # not committed — see data/README.md
+├── data/                         # see data/README.md: vocabulary and synthetic dataset are committed;
+│                                 # large or third-party raw data (ESCO, Job Skill Set, kaikki) is not
 ├── tests/
-├── docs/                         # proposal, diagrams, architecture notes
+├── docs/                         # sprint plan, vocabulary report, wireframes, test record
 ├── notebooks/                    # exploratory work
-├── scripts/                      # one-off utilities (e.g. ESCO download)
+├── scripts/                      # ESCO download, vocabulary pipeline, dataset build and reports
 └── .github/                      # CI workflow + issue templates
 ```
 
-## Environment setup
+**Current status.** The frozen vocabulary (`data/vocabulary/`) and the synthetic
+evaluation dataset (`data/raw/synthetic/`) are built and tested. The knowledge
+graph, scorers, explanation generator, API routes and web interface are in
+progress (see `docs/sprint-plan.md`).
 
-Requires Python 3.12.
+## Setup from a fresh clone
+
+Requires Python 3.12 and git. No database, API key or downloaded data is needed
+to run the tests or inspect the dataset: everything they use is committed.
 
 ```bash
-python -m venv venv
+git clone https://github.com/Kr1st1naK/kaziforce.git
+cd kaziforce
+python3.12 -m venv venv
+. venv/bin/activate                 # Windows (PowerShell): venv\Scripts\Activate.ps1
 ```
 
-Activate it:
-```bash
-# macOS/Linux
-. venv/bin/activate
-# Windows (PowerShell)
-venv\Scripts\Activate.ps1
-```
-
-**Install torch (CPU-only) first** — this avoids pulling several GB of unused
-NVIDIA/CUDA packages that `sentence-transformers` would otherwise install by default:
+**Install torch (CPU-only) first.** This avoids pulling several GB of unused
+NVIDIA/CUDA packages that `sentence-transformers` would otherwise install:
 ```bash
 pip install torch --index-url https://download.pytorch.org/whl/cpu
 ```
 
-Then install everything else (this also installs `apps/api` and
-`packages/knowledge-graph` in editable mode):
+Then install everything else. This also installs `apps/api` and
+`packages/knowledge-graph` in editable mode. Intel Macs get an older, compatible
+torch/NumPy stack automatically through environment markers in `requirements.txt`.
 ```bash
 pip install -r requirements.txt
 ```
 
-Copy the environment template and fill in real values:
+Check the install:
 ```bash
-cp .env.example .env
-```
-
-## Database setup
-
-`DATABASE_URL` in `.env` works with either option:
-
-**Option A — Supabase (recommended to start)**
-1. Create a free project at [supabase.com](https://supabase.com).
-2. In the SQL editor, run: `create extension if not exists vector;` (enables pgvector).
-3. Go to Project Settings → Database → Connection string (URI), copy it into
-   `DATABASE_URL` in your `.env`.
-
-**Option B — Local PostgreSQL via CLI** (PostgreSQL 13+)
-
-Install pgvector for your PostgreSQL version. Homebrew's `pgvector` bottle only
-targets PostgreSQL 17/18; for other versions build it from source:
-```bash
-git clone --branch v0.8.6 https://github.com/pgvector/pgvector.git /tmp/pgvector
-cd /tmp/pgvector && PG_CONFIG=$(which pg_config) make && PG_CONFIG=$(which pg_config) make install
-```
-
-As a PostgreSQL superuser, create a non-superuser app role that owns the database:
-```bash
-psql -d postgres -c "CREATE ROLE kaziforce_app LOGIN PASSWORD '<password>';"
-createdb -O kaziforce_app kaziforce
-psql kaziforce -c "CREATE EXTENSION IF NOT EXISTS vector;"
-psql kaziforce -c "REVOKE CREATE ON SCHEMA public FROM PUBLIC; GRANT USAGE, CREATE ON SCHEMA public TO kaziforce_app;"
-```
-Then set `DATABASE_URL=postgresql://kaziforce_app:<password>@localhost:5432/kaziforce` in `.env`.
-
-Test the connection, then create the schema (proposal Figure 4.6) from the
-versioned migrations in `apps/api/src/kaziforce_api/data/migrations/`:
-```bash
-python -m kaziforce_api.data.db
-python -m kaziforce_api.data.migrate          # safe to re-run; --status lists applied migrations
+pytest -v                                   # full suite; under a minute, no network needed
+ruff check apps/api packages scripts tests  # lint
 ```
 
 ## Running things
 
 ```bash
-# API
-flask --app kaziforce_api.app run
+# Synthetic dataset difficulty report (reads the committed dataset, rewrites
+# data/raw/synthetic/difficulty_report.md)
+python scripts/report_synthetic_difficulty.py
 
-# Tests
-pytest -v
+# API (currently a health check only)
+flask --app kaziforce_api.app run          # then: curl http://127.0.0.1:5000/health
+```
 
-# Lint
-ruff check apps/api packages scripts tests
+**Do not regenerate the synthetic dataset.** It is frozen: its input checksums are
+in `data/raw/synthetic/manifest.json` and the tests fail if they drift. Rebuilding
+without the (uncommitted) Job Skill Set CSV would silently drop the 200 distractor
+postings and change every job ID and relevance pair. See
+`data/raw/synthetic/README.md` before running `scripts/build_synthetic_dataset.py`.
+
+Optional raw data (only needed to rebuild inputs, not to run anything above):
+`python scripts/download_esco.py` for the ESCO subset, and the manual downloads
+described in `data/raw/*/README.md`.
+
+## Database (optional)
+
+The relational schema (proposal Figure 4.6) is defined as versioned SQL
+migrations in `apps/api/src/kaziforce_api/data/migrations/`. Nothing else uses
+the database yet.
+
+Copy the environment template and set `DATABASE_URL`:
+```bash
+cp .env.example .env
+```
+
+**Option A: Supabase.** Create a free project at [supabase.com](https://supabase.com),
+then copy Project Settings → Database → Connection string (URI) into `DATABASE_URL`.
+
+**Option B: local PostgreSQL** (13+). As a PostgreSQL superuser, create a
+non-superuser app role that owns the database:
+```bash
+psql -d postgres -c "CREATE ROLE kaziforce_app LOGIN PASSWORD '<password>';"
+createdb -O kaziforce_app kaziforce
+psql kaziforce -c "REVOKE CREATE ON SCHEMA public FROM PUBLIC; GRANT USAGE, CREATE ON SCHEMA public TO kaziforce_app;"
+```
+Then set `DATABASE_URL=postgresql://kaziforce_app:<password>@localhost:5432/kaziforce` in `.env`.
+
+Test the connection, then create the schema:
+```bash
+python -m kaziforce_api.data.db
+python -m kaziforce_api.data.migrate          # safe to re-run; --status lists applied migrations
 ```
 
 ## Development workflow
 
-- `main` — stable
-- `dev` — active work
-- `feature/<name>` — branched from `dev`, merged via pull request
+- `main`: stable, demo-able releases, tagged per sprint (e.g. `sprint-1-done`)
+- `dev`: integration branch
+- `sprint-N/<theme>`: sprint work, branched from `dev` and merged by pull request
 
-Sprint plan and progress tracking: see the GitHub Projects board and Milestones
-(mirrors the six two-week sprints in the proposal's Chapter 3 methodology).
+CI (`.github/workflows/ci.yml`) runs ruff and pytest on pushes and pull requests
+to `main` and `dev`. Progress is tracked in GitHub Milestones and Issues.
 
-Commit convention: `feat:`, `fix:`, `docs:`, `chore:`, `test:` prefixes.
+Commit convention: `feat:`, `fix:`, `docs:`, `chore:`, `test:`, `data:` prefixes.
 
 ## Tech stack
 
-Python · NetworkX · Sentence Transformers (all-MiniLM-L6-v2) · scikit-learn ·
-Flask · Next.js/React/TypeScript · PostgreSQL + pgvector
+Python · NetworkX · Sentence Transformers (all-MiniLM-L6-v2) · Flask ·
+PostgreSQL · Next.js/React/TypeScript (planned)
 
-## License
+## Licensing
 
-Academic project — Strathmore University, 2026.
+**Code and documentation:** © 2026 Kristina Kemoi. Submitted as academic work
+for the BSc Informatics and Computer Science capstone at Strathmore University.
+No open-source licence is granted; please ask before reusing.
+
+**Third-party data** keeps its own licence:
+
+| Data | Licence | Where |
+|---|---|---|
+| ESCO classification (occupations, skills) | © European Union; reused under the European Commission reuse policy (Decision 2011/833/EU), with attribution | Skill labels in `data/raw/synthetic/`, ESCO URIs in `data/vocabulary/` |
+| Job Skill Set (Mutlu, 2024) | CC BY-SA 4.0 | 200 cleaned postings in `data/raw/synthetic/jobs.csv` (`source=job_skill_set`); that adapted content stays CC BY-SA 4.0 |
+| Wiktionary (kaikki.org extract, Swahili Wiktionary) | CC BY-SA 4.0 (and GFDL) | Glosses and entry URLs in `data/vocabulary/` |
+
+Synthetic worker profiles are generated and contain no real personal data.

@@ -1,0 +1,101 @@
+worker_area_id,worker_area,job_area_id,job_area,relevant
+1,Electrician,1,Electrician,1
+1,Electrician,2,Plumber,0
+1,Electrician,3,Carpenter,0
+1,Electrician,4,Mason / bricklayer,0
+1,Electrician,7,Motor-vehicle mechanic,0
+1,Electrician,10,Mobile-phone repairer,0
+1,Electrician,11,Tailor / dressmaker,0
+1,Electrician,12,Hairdresser / barber,0
+1,Electrician,15,Laundry worker,0
+1,Electrician,16,Cook / catering worker,0
+2,Plumber,1,Electrician,0
+2,Plumber,2,Plumber,1
+2,Plumber,3,Carpenter,0
+2,Plumber,4,Mason / bricklayer,0
+2,Plumber,7,Motor-vehicle mechanic,0
+2,Plumber,10,Mobile-phone repairer,0
+2,Plumber,11,Tailor / dressmaker,0
+2,Plumber,12,Hairdresser / barber,0
+2,Plumber,15,Laundry worker,0
+2,Plumber,16,Cook / catering worker,0
+3,Carpenter,1,Electrician,0
+3,Carpenter,2,Plumber,0
+3,Carpenter,3,Carpenter,1
+3,Carpenter,4,Mason / bricklayer,0
+3,Carpenter,7,Motor-vehicle mechanic,0
+3,Carpenter,10,Mobile-phone repairer,0
+3,Carpenter,11,Tailor / dressmaker,0
+3,Carpenter,12,Hairdresser / barber,0
+3,Carpenter,15,Laundry worker,0
+3,Carpenter,16,Cook / catering worker,0
+4,Mason / bricklayer,1,Electrician,0
+4,Mason / bricklayer,2,Plumber,0
+4,Mason / bricklayer,3,Carpenter,0
+4,Mason / bricklayer,4,Mason / bricklayer,1
+4,Mason / bricklayer,7,Motor-vehicle mechanic,0
+4,Mason / bricklayer,10,Mobile-phone repairer,0
+4,Mason / bricklayer,11,Tailor / dressmaker,0
+4,Mason / bricklayer,12,Hairdresser / barber,0
+4,Mason / bricklayer,15,Laundry worker,0
+4,Mason / bricklayer,16,Cook / catering worker,0
+7,Motor-vehicle mechanic,1,Electrician,0
+7,Motor-vehicle mechanic,2,Plumber,0
+7,Motor-vehicle mechanic,3,Carpenter,0
+7,Motor-vehicle mechanic,4,Mason / bricklayer,0
+7,Motor-vehicle mechanic,7,Motor-vehicle mechanic,1
+7,Motor-vehicle mechanic,10,Mobile-phone repairer,0
+7,Motor-vehicle mechanic,11,Tailor / dressmaker,0
+7,Motor-vehicle mechanic,12,Hairdresser / barber,0
+7,Motor-vehicle mechanic,15,Laundry worker,0
+7,Motor-vehicle mechanic,16,Cook / catering worker,0
+10,Mobile-phone repairer,1,Electrician,0
+10,Mobile-phone repairer,2,Plumber,0
+10,Mobile-phone repairer,3,Carpenter,0
+10,Mobile-phone repairer,4,Mason / bricklayer,0
+10,Mobile-phone repairer,7,Motor-vehicle mechanic,0
+10,Mobile-phone repairer,10,Mobile-phone repairer,1
+10,Mobile-phone repairer,11,Tailor / dressmaker,0
+10,Mobile-phone repairer,12,Hairdresser / barber,0
+10,Mobile-phone repairer,15,Laundry worker,0
+10,Mobile-phone repairer,16,Cook / catering worker,0
+11,Tailor / dressmaker,1,Electrician,0
+11,Tailor / dressmaker,2,Plumber,0
+11,Tailor / dressmaker,3,Carpenter,0
+11,Tailor / dressmaker,4,Mason / bricklayer,0
+11,Tailor / dressmaker,7,Motor-vehicle mechanic,0
+11,Tailor / dressmaker,10,Mobile-phone repairer,0
+11,Tailor / dressmaker,11,Tailor / dressmaker,1
+11,Tailor / dressmaker,12,Hairdresser / barber,0
+11,Tailor / dressmaker,15,Laundry worker,0
+11,Tailor / dressmaker,16,Cook / catering worker,0
+12,Hairdresser / barber,1,Electrician,0
+12,Hairdresser / barber,2,Plumber,0
+12,Hairdresser / barber,3,Carpenter,0
+12,Hairdresser / barber,4,Mason / bricklayer,0
+12,Hairdresser / barber,7,Motor-vehicle mechanic,0
+12,Hairdresser / barber,10,Mobile-phone repairer,0
+12,Hairdresser / barber,11,Tailor / dressmaker,0
+12,Hairdresser / barber,12,Hairdresser / barber,1
+12,Hairdresser / barber,15,Laundry worker,0
+12,Hairdresser / barber,16,Cook / catering worker,0
+15,Laundry worker,1,Electrician,0
+15,Laundry worker,2,Plumber,0
+15,Laundry worker,3,Carpenter,0
+15,Laundry worker,4,Mason / bricklayer,0
+15,Laundry worker,7,Motor-vehicle mechanic,0
+15,Laundry worker,10,Mobile-phone repairer,0
+15,Laundry worker,11,Tailor / dressmaker,0
+15,Laundry worker,12,Hairdresser / barber,0
+15,Laundry worker,15,Laundry worker,1
+15,Laundry worker,16,Cook / catering worker,0
+16,Cook / catering worker,1,Electrician,0
+16,Cook / catering worker,2,Plumber,0
+16,Cook / catering worker,3,Carpenter,0
+16,Cook / catering worker,4,Mason / bricklayer,0
+16,Cook / catering worker,7,Motor-vehicle mechanic,0
+16,Cook / catering worker,10,Mobile-phone repairer,0
+16,Cook / catering worker,11,Tailor / dressmaker,0
+16,Cook / catering worker,12,Hairdresser / barber,0
+16,Cook / catering worker,15,Laundry worker,0
+16,Cook / catering worker,16,Cook / catering worker,1

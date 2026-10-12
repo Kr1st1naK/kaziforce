@@ -90,6 +90,28 @@ def load_esco_data(path: Path = ESCO_DIR) -> dict[str, pd.DataFrame]:
 
 SYNTHETIC_FILES = {"workers": "workers.csv", "jobs": "jobs.csv"}
 _SYNTHETIC_LIST_COLUMNS = {"workers": "skills", "jobs": "required_skills"}
+SYNTHETIC_POOLS = SYNTHETIC_DIR / "inputs" / "area_skill_pools.csv"
+
+
+def build_synthetic_data(path: Path = SYNTHETIC_DIR, rebuild_pools: bool = False,
+                         n_distractors: int = 200, **generator_kwargs) -> dict:
+    """Generate the synthetic dataset from the frozen vocabulary; returns the manifest.
+
+    Skill pools are rebuilt from the ESCO subset only if asked (or missing);
+    otherwise the committed pools file is used. Job Skill Set distractors are
+    added when the raw corpus is present and n_distractors > 0.
+    """
+    from kaziforce_api.data.synthetic import build_dataset, build_skill_pools
+
+    path = Path(path)
+    pools = path / "inputs" / "area_skill_pools.csv"
+    if rebuild_pools or not pools.exists():
+        area_map = pd.read_csv(VOCABULARY_DIR / "area_esco_map.csv", dtype=str).fillna("").to_dict("records")
+        pools.parent.mkdir(parents=True, exist_ok=True)
+        build_skill_pools(load_esco_data(), area_map).to_csv(pools, index=False)
+    corpus = load_job_corpus() if n_distractors and RAW_JOB_CSV.exists() else None
+    return build_dataset(path, VOCABULARY_DIR, pools, job_corpus=corpus, n_distractors=n_distractors,
+                         **generator_kwargs)
 
 
 def load_synthetic_data(
@@ -97,28 +119,30 @@ def load_synthetic_data(
 ) -> dict[str, pd.DataFrame]:
     """Load synthetic worker profiles and job postings (fallback source).
 
-    Generates them with kaziforce_api.data.synthetic and saves to `path` if they
-    don't exist yet (or if regenerate=True). Returns {"workers", "jobs"} with
-    skill columns as Python lists.
+    Profile files only: no area, occupation or label columns. Ground truth is
+    loaded separately with load_synthetic_ground_truth(). Generates the dataset
+    first if it is missing or regenerate=True. Skill columns are Python lists.
     """
-    from kaziforce_api.data.synthetic import generate_synthetic_data
-
     path = Path(path)
     if regenerate or not all((path / f).exists() for f in SYNTHETIC_FILES.values()):
-        path.mkdir(parents=True, exist_ok=True)
-        for key, df in generate_synthetic_data(**generator_kwargs).items():
-            out = df.copy()
-            col = _SYNTHETIC_LIST_COLUMNS[key]
-            out[col] = out[col].apply(json.dumps)
-            out.to_csv(path / SYNTHETIC_FILES[key], index=False)
+        build_synthetic_data(path, **generator_kwargs)
 
     data = {}
     for key, f in SYNTHETIC_FILES.items():
-        df = pd.read_csv(path / f)
+        df = pd.read_csv(path / f, dtype={"group_id": str})
         col = _SYNTHETIC_LIST_COLUMNS[key]
         df[col] = df[col].apply(json.loads)
         data[key] = df
     return data
+
+
+def load_synthetic_ground_truth(path: Path = SYNTHETIC_DIR) -> dict[str, pd.DataFrame]:
+    """splits, worker_truth, job_truth, relevance and compatibility_matrix tables."""
+    path = Path(path)
+    files = {"splits": path / "splits.csv",
+             **{k: path / "ground_truth" / f"{k}.csv"
+                for k in ("worker_truth", "job_truth", "relevance", "compatibility_matrix")}}
+    return {k: pd.read_csv(f, dtype={"group_id": str}) for k, f in files.items()}
 
 
 # Text cleaning primitives
@@ -139,6 +163,36 @@ def clean_text(x) -> str:
     x = _HTML_RE.sub(" ", x)
     x = _WS_RE.sub(" ", x)
     x = _MULTINL_RE.sub("\n", x)
+    x = _PUNCT_SPACE_RE.sub(r"\1", x)
+    return x.strip()
+
+
+# Emails, partial emails and @handles: anything attached to "@" (a lone " @ " meaning "at" stays).
+_EMAIL_RE = re.compile(r"[\w.+-]*@[\w-]+(?:\.[\w-]+)*|[\w.+-]+@(?=\s|$)")
+_URL_RE = re.compile(r"(?:https?://|www\.)\S+", re.IGNORECASE)
+_PHONE_RE = re.compile(
+    r"(?<![\w$])(?:\+?\d{1,3}[\s.-]?)?(?:\(\d{3}\)|\d{3})[\s.-]\d{3}[\s.-]\d{4}(?!\d)"  # (555) 555-5555
+    r"|(?<![\w$])\+?\d{10,13}(?!\d)"  # bare 10-13 digit runs
+)
+
+
+def clean_profile_text(x, uppercase_ratio: float = 0.7) -> str:
+    """Clean free text from job postings or worker profiles for matching.
+
+    Builds on clean_text(), then removes contact details (emails, URLs, phone
+    numbers), lowercases text that is mostly upper case (the Job Skill Set
+    descriptions are), and joins lines into one paragraph. Returns "" for
+    missing values.
+    """
+    x = clean_text(x)
+    if not isinstance(x, str):
+        return ""
+    for pattern in (_EMAIL_RE, _URL_RE, _PHONE_RE):
+        x = pattern.sub(" ", x)
+    letters = [c for c in x if c.isalpha()]
+    if letters and sum(c.isupper() for c in letters) / len(letters) > uppercase_ratio:
+        x = x.lower()
+    x = re.sub(r"\s+", " ", x)
     x = _PUNCT_SPACE_RE.sub(r"\1", x)
     return x.strip()
 

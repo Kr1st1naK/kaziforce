@@ -5,7 +5,6 @@
 -- job_required_skill, MatchScore -> match_score.
 -- Figure 4.6 labels MatchScore's worker FK "fk_woker_id"; implemented as fk_worker_id.
 --
--- Prerequisite (superuser, once per database): CREATE EXTENSION IF NOT EXISTS vector;
 -- Apply with: python -m kaziforce_api.data.migrate
 
 CREATE TABLE skill (
