@@ -2,6 +2,13 @@
 
 > **⚠ Revisit when the real date is known.** The submission and defense date is still being confirmed with the supervisor. This plan assumes **Nov 15, 2026** as the end of the protected buffer. If the real date is earlier, re-cut using §9 before the buffer is touched.
 
+> **Status 2026-10-12: partly superseded.** The supervisor has restructured the build phase into three sprints (Sprint II, a working end-to-end core workflow with baseline evaluation, is due at the next progress review). Sections 4–7 below are the original six-sprint scope and are kept for reference. Decisions since 2026-10-02 that override them:
+>
+> - **Split:** 40/20/40 development/validation/test by group, not 70/15/15 (S2-8).
+> - **Relevance labels:** binary same-area, not graded multi-criterion (S2-7).
+> - **Weights:** rule-based weights and α/β are assigned a priori and are **not** tuned against the labels, because the same-area labels ignore location, budget and availability. S4-4 is dropped.
+> - **pgvector:** dropped; embeddings are cached in memory. S4-2 is dropped.
+
 Prepared 2026-10-02 from a Scrum Master view for a solo developer. No BMAD Scrum Master persona is installed, so the plan follows the proposal's own Scrum framing (§3.4). Scope source of truth: `docs/proposal/kaziforce-proposal.docx`, Ch. 3 (methodology, data, model training, validation) and Ch. 4 (FR/NFR/DR/IR).
 
 ## 1. Timeline
@@ -68,8 +75,8 @@ Plan each window so its **L** task lands on that weekend and the weekday session
 | S2-4 | Must | L | Build Kenya-specific vocabulary: ≥5 informal terms per area, mapped informal term → ESCO occupation → skills | Vocabulary file with columns term, register (Swahili/Sheng/English), esco_uri, validation status, note; ≥50 terms |
 | S2-5 | Must | M | Validation pass: reviewer spot-check (≥20% sample) or, if no response by Oct 5, a two-published-source check | Validation log committed; **vocabulary frozen** (tag `vocab-v1`); limitation recorded if self-validated |
 | S2-6 | Must | L | Expand synthetic generator from the frozen vocabulary: ~100+ workers and ~60+ jobs, seeded. Each occupation gets **formal-English, informal-term, and mixed** descriptions plus **sparse "cold-start" variants** with minimal fields. Include location, availability, and rate/budget. | Deterministic `load_synthetic_data(regenerate=True)`; DR-01/02/05 fields; no PII (DR-07); variant type stored as a column (needed by the core experiment) |
-| S2-7 | Must | M | Independent ground-truth rules (occupation/skill/location/availability/budget compatibility, graded 0/1/2) and generated labels | `data/processed/ground_truth.*`; rules documented in `docs/ground-truth.md`; derived from generator specs, never from any scorer |
-| S2-8 | Must | S | 70/15/15 split, stratified by occupation and variant type, seeded | Split files + seed committed; **test split untouched until Sprint 6**; tag `data-v1` |
+| S2-7 | Must | M | Independent ground-truth rules and generated labels. **As built:** binary, relevant iff the worker and job are in the same occupational area; location, availability and budget are not used | `data/raw/synthetic/ground_truth/` (`relevance.csv` from the editable `compatibility_matrix.csv`); rule documented in `data/raw/synthetic/README.md`; derived from generator metadata, never from any scorer |
+| S2-8 | Must | S | Seeded split. **As built:** 40/20/40 development/validation/test by base-profile group (all variants of a group share a split), stratified by area, seed 42 | `data/raw/synthetic/splits.csv` + seed in `manifest.json` committed; **test split untouched until final evaluation**; tag `data-v1` not created |
 | S2-9 | Should | M | Finish `preprocess_jobs()` for Job Skill Set: clean, dedupe, map skills to ESCO where possible, keep unmapped skills as text | Processed file + row/mapping report; tests |
 | S2-10 | Should | S | Record Job Skill Set's role in `data/README.md`: supplementary/negative pool, not primary evaluation jobs | Paragraph committed (approved cut) |
 | S2-11 | Should | S | Load synthetic + processed data into PostgreSQL via migrations | Row counts match; repeatable script. Can spill into Sprint 3 |
