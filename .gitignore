@@ -8,7 +8,7 @@ __pycache__/
 # Secrets
 .env
 
-# Data (raw/processed data tracked via README pointers, not committed directly —
+# Data (raw data tracked via README pointers, not committed directly —
 # see data/README.md. Remove specific lines below if you DO want small files tracked.)
 data/raw/**/*.csv
 data/raw/**/*.json
@@ -16,7 +16,6 @@ data/raw/**/*.jsonl
 # The synthetic dataset is small, generated and frozen (splits, ground truth): track it.
 !data/raw/synthetic/**/*.csv
 !data/raw/synthetic/*.json
-data/processed/**/*
 !data/**/README.md
 !data/**/.gitkeep
 
