@@ -1,12 +1,13 @@
 """The withheld aliases (fundi wa stima -> electrician, mshonaji -> tailor) have no path into the built graph.
 
 Stronger than the vocabulary-loader tests in test_vocabulary.py: these check the
-graph itself, and every entry point a profile could use to reach it.
+graph itself, and every entry point a profile could use to reach it. Profile checks use
+the development split only.
 """
 
 import pytest
 
-from kaziforce_api.data.data_loader import SPLITS, DataLoader
+from kaziforce_api.data.data_loader import DataLoader
 from kaziforce_kg.builder import KnowledgeGraphBuilder
 from kaziforce_kg.vocabulary import VocabularyExtension, normalize_alias
 
@@ -29,7 +30,7 @@ def held_out_keys():
 def profiles():
     loader = DataLoader()
     variants = loader.variants()
-    workers = [w for s in SPLITS for w in loader.workers(s)]
+    workers = loader.workers("development")  # this sprint reads no validation or test rows
     return {v: [w for w in workers if variants[w.worker_id] == v] for v in ("held_out", "known_alias")}
 
 
@@ -55,7 +56,7 @@ def test_surface_forms_are_equivalent_to_a_withheld_key_and_match_nothing(kg, he
 
 def test_held_out_profiles_have_no_entry_point_into_the_graph(kg, profiles):
     held_out = profiles["held_out"]
-    assert len(held_out) == 60
+    assert len(held_out) == 24
     for w in held_out:
         text = " ".join([w.biography, *w.skills])
         assert kg.find_terms(text) == [], w.biography
@@ -67,7 +68,7 @@ def test_positive_control_known_alias_profiles_do_enter_the_graph(kg, profiles):
     # Same templates and slot values as held_out, only the alias differs: if the matcher
     # were broken, the held-out test above would pass vacuously. This shows it is not.
     known = profiles["known_alias"]
-    assert len(known) == 156
+    assert len(known) == 64
     for w in known:
         terms = kg.find_terms(" ".join([w.biography, *w.skills]))
         assert len(terms) == 1 and kg.label(terms[0]) == w.skills[0], w.biography

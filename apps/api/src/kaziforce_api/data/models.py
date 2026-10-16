@@ -35,11 +35,18 @@ class JobPosting:
 
 @dataclass(frozen=True)
 class MatchedSkill:
-    """A skill shared by worker and job, with the KG path that gave it to the worker."""
+    """A skill shared by worker and job, with how the worker came to have it.
 
-    skill: str  # ESCO skill URI, or normalised text for skills outside ESCO
-    label: str
-    path: tuple[tuple[str, str, str], ...] = ()  # (source, relation, target) edges; empty if asserted
+    source: "listed" (the worker listed this ESCO skill), "text" (listed text outside ESCO),
+    "informal_term" (inferred from an informal term the worker used) or "occupation_label"
+    (inferred from an ESCO occupation named in the worker's text). graph_path holds the
+    (source node, relation, target node) edges for inferred skills and is empty otherwise.
+    """
+
+    skill: str  # ESCO skill URI, or text:<normalised entry> for skills outside ESCO
+    skill_label: str
+    source: str
+    graph_path: tuple[tuple[str, str, str], ...] = ()
 
 
 @dataclass

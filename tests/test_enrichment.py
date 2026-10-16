@@ -5,7 +5,7 @@ import typing
 
 import pytest
 
-from kaziforce_api.data.data_loader import SPLITS, DataLoader
+from kaziforce_api.data.data_loader import DataLoader
 from kaziforce_api.data.loaders import load_synthetic_ground_truth
 from kaziforce_kg.builder import KnowledgeGraphBuilder
 from kaziforce_kg.enrichment import (
@@ -30,7 +30,7 @@ def enricher(kg):
 @pytest.fixture(scope="module")
 def dataset():
     loader = DataLoader()
-    workers = {w.worker_id: w for s in SPLITS for w in loader.workers(s)}
+    workers = {w.worker_id: w for w in loader.workers("development")}  # no validation or test rows
     truth = load_synthetic_ground_truth()["worker_truth"].set_index("worker_id")
     return workers, truth
 
@@ -64,33 +64,33 @@ def test_every_inferred_skill_carries_its_full_graph_path(kg, enricher):
     (term,) = e.terms
     for ev in e.evidence:
         assert ev.source == INFORMAL_TERM
-        assert ev.path == ((term, MAPS_TO, ELECTRICIAN), (ELECTRICIAN, HAS_ESSENTIAL_SKILL, ev.skill))
-        assert all(kg.graph.edges[u, v]["relation"] == r for u, r, v in ev.path)
-        assert ev.label == kg.label(ev.skill)
+        assert ev.graph_path == ((term, MAPS_TO, ELECTRICIAN), (ELECTRICIAN, HAS_ESSENTIAL_SKILL, ev.skill))
+        assert all(kg.graph.edges[u, v]["relation"] == r for u, r, v in ev.graph_path)
+        assert ev.skill_label == kg.label(ev.skill)
 
 
 def test_formal_profile_keeps_listed_skills_and_infers_the_rest(kg, enricher):
     listed = ["install electric switches", "splice cable"]
     e = enricher.enrich("Experienced electrician (20 years). Based in Nyeri.", listed)
-    assert {ev.label for ev in e.evidence if ev.source == LISTED} == set(listed)
-    assert all(ev.path == () for ev in e.evidence if ev.source == LISTED)
+    assert {ev.skill_label for ev in e.evidence if ev.source == LISTED} == set(listed)
+    assert all(ev.graph_path == () for ev in e.evidence if ev.source == LISTED)
     inferred = [ev for ev in e.evidence if ev.source == OCCUPATION_LABEL]
     assert {ev.skill for ev in inferred} == set(kg.skills_of(ELECTRICIAN)) - e.stated_skills
-    assert all(ev.path == ((ELECTRICIAN, HAS_ESSENTIAL_SKILL, ev.skill),) for ev in inferred)
+    assert all(ev.graph_path == ((ELECTRICIAN, HAS_ESSENTIAL_SKILL, ev.skill),) for ev in inferred)
 
 
 def test_listed_evidence_takes_precedence_and_each_skill_appears_once(enricher):
     e = enricher.enrich("fundi wa umeme", ["splice cable", "fundi wa umeme", "splice cable"])
     skills = [ev.skill for ev in e.evidence]
     assert len(skills) == len(set(skills)) == 21
-    assert next(ev for ev in e.evidence if ev.label == "splice cable").source == LISTED
+    assert next(ev for ev in e.evidence if ev.skill_label == "splice cable").source == LISTED
 
 
 def test_unmapped_entries_are_retained_as_text(enricher):
     e = enricher.enrich("Hello, I fix bicycles", ["bicycle repair", "Splice Cable"])
     assert e.unmapped == ("bicycle repair",)
     text = next(ev for ev in e.evidence if ev.source == TEXT)
-    assert (text.skill, text.label) == (text_skill_id("bicycle repair"), "bicycle repair")
+    assert (text.skill, text.skill_label) == (text_skill_id("bicycle repair"), "bicycle repair")
     assert e.occupations == ()
 
 
@@ -110,20 +110,20 @@ def test_null_enricher_maps_nothing_and_keeps_every_entry_as_text():
 
 # Withheld aliases at the enrichment level, with a positive control
 
-def test_no_held_out_worker_enriches_to_an_occupation(enricher, dataset):
+def test_no_development_held_out_worker_enriches_to_an_occupation(enricher, dataset):
     workers, truth = dataset
     held_out = [w for wid, w in workers.items() if truth.loc[wid, "variant"] == "held_out"]
-    assert len(held_out) == 60
+    assert len(held_out) == 24
     for w in held_out:
         e = enricher.enrich(w.biography, w.skills)
         assert e.terms == () and e.occupations == () and e.inferred_skills == set(), w.biography
         assert e.unmapped == (truth.loc[w.worker_id, "alias"],)
 
 
-def test_positive_control_every_known_alias_worker_enriches_to_its_true_occupation(enricher, dataset):
+def test_positive_control_every_development_known_alias_worker_enriches_to_its_true_occupation(enricher, dataset):
     workers, truth = dataset
     known = [w for wid, w in workers.items() if truth.loc[wid, "variant"] == "known_alias"]
-    assert len(known) == 156
+    assert len(known) == 64
     for w in known:
         e = enricher.enrich(w.biography, w.skills)
         assert e.occupations == (truth.loc[w.worker_id, "esco_uri"],), w.biography
@@ -132,9 +132,10 @@ def test_positive_control_every_known_alias_worker_enriches_to_its_true_occupati
 
 def test_held_out_and_known_alias_of_the_same_group_differ_only_in_the_mapping(enricher, dataset):
     workers, truth = dataset
-    groups = truth[truth.variant.isin(["held_out", "known_alias"])].groupby("group_id")
+    dev = truth[truth.index.isin(workers) & truth.variant.isin(["held_out", "known_alias"])]
+    groups = dev.groupby("group_id")
     pairs = [g for _, g in groups if len(g) == 2]
-    assert len(pairs) == 60
+    assert len(pairs) == 24
     for g in pairs:
         by_variant = dict(zip(g.variant, g.index))
         held, known = workers[by_variant["held_out"]], workers[by_variant["known_alias"]]

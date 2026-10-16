@@ -38,9 +38,9 @@ def text_skill_id(entry: str) -> str:
 @dataclass(frozen=True)
 class SkillEvidence:
     skill: str                      # ESCO skill URI or text:<normalised entry>
-    label: str
-    source: str
-    path: tuple[Edge, ...] = ()     # full graph path for inferred skills; () for stated ones
+    skill_label: str
+    source: str                     # listed, text, informal_term or occupation_label
+    graph_path: tuple[Edge, ...] = ()  # full graph path for inferred skills; () for stated ones
 
 
 @dataclass(frozen=True)
@@ -63,7 +63,7 @@ class Enrichment:
         return frozenset(e.skill for e in self.evidence if e.source in INFERRED_SOURCES)
 
     def labels(self) -> list[str]:
-        return [e.label for e in self.evidence]
+        return [e.skill_label for e in self.evidence]
 
 
 class Enricher(ABC):
