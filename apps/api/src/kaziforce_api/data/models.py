@@ -11,6 +11,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from kaziforce_kg.enrichment import Enrichment
+
 
 @dataclass(frozen=True)
 class WorkerProfile:
@@ -31,6 +33,20 @@ class JobPosting:
     location: str | None
     availability: str | None
     budget: float | None  # KES per day
+
+
+@dataclass(frozen=True)
+class EnrichedWorker:
+    """A worker profile with the Enrichment produced by the configuration's enricher."""
+
+    profile: WorkerProfile
+    enrichment: Enrichment
+
+
+@dataclass(frozen=True)
+class EnrichedJob:
+    profile: JobPosting
+    enrichment: Enrichment
 
 
 @dataclass(frozen=True)
