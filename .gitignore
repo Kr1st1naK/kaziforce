@@ -55,3 +55,6 @@ _bmad-output/
 
 # Course handouts from the supervisor: never commit to this public repo
 docs/course/
+
+# Partial evaluation runs (scripts/evaluate.py --max-queries); full runs in results/dev/ are committed
+results/scratch/

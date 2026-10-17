@@ -10,7 +10,7 @@ from kaziforce_api.matching.hybrid import HybridScorer
 from kaziforce_api.matching.keyword import KeywordScorer
 from kaziforce_api.matching.rule_based import RuleBasedScorer
 from kaziforce_api.matching.semantic import SemanticScorer
-from kaziforce_api.pipeline import CONFIGURATIONS, Recommender, build_recommender
+from kaziforce_api.pipeline import CONFIGURATIONS, KG_ABLATION_PAIRS, Recommender, build_recommender
 from kaziforce_kg.builder import KnowledgeGraphBuilder
 from kaziforce_kg.enrichment import INFORMAL_TERM, Enricher, NullEnricher, ProfileEnricher
 
@@ -55,13 +55,22 @@ def test_every_configuration_is_an_enricher_scorer_pair():
     kg = KnowledgeGraphBuilder().build()
     semantic = SemanticScorer(encoder=_letters)
     expected = {"keyword": (NullEnricher, KeywordScorer), "rule_only": (NullEnricher, RuleBasedScorer),
-                "semantic_only": (NullEnricher, SemanticScorer), "hybrid_no_kg": (NullEnricher, HybridScorer),
+                "rule_kg": (ProfileEnricher, RuleBasedScorer), "semantic_only": (NullEnricher, SemanticScorer),
+                "semantic_kg": (ProfileEnricher, SemanticScorer), "hybrid_no_kg": (NullEnricher, HybridScorer),
                 "full": (ProfileEnricher, HybridScorer)}
     assert set(CONFIGURATIONS) == set(expected)
     for name, (enricher_cls, scorer_cls) in expected.items():
         r = build_recommender(name, JOBS, kg=kg, semantic=semantic)
         assert type(r.enricher) is enricher_cls and type(r.scorer) is scorer_cls
         assert isinstance(r.enricher, Enricher) and isinstance(r.scorer, Scorer)
+
+
+def test_kg_ablation_pairs_differ_only_in_the_enricher():
+    kg, semantic = KnowledgeGraphBuilder().build(), SemanticScorer(encoder=_letters)
+    for without, with_kg in KG_ABLATION_PAIRS:
+        a, b = (build_recommender(n, JOBS, kg=kg, semantic=semantic) for n in (without, with_kg))
+        assert type(a.scorer) is type(b.scorer)
+        assert (type(a.enricher), type(b.enricher)) == (NullEnricher, ProfileEnricher)
 
 
 def test_configuration_errors():

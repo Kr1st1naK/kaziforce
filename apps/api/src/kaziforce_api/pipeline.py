@@ -57,10 +57,14 @@ Factory = Callable[[KnowledgeGraph | None, SemanticScorer, Sequence[JobPosting]]
 CONFIGURATIONS: dict[str, tuple[bool, Factory]] = {
     "keyword": (False, lambda kg, sem, jobs: (NullEnricher(), KeywordScorer(jobs))),
     "rule_only": (False, lambda kg, sem, jobs: (NullEnricher(), RuleBasedScorer())),
+    "rule_kg": (True, lambda kg, sem, jobs: (ProfileEnricher(kg), RuleBasedScorer())),
     "semantic_only": (False, lambda kg, sem, jobs: (NullEnricher(), sem)),
+    "semantic_kg": (True, lambda kg, sem, jobs: (ProfileEnricher(kg), sem)),
     "hybrid_no_kg": (False, lambda kg, sem, jobs: (NullEnricher(), HybridScorer(RuleBasedScorer(), sem))),
     "full": (True, lambda kg, sem, jobs: (ProfileEnricher(kg), HybridScorer(RuleBasedScorer(), sem))),
 }
+# Pairs that differ only in the enricher, to locate where the knowledge graph's effect comes from.
+KG_ABLATION_PAIRS = (("rule_only", "rule_kg"), ("semantic_only", "semantic_kg"), ("hybrid_no_kg", "full"))
 
 
 def build_recommender(name: str, jobs: Sequence[JobPosting], kg: KnowledgeGraph | None = None,
