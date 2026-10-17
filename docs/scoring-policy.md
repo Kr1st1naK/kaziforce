@@ -1,7 +1,7 @@
 # Scoring policy (decided before any score exists)
 
 **Decided and committed 2026-10-16, before any scorer was implemented or any
-score computed.** These rules are frozen. Any change after results exist is
+score computed** (keyword score revised to BM25 on 2026-10-17, still before any score; see "Revisions" below). These rules are frozen. Any change after results exist is
 recorded below under "Deviations" with its date and reason, and the affected
 results are re-run and labelled as such.
 
@@ -62,7 +62,15 @@ required skills.
   2. Tokens are maximal runs of the letters a–z.
   3. Keep tokens of 3 or more letters.
   4. Remove the function words listed below.
-- **Score:** Jaccard similarity of the two token sets, \|Tw ∩ Tj\| / \|Tw ∪ Tj\| (0 if both are empty).
+- **Score:** Okapi BM25, with the worker text as the query and each posting as a document:
+
+      BM25(q, d) = Σ_{t ∈ q} IDF(t) · tf(t, d) · (k1 + 1) / (tf(t, d) + k1 · (1 − b + b · |d| / avgdl))
+      IDF(t) = ln(1 + (N − n(t) + 0.5) / (n(t) + 0.5))
+
+  - Each distinct query term counts once.
+  - N, n(t), |d| and avgdl come from the candidate pool being ranked (the 280 postings); no labels are involved.
+  - k1 = 1.2 and b = 0.75 are the standard defaults, not tuned.
+  - This IDF form is never negative.
 
 **Why this tokeniser.** The stop-word list contains **closed-class function
 words only**: articles, pronouns, possessives, demonstratives, prepositions,
@@ -81,11 +89,7 @@ unavoidable for function words, and they are on the list because of their
 grammatical category. One- and two-letter words (*na*, *ni*, *wa*, *ya*, *is*,
 *in*, *at*, …) are removed by the length rule.
 
-**Why Jaccard rather than a raw count.** A raw count of shared tokens favours
-long postings. The Job Skill Set descriptions are around 3,300 characters,
-against one or two sentences for a worker, so they would outrank short relevant
-postings by length alone. Jaccard normalises by the size of both texts and
-needs no fitted parameters (unlike TF-IDF).
+**Why BM25.** It is the standard lexical baseline in retrieval and in the job-matching literature cited in Chapter 2, so the comparison is directly interpretable. Its length normalisation (b) also stops the long Job Skill Set descriptions (about 3,300 characters) from outranking short postings by length alone. Its parameters are fixed defaults and nothing is fitted to the data.
 
 English function words:
 
@@ -124,6 +128,12 @@ reason given in §1.
 Jobs are ranked by descending score. Ties are broken by one fixed random order
 of the 280 postings (seed 42), the same order for every configuration, so no
 configuration gains from the incidental order of `jobs.csv`.
+
+## Revisions before any score existed
+
+| Date | Change | Reason |
+|---|---|---|
+| 2026-10-17 | Keyword score changed from Jaccard similarity to Okapi BM25 (k1 = 1.2, b = 0.75); tokeniser unchanged | Comparability with the BM25 baselines in the literature cited in Chapter 2. No scorer had been run on the dataset. |
 
 ## Deviations
 

@@ -1,19 +1,23 @@
 """
-Keyword baseline: token overlap between worker and job text, with no knowledge
-graph and no embeddings.
+Keyword baseline: Okapi BM25 ranking of job postings for a worker's text, with
+no knowledge graph and no embeddings.
 
 The tokeniser is frozen in docs/scoring-policy.md §2, and FUNCTION_WORDS must
 equal the lists given there (tests/test_keyword_scorer.py checks this).
 Closed-class function words only; content words stay even when the generated
-templates use them often.
+templates use them often. BM25 parameters are the standard defaults
+(k1 = 1.2, b = 0.75), not tuned.
 """
 
 from __future__ import annotations
 
+import math
 import re
 import unicodedata
+from collections import Counter
+from collections.abc import Sequence
 
-from kaziforce_api.data.models import EnrichedJob, EnrichedWorker
+from kaziforce_api.data.models import EnrichedJob, EnrichedWorker, JobPosting
 
 ENGLISH_FUNCTION_WORDS = frozenset("""
 about above after again against all also although among and any are because been before being below
@@ -34,20 +38,46 @@ MIN_TOKEN_LENGTH = 3
 _TOKEN_RE = re.compile(r"[a-z]+")
 
 
-def tokens(text: str) -> frozenset[str]:
+def token_list(text: str) -> list[str]:
+    """Tokens in order, with repeats (for term frequencies)."""
     text = unicodedata.normalize("NFKC", text).lower()
-    return frozenset(t for t in _TOKEN_RE.findall(text) if len(t) >= MIN_TOKEN_LENGTH and t not in FUNCTION_WORDS)
+    return [t for t in _TOKEN_RE.findall(text) if len(t) >= MIN_TOKEN_LENGTH and t not in FUNCTION_WORDS]
 
 
-def jaccard(a: frozenset[str], b: frozenset[str]) -> float:
-    union = a | b
-    return len(a & b) / len(union) if union else 0.0
+def tokens(text: str) -> frozenset[str]:
+    return frozenset(token_list(text))
+
+
+def worker_text(worker: EnrichedWorker) -> str:
+    return " ".join([worker.profile.biography, *worker.profile.skills])
+
+
+def job_text(job: JobPosting) -> str:
+    return " ".join([job.title, job.description, *job.required_skills])
 
 
 class KeywordScorer:
-    """Jaccard similarity of the token sets. Reads only the profiles; the enrichment is ignored."""
+    """Okapi BM25 over the candidate job postings. Reads only the profiles; the enrichment is ignored.
+
+    The index (document frequencies, lengths) is built from the postings passed in, i.e. the
+    candidate pool being ranked; no labels are involved. The worker text is the query, with each
+    distinct query term counted once. IDF is ln(1 + (N - n + 0.5) / (n + 0.5)), which is never
+    negative.
+    """
+
+    def __init__(self, jobs: Sequence[JobPosting], k1: float = 1.2, b: float = 0.75):
+        self.k1, self.b = k1, b
+        self._tf = {j.posting_id: Counter(token_list(job_text(j))) for j in jobs}
+        self._length = {pid: sum(tf.values()) for pid, tf in self._tf.items()}
+        n_docs = len(self._tf)
+        self._avg_length = sum(self._length.values()) / n_docs if n_docs else 0.0
+        df = Counter(term for tf in self._tf.values() for term in tf)
+        self._idf = {term: math.log(1 + (n_docs - n + 0.5) / (n + 0.5)) for term, n in df.items()}
 
     def score(self, worker: EnrichedWorker, job: EnrichedJob) -> float:
-        w, j = worker.profile, job.profile
-        return jaccard(tokens(" ".join([w.biography, *w.skills])),
-                       tokens(" ".join([j.title, j.description, *j.required_skills])))
+        pid = job.profile.posting_id
+        if pid not in self._tf:
+            raise KeyError(f"posting {pid} is not in the BM25 index")
+        tf, length = self._tf[pid], self._length[pid]
+        norm = self.k1 * (1 - self.b + self.b * length / self._avg_length) if self._avg_length else self.k1
+        return sum(self._idf[t] * tf[t] * (self.k1 + 1) / (tf[t] + norm) for t in tokens(worker_text(worker)) if t in tf)
