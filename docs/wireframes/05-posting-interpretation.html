@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Wireframe 05 — Your Job Posting Is Live</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #ffffff; }
+  body { font-family: Arial, Helvetica, sans-serif; color: #000000; }
+  .canvas { width: 1440px; height: 1024px; overflow: hidden; background: #ffffff; padding: 48px 0; }
+  .panel { width: 1000px; margin: 0 auto; border: 2px solid #000000; padding: 32px 40px; }
+  h1 { font-size: 28px; font-weight: bold; margin: 0 0 8px 0; }
+  .note { font-size: 14px; color: #555555; margin: 0 0 24px 0; }
+  .section { border: 1.5px solid #000000; padding: 20px 24px; margin-bottom: 22px; }
+  .section-title { font-size: 16px; font-weight: bold; margin: 0 0 14px 0; }
+  .summary { display: flex; justify-content: space-between; align-items: center; font-size: 18px; }
+  ul { margin: 0; padding-left: 22px; font-size: 15px; line-height: 2; }
+  .tag { font-size: 13px; color: #555555; border: 1px solid #999999; padding: 1px 8px; margin-left: 8px; }
+  .trace { font-family: "Courier New", Courier, monospace; font-size: 15px; white-space: normal; overflow-wrap: break-word; word-break: break-word; max-width: 100%; background: #f2f2f2; border: 1px dashed #999999; padding: 14px 16px; line-height: 1.8; }
+  .pool { font-size: 16px; }
+  .pool strong { font-size: 22px; }
+  .actions { display: flex; justify-content: flex-start; margin-top: 4px; }
+  .button { border: 2px solid #000000; background: #cccccc; padding: 12px 32px; font-size: 16px; font-weight: bold; }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="panel">
+    <h1>Your Job Posting Is Live</h1>
+    <p class="note">[Short confirmation text]</p>
+
+    <div class="section">
+      <div class="summary">
+        <span>[Job title]</span>
+        <span>[Location] &nbsp;·&nbsp; KES [Budget]</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">How We Understood Your Posting</div>
+      <div class="trace">
+        "fundi wa umeme" (your wording) &mdash;MAPS_TO&rarr; electrician (ESCO occupation)<br>
+        &mdash;HAS_ESSENTIAL_SKILL&rarr; the required skills listed below
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Required Skills</div>
+      <ul>
+        <li>install electricity sockets <span class="tag">inferred via fundi wa umeme</span></li>
+        <li>electrical wiring plans <span class="tag">inferred via occupation</span></li>
+        <li>install electric switches <span class="tag">listed by you</span></li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Worker Pool</div>
+      <div class="pool"><strong>30</strong> workers are currently registered in the Electrician area.</div>
+    </div>
+
+    <div class="actions">
+      <span class="button">Back to My Postings</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>
