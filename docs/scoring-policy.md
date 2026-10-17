@@ -109,7 +109,7 @@ Swahili function words:
 
 ## 3. Semantic score
 
-- **Model and text.** all-MiniLM-L6-v2 sentence embeddings, L2-normalised.
+- **Model and text.** all-MiniLM-L6-v2 sentence embeddings, L2-normalised. The model is pinned to one Hugging Face revision in code, so it cannot change through configuration.
   - The worker text is the biography, followed by the labels of the skills in the worker's enrichment.
   - The job text is the description.
   - The same rule applies in every configuration; only the enrichment's contents differ.
