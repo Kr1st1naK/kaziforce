@@ -1,0 +1,281 @@
+posting_id,source,area_id,area,esco_uri,esco_label,isco_code
+af71b82c-4bac-44bf-8a97-0fe60b6c04ca,job_skill_set,,,,,
+1dd693ce-222a-4844-927c-efa8ddaf5c8f,job_skill_set,,,,,
+45bb3f31-77e0-47da-af40-cac35a2fe57a,job_skill_set,,,,,
+f0128330-c343-45b1-ad25-6839c2de6bc8,synthetic,15,Laundry worker,http://data.europa.eu/esco/occupation/0da51178-e386-4534-ae71-15ba789ad756,laundry worker,8157.1
+f00cf19b-331e-46b5-9a55-91deab52cda5,job_skill_set,,,,,
+7da0feb9-72f7-406a-a99a-9c3a9dfc6ffd,job_skill_set,,,,,
+c19016a8-b0c3-4fc4-9cf0-ee3eef9ad9af,job_skill_set,,,,,
+e6e84af4-3f12-4dbb-a27c-e4119dac2bf2,job_skill_set,,,,,
+3698f1a6-82ba-4e36-896e-804c24d41427,job_skill_set,,,,,
+3ea7605c-1b37-4d21-968f-43089170a300,synthetic,3,Carpenter,http://data.europa.eu/esco/occupation/2a22ff9e-de3b-408d-b312-5034896cc4f4,carpenter,7115.1
+197284e4-a9ae-4685-bdd5-a1611f411dea,synthetic,12,Hairdresser / barber,http://data.europa.eu/esco/occupation/4e0c14d6-b170-40f1-bcdc-703c0b92109b,barber,5141.1.1
+e7a07c82-e70d-4fcb-ab5c-56dafbdcbbcd,job_skill_set,,,,,
+5532ed4f-2bb6-4484-a6cf-f82c175b5089,synthetic,11,Tailor / dressmaker,http://data.europa.eu/esco/occupation/978ae3a2-0831-415a-8396-b84dde656fc5,tailor,7531.5
+cf289d9e-9dbc-442b-a674-14c9ee0669f9,job_skill_set,,,,,
+2f5eb4ab-b8e7-4c91-bce3-adbd03db51ac,synthetic,7,Motor-vehicle mechanic,http://data.europa.eu/esco/occupation/4ad4024e-d1d3-4dea-b6d1-2c7948111dce,vehicle technician,7231.10
+f899bc9e-0213-44c9-a5a2-3c508371875d,synthetic,1,Electrician,http://data.europa.eu/esco/occupation/4910419f-b4af-4f59-b544-9dbebc8a74f0,electrician,7411.1
+b34ee67c-6fbb-4561-a4aa-e74a8a0ee965,job_skill_set,,,,,
+e207c7b3-4a2d-4d5a-b786-f5ed11b52a08,job_skill_set,,,,,
+8b1b2b6b-f4dd-42c8-a492-2e0229dc1b5f,job_skill_set,,,,,
+329c2d29-e98a-4b8c-b167-8704d26cec6f,job_skill_set,,,,,
+e2ab6a60-36d3-4398-90ee-042cb63bd4b6,job_skill_set,,,,,
+13dce949-7e95-4c8b-a0d5-2dbc83f67160,job_skill_set,,,,,
+26cfde46-1428-4db0-95bc-6a3de321f2c0,job_skill_set,,,,,
+74319deb-a074-4476-a2a3-008931da7ee2,job_skill_set,,,,,
+ddebf121-fa85-4fe8-91bf-2b5d3cb7ac46,job_skill_set,,,,,
+78040f3a-d740-45e2-ad79-21bafa91058b,job_skill_set,,,,,
+d33e4781-01b9-48b8-9924-729a0c17ebfe,synthetic,16,Cook / catering worker,http://data.europa.eu/esco/occupation/90f75f67-495d-49fa-ab57-2f320e251d7e,cook,5120.1
+1acff0fc-9fbe-4b60-9fb5-b7c8f8c06b48,job_skill_set,,,,,
+8eb0c4df-e212-4ab8-8ed5-c1a4dd2430c2,job_skill_set,,,,,
+6c294532-bc74-480f-88ec-c1c636beafe5,job_skill_set,,,,,
+468e125b-5e5f-48e3-b3f1-4ceebcddf630,job_skill_set,,,,,
+9536b8b2-4905-4b5a-a5c2-1ae425f163ed,job_skill_set,,,,,
+b85e063c-3633-439c-99da-8928313a8c5c,job_skill_set,,,,,
+25cae58a-5899-41c0-a9f0-a13ee3325347,synthetic,7,Motor-vehicle mechanic,http://data.europa.eu/esco/occupation/4ad4024e-d1d3-4dea-b6d1-2c7948111dce,vehicle technician,7231.10
+59fb798b-0fd8-47bc-a344-6b86d6969767,job_skill_set,,,,,
+85806949-626d-4d4b-be4f-fe4cfb1c0b13,job_skill_set,,,,,
+3de9f349-57f3-40f4-b812-7d1930a4bbb4,job_skill_set,,,,,
+8fc55fca-7098-4c57-a2a0-5f6b0eb2bdeb,job_skill_set,,,,,
+d154e4a7-53a7-4c2e-90ed-5c0df848aecb,job_skill_set,,,,,
+d3dc5800-f9d1-4586-a942-fa4e9b54b9c0,job_skill_set,,,,,
+84125401-8b23-4b2b-be06-e8ad0f410903,job_skill_set,,,,,
+6ba66c2b-31fd-4e58-96f1-b231f8beaf7c,job_skill_set,,,,,
+1e7695ee-ef28-45d1-94aa-e54479b0602b,job_skill_set,,,,,
+7eb33885-61cf-4d1d-b660-fc263727a37f,synthetic,15,Laundry worker,http://data.europa.eu/esco/occupation/0da51178-e386-4534-ae71-15ba789ad756,laundry worker,8157.1
+c9620ae3-8bf2-479b-86fa-0fdcf15c1666,job_skill_set,,,,,
+6f745f9c-50d3-43cf-bf06-db01207207ef,synthetic,15,Laundry worker,http://data.europa.eu/esco/occupation/0da51178-e386-4534-ae71-15ba789ad756,laundry worker,8157.1
+f763658a-8618-4b10-9252-a03b4d5857d2,job_skill_set,,,,,
+9078378e-6d54-4772-9c32-eddbd4d7ca4d,job_skill_set,,,,,
+d92b213d-0e5f-4c65-88f4-709c274b1cc5,job_skill_set,,,,,
+3d607df5-17a7-400f-9116-7a06d2741578,job_skill_set,,,,,
+9aa26bbb-6a67-4464-8d3b-e62b8dfdc51d,job_skill_set,,,,,
+7b49da96-fd4b-40b9-942c-b4c82d105fa5,job_skill_set,,,,,
+829dac13-fc7f-466f-bd44-8c6536b64904,synthetic,10,Mobile-phone repairer,http://data.europa.eu/esco/occupation/f0f6d531-eb96-4bad-84ff-8e2999ea68e6,mobile phone repair technician,7422.3.1
+2683f05d-4775-4a96-831b-92e88676bccb,job_skill_set,,,,,
+ba819166-4ffe-478d-8147-3b11c61622d5,synthetic,1,Electrician,http://data.europa.eu/esco/occupation/4910419f-b4af-4f59-b544-9dbebc8a74f0,electrician,7411.1
+a021c526-7495-4b07-b64d-f417133700f1,job_skill_set,,,,,
+9b2f27b3-7b8e-4375-af79-ea6eb172fadc,job_skill_set,,,,,
+e68346eb-fe8b-41da-8e2f-8ce3ec72f8ad,job_skill_set,,,,,
+585b3522-472a-46df-9bf0-a05d2ca340c6,job_skill_set,,,,,
+bb3c8a9f-aed1-4fd9-b4e7-92f633fe1a1a,synthetic,16,Cook / catering worker,http://data.europa.eu/esco/occupation/90f75f67-495d-49fa-ab57-2f320e251d7e,cook,5120.1
+8cccd43e-d18f-4750-b1a2-dfd3748a6801,synthetic,10,Mobile-phone repairer,http://data.europa.eu/esco/occupation/f0f6d531-eb96-4bad-84ff-8e2999ea68e6,mobile phone repair technician,7422.3.1
+7f268cee-9f08-4114-842c-d6e8f9a5828f,job_skill_set,,,,,
+b1f74582-1bb4-4baa-a028-b56713cc9863,job_skill_set,,,,,
+b3711b25-ffc3-48c3-80fb-052552004e83,job_skill_set,,,,,
+78d05713-f951-48d8-b38e-e314afa8cb8f,synthetic,4,Mason / bricklayer,http://data.europa.eu/esco/occupation/05f321f8-055b-407d-bf19-e0ddabda56b7,bricklayer,7112.1
+9d549864-5eea-4aa5-8544-0d68a43a45bf,job_skill_set,,,,,
+29b09fc9-a234-4335-a810-de61471c0b8c,job_skill_set,,,,,
+8df53d1c-8e19-47e7-8446-9b458c62dc72,synthetic,4,Mason / bricklayer,http://data.europa.eu/esco/occupation/05f321f8-055b-407d-bf19-e0ddabda56b7,bricklayer,7112.1
+24004ebc-1359-4643-936e-770cde57da24,job_skill_set,,,,,
+e3f6b85d-8205-43bd-b050-193710a7023d,job_skill_set,,,,,
+4cd211dc-e3e0-4ce7-955a-b22e675e8360,job_skill_set,,,,,
+155813c2-5dc1-4f7e-b6af-b4308cd498db,job_skill_set,,,,,
+ac9aa2f1-6b49-48cc-9dfb-c99e8fd1c038,job_skill_set,,,,,
+468f8254-78b6-46c1-8150-907c2b066c96,job_skill_set,,,,,
+7964ef28-55ef-460c-b72b-6cba23200d9a,synthetic,10,Mobile-phone repairer,http://data.europa.eu/esco/occupation/f0f6d531-eb96-4bad-84ff-8e2999ea68e6,mobile phone repair technician,7422.3.1
+00353283-13fb-485b-a30f-1aa7d834b9c8,job_skill_set,,,,,
+364bd2cd-488b-4de9-accd-cec15e12fc49,job_skill_set,,,,,
+16825655-4880-4cb0-a732-06d2182a39fd,job_skill_set,,,,,
+5f2fa756-bdc5-43c8-8409-1858751aa800,job_skill_set,,,,,
+a12aea9d-e528-4992-8db2-76b1bf17f000,synthetic,7,Motor-vehicle mechanic,http://data.europa.eu/esco/occupation/4ad4024e-d1d3-4dea-b6d1-2c7948111dce,vehicle technician,7231.10
+8e3f2939-662d-4c1b-96f2-54bc915baa83,job_skill_set,,,,,
+4feb9355-66ca-4aca-8fa1-a420f8f4b09b,synthetic,16,Cook / catering worker,http://data.europa.eu/esco/occupation/90f75f67-495d-49fa-ab57-2f320e251d7e,cook,5120.1
+dcbbf3b7-a036-4b4e-a0dc-334e741d4ab3,job_skill_set,,,,,
+29d210b4-473e-4481-b8db-1524492bff72,job_skill_set,,,,,
+13ecbe00-a28b-4bf0-91a4-8814d0cb77d6,job_skill_set,,,,,
+4ef20b57-49dd-403d-8774-e24ac55ba252,job_skill_set,,,,,
+c716720d-1d25-4fd5-acb1-97edc6bd7e3f,job_skill_set,,,,,
+dec995ad-1af8-4915-9f54-5899cb2e603b,synthetic,3,Carpenter,http://data.europa.eu/esco/occupation/2a22ff9e-de3b-408d-b312-5034896cc4f4,carpenter,7115.1
+190e5d9f-8722-4631-92a5-855e38cd2743,job_skill_set,,,,,
+fec42050-1128-49cd-a08c-c848d246be54,job_skill_set,,,,,
+4f7eeb38-400b-4969-8102-2c8ef6d80546,job_skill_set,,,,,
+b263b890-42c3-464f-9c1a-d508eedd709b,job_skill_set,,,,,
+2cb34dea-bb00-4996-8e56-a41a28de794e,job_skill_set,,,,,
+41bd3926-128f-47da-978f-bd3fec16609c,job_skill_set,,,,,
+9ef2ed93-1ae0-436a-bb59-713278d8acc9,job_skill_set,,,,,
+b83b85cf-9c96-4570-bc8c-3bf93ef6c763,job_skill_set,,,,,
+37b7d687-abd8-4e14-b84b-b04b4ef0fbf7,synthetic,4,Mason / bricklayer,http://data.europa.eu/esco/occupation/05f321f8-055b-407d-bf19-e0ddabda56b7,bricklayer,7112.1
+245c2672-6e87-4f1a-8ebb-8616eaac29e7,job_skill_set,,,,,
+d2a4316a-9449-466f-8539-4ea045d7efd2,synthetic,1,Electrician,http://data.europa.eu/esco/occupation/4910419f-b4af-4f59-b544-9dbebc8a74f0,electrician,7411.1
+8b8bc3ad-9ee6-4c6e-a347-a120ff9faad4,job_skill_set,,,,,
+20e8fde4-f9a5-4872-b5ad-d8c968a915a8,job_skill_set,,,,,
+7b35f82e-b538-4e3a-92ee-6411da74755d,synthetic,2,Plumber,http://data.europa.eu/esco/occupation/ed3cf43d-c2c1-4c46-82fc-1375e27e0290,plumber,7126.8
+a0b94bf0-1db8-4800-ab79-e34b25ff7cff,job_skill_set,,,,,
+3907e9b3-5a20-42aa-bfde-4a8329223d1a,job_skill_set,,,,,
+9c9b67c9-0ce5-4274-8c83-f36fa9483b4c,synthetic,7,Motor-vehicle mechanic,http://data.europa.eu/esco/occupation/4ad4024e-d1d3-4dea-b6d1-2c7948111dce,vehicle technician,7231.10
+d781153d-91e4-4e6b-94c9-0c23feb7b404,synthetic,15,Laundry worker,http://data.europa.eu/esco/occupation/0da51178-e386-4534-ae71-15ba789ad756,laundry worker,8157.1
+7cebf5f4-ffbd-4c2d-bd05-3640cc1947cf,job_skill_set,,,,,
+d8f4a1dc-9cb9-4c96-bcc3-fc3a6bfd53bd,job_skill_set,,,,,
+2acb06fc-428d-463c-898c-575800f64c7c,job_skill_set,,,,,
+2c0627a7-900e-48fd-b89e-85a98b66f9c0,synthetic,10,Mobile-phone repairer,http://data.europa.eu/esco/occupation/f0f6d531-eb96-4bad-84ff-8e2999ea68e6,mobile phone repair technician,7422.3.1
+ee05dfd5-e117-4332-ba53-fb5c9a6da776,synthetic,15,Laundry worker,http://data.europa.eu/esco/occupation/0da51178-e386-4534-ae71-15ba789ad756,laundry worker,8157.1
+9767a162-dda5-4013-a894-d778953830c6,synthetic,7,Motor-vehicle mechanic,http://data.europa.eu/esco/occupation/4ad4024e-d1d3-4dea-b6d1-2c7948111dce,vehicle technician,7231.10
+0dffeae5-d317-48fb-bb5f-9ddad5c920cc,job_skill_set,,,,,
+06de535e-f6e4-4fd9-bfcd-5a28b4e28227,synthetic,10,Mobile-phone repairer,http://data.europa.eu/esco/occupation/f0f6d531-eb96-4bad-84ff-8e2999ea68e6,mobile phone repair technician,7422.3.1
+a4c33e15-5acf-4023-a3e8-204ff672f7cf,synthetic,12,Hairdresser / barber,http://data.europa.eu/esco/occupation/4e0c14d6-b170-40f1-bcdc-703c0b92109b,barber,5141.1.1
+f79eb845-9c0b-41e4-8843-45bd6c999940,synthetic,1,Electrician,http://data.europa.eu/esco/occupation/4910419f-b4af-4f59-b544-9dbebc8a74f0,electrician,7411.1
+2d566209-6128-4e6f-a075-08517e974920,job_skill_set,,,,,
+eca8a542-3e7c-424d-afa1-dae820231ec3,job_skill_set,,,,,
+f983e2e5-ed91-43eb-a4c4-e9cb01ab0b2a,synthetic,11,Tailor / dressmaker,http://data.europa.eu/esco/occupation/978ae3a2-0831-415a-8396-b84dde656fc5,tailor,7531.5
+dbda2d76-63c8-420b-ace1-83e72b215e99,job_skill_set,,,,,
+7a095c21-7e0b-4557-ae32-deb0df9e21b2,synthetic,10,Mobile-phone repairer,http://data.europa.eu/esco/occupation/f0f6d531-eb96-4bad-84ff-8e2999ea68e6,mobile phone repair technician,7422.3.1
+d3e32f94-c4f5-4cce-bc1c-2c6e5044fcef,job_skill_set,,,,,
+c10d29fb-6407-4482-b7b1-3e2cc8faf9a7,synthetic,3,Carpenter,http://data.europa.eu/esco/occupation/2a22ff9e-de3b-408d-b312-5034896cc4f4,carpenter,7115.1
+a81ca667-5b4b-47c9-b829-495d1b429727,synthetic,15,Laundry worker,http://data.europa.eu/esco/occupation/0da51178-e386-4534-ae71-15ba789ad756,laundry worker,8157.1
+979d6da3-3b29-43cd-8e3f-8e612197d124,synthetic,1,Electrician,http://data.europa.eu/esco/occupation/4910419f-b4af-4f59-b544-9dbebc8a74f0,electrician,7411.1
+cc728d01-f2bf-4d92-97ee-41297e5617b1,job_skill_set,,,,,
+dc04a1f3-8216-4f80-a01d-d4e9ae82b8e7,synthetic,2,Plumber,http://data.europa.eu/esco/occupation/ed3cf43d-c2c1-4c46-82fc-1375e27e0290,plumber,7126.8
+18cf6be8-85c2-4bb3-95b2-e69d9922ba32,job_skill_set,,,,,
+4e9fe1ef-68ca-4318-a370-f49651bf534a,job_skill_set,,,,,
+958868c0-7af5-48f8-a004-56063b7575d6,job_skill_set,,,,,
+b265491a-63bf-4286-aa0e-5fe6960e5bdd,job_skill_set,,,,,
+281a1c02-c78b-4c08-8a62-80f2267f6060,synthetic,2,Plumber,http://data.europa.eu/esco/occupation/ed3cf43d-c2c1-4c46-82fc-1375e27e0290,plumber,7126.8
+4a2bb98b-f903-435c-a56f-f5087a7b8bd1,job_skill_set,,,,,
+fe294188-f263-4fb3-ac86-ab31dc78dda4,job_skill_set,,,,,
+343fc7d1-2cf5-46b2-b8fd-d0bc96dbedfe,synthetic,16,Cook / catering worker,http://data.europa.eu/esco/occupation/90f75f67-495d-49fa-ab57-2f320e251d7e,cook,5120.1
+be03113b-54e0-4aa2-bb2d-ea242d39f95c,job_skill_set,,,,,
+9cdb670d-c29d-4f3b-b5d5-1d72d727de36,job_skill_set,,,,,
+76a78b84-13e9-4039-934c-c8d76bf5236a,job_skill_set,,,,,
+807eede7-3898-45a6-87da-b189596358f4,job_skill_set,,,,,
+89a775cf-8994-430c-9978-5404e9821e08,job_skill_set,,,,,
+04d676e2-4d4d-43a0-a9d7-64dfdc181576,synthetic,16,Cook / catering worker,http://data.europa.eu/esco/occupation/90f75f67-495d-49fa-ab57-2f320e251d7e,cook,5120.1
+2f163a35-c59e-44b9-9546-f43f026a11b7,job_skill_set,,,,,
+d4f71f8e-22a7-4325-a7bd-627bb752459f,synthetic,12,Hairdresser / barber,http://data.europa.eu/esco/occupation/4e0c14d6-b170-40f1-bcdc-703c0b92109b,barber,5141.1.1
+94b9a74d-9d47-40f0-93d7-ffe821d0b890,synthetic,11,Tailor / dressmaker,http://data.europa.eu/esco/occupation/978ae3a2-0831-415a-8396-b84dde656fc5,tailor,7531.5
+27b04258-385f-4902-8957-86c999f5b4a9,synthetic,12,Hairdresser / barber,http://data.europa.eu/esco/occupation/099c6bb0-22d3-4c5d-8bf5-70910af381ef,hairdresser,5141.1
+44bd6957-bcca-474b-a879-30720c66be4d,job_skill_set,,,,,
+82ea8962-ad79-4779-b173-9c51b68053fb,job_skill_set,,,,,
+ff991621-5412-49f1-8ece-b39c1eafe925,synthetic,4,Mason / bricklayer,http://data.europa.eu/esco/occupation/05f321f8-055b-407d-bf19-e0ddabda56b7,bricklayer,7112.1
+47316297-d4a9-49cc-a7b9-04119ff0fe40,job_skill_set,,,,,
+1d88f7e6-2616-498c-8034-1872d4153bf6,job_skill_set,,,,,
+8f711db7-2898-40ef-a43f-320e4c8d62ed,job_skill_set,,,,,
+8b08c434-6549-4911-8965-5af9e96d86ec,job_skill_set,,,,,
+4f97b5cf-5caa-4be9-a223-32fc0f28d9ee,job_skill_set,,,,,
+cc644fb3-e076-4d5d-a9ca-6838b9f2c94a,synthetic,7,Motor-vehicle mechanic,http://data.europa.eu/esco/occupation/4ad4024e-d1d3-4dea-b6d1-2c7948111dce,vehicle technician,7231.10
+807a527c-07c4-4c88-be9f-32be7fa54580,job_skill_set,,,,,
+eb3d88b4-c7e1-4efa-b9ea-a8ed3aa50598,job_skill_set,,,,,
+22d5cbc5-362f-493c-b63d-8072cede6c27,job_skill_set,,,,,
+96f7c3c5-d650-439e-9fe6-9d4c6c6b23aa,synthetic,11,Tailor / dressmaker,http://data.europa.eu/esco/occupation/978ae3a2-0831-415a-8396-b84dde656fc5,tailor,7531.5
+13c8f444-9d3f-4343-8192-2e81ab2a4e29,job_skill_set,,,,,
+98271ea3-c988-466f-8e89-363c4cff1712,job_skill_set,,,,,
+0f4bc344-e007-4d3f-b1de-8ca5e684ffb0,synthetic,4,Mason / bricklayer,http://data.europa.eu/esco/occupation/05f321f8-055b-407d-bf19-e0ddabda56b7,bricklayer,7112.1
+604d0797-c057-4452-bf79-1d389feb999b,job_skill_set,,,,,
+ad7e88d3-5cef-40c9-a530-bfa47fcb22e2,synthetic,10,Mobile-phone repairer,http://data.europa.eu/esco/occupation/f0f6d531-eb96-4bad-84ff-8e2999ea68e6,mobile phone repair technician,7422.3.1
+8dd9203d-9459-42b6-8346-aaa563efbb74,job_skill_set,,,,,
+cdfcbcd9-601d-44af-9162-9cac4b819d21,job_skill_set,,,,,
+56884f26-ebb8-4953-bca5-d5400e33dd22,job_skill_set,,,,,
+2b785067-a123-49b2-970a-fecbd6534410,synthetic,2,Plumber,http://data.europa.eu/esco/occupation/ed3cf43d-c2c1-4c46-82fc-1375e27e0290,plumber,7126.8
+f550f7b3-e285-46c0-94b9-bd5ddc6928dd,job_skill_set,,,,,
+f8561e97-621c-40fd-85ec-31757bb1bbf7,job_skill_set,,,,,
+24448f6a-55d3-4b8d-b6c8-612ebe62ef3f,job_skill_set,,,,,
+615594cf-24de-4960-b61f-beb371aa64fa,synthetic,3,Carpenter,http://data.europa.eu/esco/occupation/2a22ff9e-de3b-408d-b312-5034896cc4f4,carpenter,7115.1
+8155be40-710c-4373-a8e8-7a85deb57984,job_skill_set,,,,,
+745ee5e0-3bea-47cf-8982-6f48533bc11a,job_skill_set,,,,,
+f852bd02-1c3c-4803-9697-75615a92bea7,job_skill_set,,,,,
+8e05acf2-e719-4f71-ad5d-84baf121bf5b,job_skill_set,,,,,
+f2150d01-202b-4081-9e3a-733fdf5faa8a,synthetic,16,Cook / catering worker,http://data.europa.eu/esco/occupation/90f75f67-495d-49fa-ab57-2f320e251d7e,cook,5120.1
+90478a83-5df8-4052-ba1a-6a699f4ba2c6,job_skill_set,,,,,
+4f71cb6f-7637-4138-af08-79006cefd9ca,job_skill_set,,,,,
+cabae57d-4386-487e-8aa7-bf87da0b8b8b,synthetic,4,Mason / bricklayer,http://data.europa.eu/esco/occupation/05f321f8-055b-407d-bf19-e0ddabda56b7,bricklayer,7112.1
+197eeb94-615c-485c-8bc8-2ccd4372874c,job_skill_set,,,,,
+348c2035-cb05-494c-b6a6-611fe8a7632e,synthetic,16,Cook / catering worker,http://data.europa.eu/esco/occupation/90f75f67-495d-49fa-ab57-2f320e251d7e,cook,5120.1
+43142515-735c-4587-b052-80c3e32ffc1e,job_skill_set,,,,,
+8361106a-1534-4377-b724-dd1f92085ef9,synthetic,4,Mason / bricklayer,http://data.europa.eu/esco/occupation/05f321f8-055b-407d-bf19-e0ddabda56b7,bricklayer,7112.1
+03d8df89-918a-4877-a6b5-bc667e69cf6f,job_skill_set,,,,,
+48081482-d56c-42b0-b14e-aa8e77f40344,job_skill_set,,,,,
+3fe72cf8-520a-409f-af3b-50a4ab841f5c,job_skill_set,,,,,
+dbc0f9a6-76ec-48ac-ab7d-462001373f8a,job_skill_set,,,,,
+be0602f7-f9ae-4d9e-b053-963050523dbb,job_skill_set,,,,,
+9d8f1260-1370-4b44-b1b3-e7c77268acdf,synthetic,16,Cook / catering worker,http://data.europa.eu/esco/occupation/90f75f67-495d-49fa-ab57-2f320e251d7e,cook,5120.1
+1c74590f-f4df-4903-8191-5a4280fdf94d,job_skill_set,,,,,
+a6ff5b54-656b-4de2-9078-f0d95e69f3e1,synthetic,7,Motor-vehicle mechanic,http://data.europa.eu/esco/occupation/4ad4024e-d1d3-4dea-b6d1-2c7948111dce,vehicle technician,7231.10
+0d66efc5-64f5-4fb7-beff-4cd84990bc81,job_skill_set,,,,,
+d78db0ff-d706-4cea-a636-59da0a3647e5,job_skill_set,,,,,
+e2428862-2ee8-4c15-8872-ecb160f56b1b,job_skill_set,,,,,
+1a69b7b5-4149-4286-805e-043e57655846,synthetic,2,Plumber,http://data.europa.eu/esco/occupation/ed3cf43d-c2c1-4c46-82fc-1375e27e0290,plumber,7126.8
+6544ac90-3be7-48ba-8da9-8cda2c1933bf,job_skill_set,,,,,
+f12cf71b-cbb8-4bc3-9b48-e6c3dac2767c,job_skill_set,,,,,
+6df904b0-4872-4b63-8cc2-bb10d1392d2b,job_skill_set,,,,,
+f416af95-7bd1-4afd-a26c-2e88a0e298e1,job_skill_set,,,,,
+b9f77288-fea9-4b84-8c06-46f343c06e3b,synthetic,10,Mobile-phone repairer,http://data.europa.eu/esco/occupation/f0f6d531-eb96-4bad-84ff-8e2999ea68e6,mobile phone repair technician,7422.3.1
+e022f1e5-3aee-4c45-b257-8047c560c5f4,job_skill_set,,,,,
+7ce3a12e-590a-4f96-896d-773aafc30045,synthetic,12,Hairdresser / barber,http://data.europa.eu/esco/occupation/4e0c14d6-b170-40f1-bcdc-703c0b92109b,barber,5141.1.1
+fb55e332-72d2-4c65-b689-5510dc0e93b1,job_skill_set,,,,,
+7fdf1e32-a8e2-4e28-bb3f-d872a82a07e5,synthetic,12,Hairdresser / barber,http://data.europa.eu/esco/occupation/099c6bb0-22d3-4c5d-8bf5-70910af381ef,hairdresser,5141.1
+6f745e9a-8546-4ba4-9b44-6414ed136f32,job_skill_set,,,,,
+ad0c1b48-3e27-498d-8e0c-115f75f01f62,synthetic,2,Plumber,http://data.europa.eu/esco/occupation/ed3cf43d-c2c1-4c46-82fc-1375e27e0290,plumber,7126.8
+d23d7771-a31f-4a0a-9e82-9d974c9745e1,job_skill_set,,,,,
+34869b82-c673-499c-b0f7-41c1d76936fa,job_skill_set,,,,,
+74f4dc32-1c51-4ab8-b5e0-65831c75866e,job_skill_set,,,,,
+f37d8641-04de-43ea-aae5-6e56644fd3f0,synthetic,3,Carpenter,http://data.europa.eu/esco/occupation/2a22ff9e-de3b-408d-b312-5034896cc4f4,carpenter,7115.1
+32bbd9d9-227f-4a56-a6fa-670e1feb8810,job_skill_set,,,,,
+74945d54-148e-4d1f-aed6-3d5d4d254edb,synthetic,4,Mason / bricklayer,http://data.europa.eu/esco/occupation/05f321f8-055b-407d-bf19-e0ddabda56b7,bricklayer,7112.1
+b6ec8afa-cc26-4dce-8ef9-8ff7325a0ed9,job_skill_set,,,,,
+14d9e1f1-e35e-44c2-ad63-219a621fdf87,job_skill_set,,,,,
+43e3b360-3ac0-411b-a1ef-85f262812c4c,job_skill_set,,,,,
+b2edaf8e-4b72-4442-9566-ba23fc229fca,job_skill_set,,,,,
+ca051363-f668-4ff6-bc04-a31c7d8c3fe0,synthetic,15,Laundry worker,http://data.europa.eu/esco/occupation/0da51178-e386-4534-ae71-15ba789ad756,laundry worker,8157.1
+6e841ac1-6bbe-4f63-9751-4b48589095c7,job_skill_set,,,,,
+858911b3-0941-44eb-a5de-0a53675634c5,job_skill_set,,,,,
+9a8d1917-6975-4b24-91f2-54d7b2915401,synthetic,1,Electrician,http://data.europa.eu/esco/occupation/4910419f-b4af-4f59-b544-9dbebc8a74f0,electrician,7411.1
+ecbd5bbf-a865-4148-afc8-c61406c174b6,synthetic,1,Electrician,http://data.europa.eu/esco/occupation/4910419f-b4af-4f59-b544-9dbebc8a74f0,electrician,7411.1
+e0e7db72-87f7-48ca-8f08-e16c5e497873,synthetic,11,Tailor / dressmaker,http://data.europa.eu/esco/occupation/978ae3a2-0831-415a-8396-b84dde656fc5,tailor,7531.5
+f0906a95-7651-4482-9184-66006c136f56,job_skill_set,,,,,
+0bd4a7aa-0f07-4b41-8898-4ce52f8eb0c0,job_skill_set,,,,,
+b0670f08-3ce2-4e48-97bb-92ccd46c040a,job_skill_set,,,,,
+4d02937c-ca35-4a5f-9323-602ca5946b3a,job_skill_set,,,,,
+280483af-c995-4d6a-a14e-09659d56913c,job_skill_set,,,,,
+e854f4da-29cc-48a3-866d-d44bec19c576,synthetic,11,Tailor / dressmaker,http://data.europa.eu/esco/occupation/978ae3a2-0831-415a-8396-b84dde656fc5,tailor,7531.5
+efea3d8c-5440-4f67-a55a-0fa00d0859c4,job_skill_set,,,,,
+654ee779-aadc-467b-9822-924bc895d250,job_skill_set,,,,,
+5baf5613-a3cc-4f1d-8116-e332bb9e929b,synthetic,15,Laundry worker,http://data.europa.eu/esco/occupation/0da51178-e386-4534-ae71-15ba789ad756,laundry worker,8157.1
+ee5a5724-aef9-4943-bb77-47789d5b2089,synthetic,2,Plumber,http://data.europa.eu/esco/occupation/ed3cf43d-c2c1-4c46-82fc-1375e27e0290,plumber,7126.8
+dc2e256d-3948-40f0-9c2b-2dedfb18d40e,job_skill_set,,,,,
+b68be470-75b3-4744-a48e-5547d3dbdf5f,job_skill_set,,,,,
+5184c283-fe63-4a25-b9cb-48db97dd5251,synthetic,2,Plumber,http://data.europa.eu/esco/occupation/ed3cf43d-c2c1-4c46-82fc-1375e27e0290,plumber,7126.8
+c650742e-d6f2-46c4-9e99-ee1c65cbebf2,job_skill_set,,,,,
+6c19f99b-8896-4735-8ff9-f874d8bea5d9,job_skill_set,,,,,
+469bc6e0-282f-4bc3-b17b-cf26d0f93625,synthetic,1,Electrician,http://data.europa.eu/esco/occupation/4910419f-b4af-4f59-b544-9dbebc8a74f0,electrician,7411.1
+76b40803-6cdd-48eb-a218-7dfec5b5010f,job_skill_set,,,,,
+6aad12ac-a2ad-4030-9662-8885988f3ffc,job_skill_set,,,,,
+db6f75a9-8f60-4d1a-bc13-86384958c4e3,synthetic,12,Hairdresser / barber,http://data.europa.eu/esco/occupation/099c6bb0-22d3-4c5d-8bf5-70910af381ef,hairdresser,5141.1
+a8fcdc4a-2393-4ad1-9d5d-e450d1367bd2,synthetic,12,Hairdresser / barber,http://data.europa.eu/esco/occupation/099c6bb0-22d3-4c5d-8bf5-70910af381ef,hairdresser,5141.1
+d793ca12-8e53-4438-8faf-16b83ef647be,job_skill_set,,,,,
+3e32ee9b-e9d1-41ed-9bfa-bcfc87cc03aa,job_skill_set,,,,,
+d3c8d095-9926-43d1-83b3-bca56e4c148c,job_skill_set,,,,,
+c4301d4f-8ecf-4100-8620-3c5a430256d7,job_skill_set,,,,,
+481c1aea-a918-41e7-ac10-f34591eb49bb,job_skill_set,,,,,
+bd7bc447-96f1-481a-bd50-b81a658c8d23,job_skill_set,,,,,
+6714e068-2d49-4064-9330-a46dc582ad49,job_skill_set,,,,,
+2743eb00-d041-45e8-8242-110efa6697a0,synthetic,3,Carpenter,http://data.europa.eu/esco/occupation/2a22ff9e-de3b-408d-b312-5034896cc4f4,carpenter,7115.1
+2d4ec26a-954f-4c3f-89cc-33b53e62fa8e,synthetic,3,Carpenter,http://data.europa.eu/esco/occupation/2a22ff9e-de3b-408d-b312-5034896cc4f4,carpenter,7115.1
+759cb472-0b69-431c-b008-17f510f3e3b1,job_skill_set,,,,,
+c39d288d-fdfa-4ac3-ae7b-d72c1bad9f7e,synthetic,7,Motor-vehicle mechanic,http://data.europa.eu/esco/occupation/4ad4024e-d1d3-4dea-b6d1-2c7948111dce,vehicle technician,7231.10
+2b01e536-298e-4a88-b62f-323b3f1e9c43,job_skill_set,,,,,
+c046f3d8-79c3-439f-b74b-6053c4356f5a,job_skill_set,,,,,
+c0eea9b1-f8a5-4897-986d-7a39d349ba79,job_skill_set,,,,,
+1572a010-9ec6-442b-b0b8-42844307022b,job_skill_set,,,,,
+8494d050-9ee8-45e6-887f-f45bc1c09c77,job_skill_set,,,,,
+ec5bd08d-374d-42e3-9f3a-9d64e5cecd98,job_skill_set,,,,,
+f55488fc-7c8d-48f4-938a-c6a27464cf58,synthetic,3,Carpenter,http://data.europa.eu/esco/occupation/2a22ff9e-de3b-408d-b312-5034896cc4f4,carpenter,7115.1
+5b5d1a7c-3c63-476a-92a9-715c9000fe13,job_skill_set,,,,,
+92c48c8b-5391-448d-87ea-0a86b8a9716e,job_skill_set,,,,,
+933b862b-3f25-4e6c-841e-b32b3a94f0b9,job_skill_set,,,,,
+250fc94a-e9d8-4f71-8b45-19c07384f29a,job_skill_set,,,,,
+82ff7d49-3b20-4fcc-b158-9ad910e2c2d0,job_skill_set,,,,,
+ffe7b9e5-b804-40dd-8f89-55b1f07458a1,job_skill_set,,,,,
+1ed837d1-134a-4966-8c9a-09808c4cdd18,job_skill_set,,,,,
+02b4ba60-035b-4e75-a4e1-24ccad9f7639,job_skill_set,,,,,
+284bef5b-3532-4839-8e5d-657d65c0af5e,job_skill_set,,,,,
+a85f69b7-55a4-4655-8ad3-a00a59fc9152,job_skill_set,,,,,
+d8acda74-b229-4a9f-9795-8eb819b03db4,job_skill_set,,,,,
+c4d03bf4-736b-405a-8ebb-a3bf64e0bb6e,synthetic,11,Tailor / dressmaker,http://data.europa.eu/esco/occupation/978ae3a2-0831-415a-8396-b84dde656fc5,tailor,7531.5
+767da6b9-c7d9-436d-9f70-565923caf3e7,synthetic,11,Tailor / dressmaker,http://data.europa.eu/esco/occupation/978ae3a2-0831-415a-8396-b84dde656fc5,tailor,7531.5
+4d50905e-8ce4-40a6-bdb7-82215dec23e6,job_skill_set,,,,,
+905d4226-6b49-41f9-a3b2-1daef37f06be,job_skill_set,,,,,
+6c548893-7741-4588-b0ab-9bad97e9ff71,job_skill_set,,,,,
+4133f9fc-63f9-4edb-bb68-b2c0d7566ae0,job_skill_set,,,,,
+ceaa7dc7-39cf-4a55-b649-3cfa67494889,job_skill_set,,,,,
+71e0a858-b15f-4fc0-b5a1-3f17987fc818,job_skill_set,,,,,
+85e706ba-d62b-4842-aa20-a7d3cb425393,job_skill_set,,,,,

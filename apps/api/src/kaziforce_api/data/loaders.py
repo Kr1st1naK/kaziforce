@@ -41,7 +41,6 @@ DATA_DIR = _find_data_dir()
 RAW_JOB_CSV = DATA_DIR / "raw/job_skill_set/all_job_post.csv"
 ESCO_DIR = DATA_DIR / "raw/esco"
 SYNTHETIC_DIR = DATA_DIR / "raw/synthetic"
-PROCESSED_DIR = DATA_DIR / "processed"
 VOCABULARY_DIR = DATA_DIR / "vocabulary"
 
 # Source loaders
@@ -90,6 +89,28 @@ def load_esco_data(path: Path = ESCO_DIR) -> dict[str, pd.DataFrame]:
 
 SYNTHETIC_FILES = {"workers": "workers.csv", "jobs": "jobs.csv"}
 _SYNTHETIC_LIST_COLUMNS = {"workers": "skills", "jobs": "required_skills"}
+SYNTHETIC_POOLS = SYNTHETIC_DIR / "inputs" / "area_skill_pools.csv"
+
+
+def build_synthetic_data(path: Path = SYNTHETIC_DIR, rebuild_pools: bool = False,
+                         n_distractors: int = 200, **generator_kwargs) -> dict:
+    """Generate the synthetic dataset from the frozen vocabulary; returns the manifest.
+
+    Skill pools are rebuilt from the ESCO subset only if asked (or missing);
+    otherwise the committed pools file is used. Job Skill Set distractors are
+    added when the raw corpus is present and n_distractors > 0.
+    """
+    from kaziforce_api.data.synthetic import build_dataset, build_skill_pools
+
+    path = Path(path)
+    pools = path / "inputs" / "area_skill_pools.csv"
+    if rebuild_pools or not pools.exists():
+        area_map = pd.read_csv(VOCABULARY_DIR / "area_esco_map.csv", dtype=str).fillna("").to_dict("records")
+        pools.parent.mkdir(parents=True, exist_ok=True)
+        build_skill_pools(load_esco_data(), area_map).to_csv(pools, index=False)
+    corpus = load_job_corpus() if n_distractors and RAW_JOB_CSV.exists() else None
+    return build_dataset(path, VOCABULARY_DIR, pools, job_corpus=corpus, n_distractors=n_distractors,
+                         **generator_kwargs)
 
 
 def load_synthetic_data(
@@ -97,28 +118,30 @@ def load_synthetic_data(
 ) -> dict[str, pd.DataFrame]:
     """Load synthetic worker profiles and job postings (fallback source).
 
-    Generates them with kaziforce_api.data.synthetic and saves to `path` if they
-    don't exist yet (or if regenerate=True). Returns {"workers", "jobs"} with
-    skill columns as Python lists.
+    Profile files only: no area, occupation or label columns. Ground truth is
+    loaded separately with load_synthetic_ground_truth(). Generates the dataset
+    first if it is missing or regenerate=True. Skill columns are Python lists.
     """
-    from kaziforce_api.data.synthetic import generate_synthetic_data
-
     path = Path(path)
     if regenerate or not all((path / f).exists() for f in SYNTHETIC_FILES.values()):
-        path.mkdir(parents=True, exist_ok=True)
-        for key, df in generate_synthetic_data(**generator_kwargs).items():
-            out = df.copy()
-            col = _SYNTHETIC_LIST_COLUMNS[key]
-            out[col] = out[col].apply(json.dumps)
-            out.to_csv(path / SYNTHETIC_FILES[key], index=False)
+        build_synthetic_data(path, **generator_kwargs)
 
     data = {}
     for key, f in SYNTHETIC_FILES.items():
-        df = pd.read_csv(path / f)
+        df = pd.read_csv(path / f, dtype={"group_id": str})
         col = _SYNTHETIC_LIST_COLUMNS[key]
         df[col] = df[col].apply(json.loads)
         data[key] = df
     return data
+
+
+def load_synthetic_ground_truth(path: Path = SYNTHETIC_DIR) -> dict[str, pd.DataFrame]:
+    """splits, worker_truth, job_truth, relevance and compatibility_matrix tables."""
+    path = Path(path)
+    files = {"splits": path / "splits.csv",
+             **{k: path / "ground_truth" / f"{k}.csv"
+                for k in ("worker_truth", "job_truth", "relevance", "compatibility_matrix")}}
+    return {k: pd.read_csv(f, dtype={"group_id": str}) for k, f in files.items()}
 
 
 # Text cleaning primitives
@@ -127,7 +150,6 @@ _HTML_RE = re.compile(r"<[^>]+>")
 _WS_RE = re.compile(r"[ \t]+")
 _MULTINL_RE = re.compile(r"\n\s*\n+")
 _PUNCT_SPACE_RE = re.compile(r"\s+([.,;:!?])")
-_SKILL_STRIP_RE = re.compile(r"[^\w\s\-\+/#\.]")
 
 
 def clean_text(x) -> str:
@@ -139,6 +161,36 @@ def clean_text(x) -> str:
     x = _HTML_RE.sub(" ", x)
     x = _WS_RE.sub(" ", x)
     x = _MULTINL_RE.sub("\n", x)
+    x = _PUNCT_SPACE_RE.sub(r"\1", x)
+    return x.strip()
+
+
+# Emails, partial emails and @handles: anything attached to "@" (a lone " @ " meaning "at" stays).
+_EMAIL_RE = re.compile(r"[\w.+-]*@[\w-]+(?:\.[\w-]+)*|[\w.+-]+@(?=\s|$)")
+_URL_RE = re.compile(r"(?:https?://|www\.)\S+", re.IGNORECASE)
+_PHONE_RE = re.compile(
+    r"(?<![\w$])(?:\+?\d{1,3}[\s.-]?)?(?:\(\d{3}\)|\d{3})[\s.-]\d{3}[\s.-]\d{4}(?!\d)"  # (555) 555-5555
+    r"|(?<![\w$])\+?\d{10,13}(?!\d)"  # bare 10-13 digit runs
+)
+
+
+def clean_profile_text(x, uppercase_ratio: float = 0.7) -> str:
+    """Clean free text from job postings or worker profiles for matching.
+
+    Builds on clean_text(), then removes contact details (emails, URLs, phone
+    numbers), lowercases text that is mostly upper case (the Job Skill Set
+    descriptions are), and joins lines into one paragraph. Returns "" for
+    missing values.
+    """
+    x = clean_text(x)
+    if not isinstance(x, str):
+        return ""
+    for pattern in (_EMAIL_RE, _URL_RE, _PHONE_RE):
+        x = pattern.sub(" ", x)
+    letters = [c for c in x if c.isalpha()]
+    if letters and sum(c.isupper() for c in letters) / len(letters) > uppercase_ratio:
+        x = x.lower()
+    x = re.sub(r"\s+", " ", x)
     x = _PUNCT_SPACE_RE.sub(r"\1", x)
     return x.strip()
 
@@ -166,139 +218,3 @@ def parse_skill_set(s) -> list[str]:
         p.strip().strip("'\"") for p in parts
         if p.strip().strip("'\"") and p.strip().strip("'\"").lower() not in {"nan", "none", "null"}
     ]
-
-
-def normalize_skill(s) -> str:
-    if pd.isna(s):
-        return np.nan
-    s = clean_text(s)
-    if not s:
-        return np.nan
-    s = s.lower().replace("&", " and ")
-    s = _SKILL_STRIP_RE.sub(" ", s)
-    s = re.sub(r"\s+", " ", s).strip()
-    return s if s else np.nan
-
-# Orchestration
-def preprocess_jobs(df: pd.DataFrame, out_dir: Path = PROCESSED_DIR) -> dict:
-    """Clean, dedupe, parse, and export the job-side corpus."""
-    out_dir = Path(out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
-
-    report: dict = {"original_rows": int(len(df))}
-    df = df.copy()
-
-    # --- Text cleaning ---
-    df["job_title_clean"] = df["job_title"].apply(clean_text)
-    df["job_description_clean"] = df["job_description"].apply(clean_text)
-    df["category_clean"] = df["category"].apply(
-        lambda x: clean_text(x).lower() if pd.notna(x) else np.nan
-    )
-    df["job_title_norm"] = df["job_title_clean"].str.lower()
-    df["job_description_norm"] = df["job_description_clean"].str.lower()
-
-    # --- Skills parse + normalise ---
-    df["job_skill_list"] = df["job_skill_set"].apply(parse_skill_set)
-    df["job_skill_list"] = df["job_skill_list"].apply(
-        lambda xs: sorted(set(xs), key=lambda s: s.lower())
-    )
-    df["job_skill_normalized_list"] = df["job_skill_list"].apply(
-        lambda xs: sorted(set(
-            normalize_skill(x) for x in xs if pd.notna(normalize_skill(x))
-        ))
-    )
-    df["job_skill_count"] = df["job_skill_list"].apply(len)
-
-    # --- Deduplicate ---
-    before = len(df)
-    df = df.drop_duplicates(keep="first").copy()
-    report["dropped_exact_duplicates"] = before - len(df)
-
-    dups = df[df.duplicated(subset=["job_id"], keep=False)].copy()
-    if len(dups):
-        dups.to_csv(out_dir / "duplicate_job_ids.csv", index=False)
-
-    before = len(df)
-    df = df.drop_duplicates(subset=["job_id"], keep="first").copy()
-    report["dropped_duplicate_job_id"] = before - len(df)
-
-    before = len(df)
-    df = df.drop_duplicates(
-        subset=["job_title_clean", "job_description_clean", "category_clean"],
-        keep="first",
-    ).copy()
-    report["dropped_near_duplicates"] = before - len(df)
-
-    # --- Usability flags ---
-    df["has_title"] = df["job_title_clean"].fillna("").str.len() > 0
-    df["has_description"] = df["job_description_clean"].fillna("").str.len() > 0
-    df["has_skills"] = df["job_skill_list"].apply(len) > 0
-    df["usable_for_semantic"] = df["has_description"]
-    df["usable_for_rule"] = df["has_skills"]
-    df["usable_for_kg"] = df["has_title"] & df["has_skills"]
-
-    report["usable_for_semantic"] = int(df["usable_for_semantic"].sum())
-    report["usable_for_rule"] = int(df["usable_for_rule"].sum())
-    report["usable_for_kg"] = int(df["usable_for_kg"].sum())
-    report["final_rows"] = int(len(df))
-
-    df[~df["has_title"] & ~df["has_description"] & ~df["has_skills"]].to_csv(
-        out_dir / "unusable_jobs.csv", index=False
-    )
-
-    # --- Long job-skill table ---
-    skills_long = df.explode("job_skill_list").dropna(subset=["job_skill_list"]).copy()
-    skills_long["skill_original"] = skills_long["job_skill_list"].astype(str).str.strip()
-    skills_long["skill_normalized"] = skills_long["skill_original"].apply(normalize_skill)
-    skills_long = skills_long[skills_long["skill_normalized"].notna()].copy()
-    skills_long = skills_long[
-        ["job_id", "category_clean", "job_title_clean",
-         "skill_original", "skill_normalized"]
-    ].drop_duplicates(subset=["job_id", "skill_normalized"])
-    report["long_skill_rows"] = int(len(skills_long))
-
-    # --- Skill vocabulary ---
-    skill_vocab = (
-        skills_long.groupby("skill_normalized")
-        .agg(frequency=("job_id", "nunique"), example_original=("skill_original", "first"))
-        .reset_index()
-        .sort_values(["frequency", "skill_normalized"], ascending=[False, True])
-    )
-    skill_vocab["esco_skill_id"] = None
-    skill_vocab["mapping_status"] = "unmapped"
-    skill_vocab["mapping_notes"] = None
-    report["unique_normalized_skills"] = int(len(skill_vocab))
-
-    # --- Templates ---
-    pd.DataFrame(columns=[
-        "skill_normalized", "esco_skill_id", "esco_preferred_label",
-        "mapping_status", "source", "notes",
-    ]).to_csv(out_dir / "esco_skill_mapping_template.csv", index=False)
-
-    VOCABULARY_DIR.mkdir(parents=True, exist_ok=True)
-    kenya_path = VOCABULARY_DIR / "kenya_informal_vocab_template.csv"
-    if not kenya_path.exists():
-        pd.DataFrame(columns=[
-            "informal_term", "formal_term", "esco_occupation_uri",
-            "esco_skill_uri", "source", "validated",
-        ]).to_csv(kenya_path, index=False)
-
-    # --- Save outputs ---
-    jobs_clean = df.copy()
-    jobs_clean["job_skill_list_json"] = jobs_clean["job_skill_list"].apply(json.dumps)
-    jobs_clean["job_skill_normalized_list_json"] = (
-        jobs_clean["job_skill_normalized_list"].apply(json.dumps)
-    )
-    jobs_clean.drop(
-        columns=["job_skill_list", "job_skill_normalized_list"], errors="ignore"
-    ).to_csv(out_dir / "jobs_clean.csv", index=False)
-    skills_long.to_csv(out_dir / "job_skills_long.csv", index=False)
-    skill_vocab.to_csv(out_dir / "skill_vocab.csv", index=False)
-
-    # --- Report ---
-    with open(out_dir / "preprocessing_report.txt", "w", encoding="utf-8") as f:
-        f.write("JOB CORPUS PREPROCESSING REPORT\n" + "=" * 40 + "\n")
-        for k, v in report.items():
-            f.write(f"{k}: {v}\n")
-
-    return report

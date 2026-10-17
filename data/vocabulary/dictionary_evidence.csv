@@ -1,0 +1,253 @@
+area_id,alias,component,role,source,result,headword,pos,occupation_tagged,url
+1,fundi wa umeme,fundi wa umeme,phrase,kaikki_en,not_found,,,no,
+1,fundi wa umeme,fundi wa umeme,phrase,sw_wiktionary,not_found,,,,
+1,fundi wa umeme,fundi,head,kaikki_en,headword,fundi,noun,yes,https://en.wiktionary.org/wiki/fundi#Swahili
+1,fundi wa umeme,fundi,head,sw_wiktionary,headword,fundi,nomino,,https://sw.wiktionary.org/wiki/fundi
+1,fundi wa umeme,wa,function_word,kaikki_en,headword,wa,particle/verb,no,https://en.wiktionary.org/wiki/wa#Swahili
+1,fundi wa umeme,wa,function_word,sw_wiktionary,not_found,,,,
+1,fundi wa umeme,umeme,complement,kaikki_en,headword,umeme,noun,no,https://en.wiktionary.org/wiki/umeme#Swahili
+1,fundi wa umeme,umeme,complement,sw_wiktionary,headword,umeme,nomino,,https://sw.wiktionary.org/wiki/umeme
+1,fundi wa stima,fundi wa stima,phrase,kaikki_en,not_found,,,no,
+1,fundi wa stima,fundi wa stima,phrase,sw_wiktionary,not_found,,,,
+1,fundi wa stima,fundi,head,kaikki_en,headword,fundi,noun,yes,https://en.wiktionary.org/wiki/fundi#Swahili
+1,fundi wa stima,fundi,head,sw_wiktionary,headword,fundi,nomino,,https://sw.wiktionary.org/wiki/fundi
+1,fundi wa stima,wa,function_word,kaikki_en,headword,wa,particle/verb,no,https://en.wiktionary.org/wiki/wa#Swahili
+1,fundi wa stima,wa,function_word,sw_wiktionary,not_found,,,,
+1,fundi wa stima,stima,complement,kaikki_en,headword,stima,noun,no,https://en.wiktionary.org/wiki/stima#Swahili
+1,fundi wa stima,stima,complement,sw_wiktionary,headword,stima,nomino,,https://sw.wiktionary.org/wiki/stima
+2,fundi bomba,fundi bomba,phrase,kaikki_en,headword,fundi bomba,noun,yes,https://en.wiktionary.org/wiki/fundi_bomba#Swahili
+2,fundi bomba,fundi bomba,phrase,sw_wiktionary,not_found,,,,
+2,fundi bomba,fundi,head,kaikki_en,headword,fundi,noun,yes,https://en.wiktionary.org/wiki/fundi#Swahili
+2,fundi bomba,fundi,head,sw_wiktionary,headword,fundi,nomino,,https://sw.wiktionary.org/wiki/fundi
+2,fundi bomba,bomba,complement,kaikki_en,headword,bomba,noun,no,https://en.wiktionary.org/wiki/bomba#Swahili
+2,fundi bomba,bomba,complement,sw_wiktionary,headword,bomba,nomino,,https://sw.wiktionary.org/wiki/bomba
+2,plumber,plumber,phrase,,not_checked_english,,,,
+3,fundi wa mbao,fundi wa mbao,phrase,kaikki_en,not_found,,,no,
+3,fundi wa mbao,fundi wa mbao,phrase,sw_wiktionary,not_found,,,,
+3,fundi wa mbao,fundi,head,kaikki_en,headword,fundi,noun,yes,https://en.wiktionary.org/wiki/fundi#Swahili
+3,fundi wa mbao,fundi,head,sw_wiktionary,headword,fundi,nomino,,https://sw.wiktionary.org/wiki/fundi
+3,fundi wa mbao,wa,function_word,kaikki_en,headword,wa,particle/verb,no,https://en.wiktionary.org/wiki/wa#Swahili
+3,fundi wa mbao,wa,function_word,sw_wiktionary,not_found,,,,
+3,fundi wa mbao,mbao,complement,kaikki_en,headword,mbao,noun,no,https://en.wiktionary.org/wiki/mbao#Swahili
+3,fundi wa mbao,mbao,complement,sw_wiktionary,headword,mbao,nomino,,https://sw.wiktionary.org/wiki/mbao
+3,fundi seremala,fundi seremala,phrase,kaikki_en,not_found,,,no,
+3,fundi seremala,fundi seremala,phrase,sw_wiktionary,not_found,,,,
+3,fundi seremala,fundi,head,kaikki_en,headword,fundi,noun,yes,https://en.wiktionary.org/wiki/fundi#Swahili
+3,fundi seremala,fundi,head,sw_wiktionary,headword,fundi,nomino,,https://sw.wiktionary.org/wiki/fundi
+3,fundi seremala,seremala,complement,kaikki_en,headword,seremala,noun,yes,https://en.wiktionary.org/wiki/seremala#Swahili
+3,fundi seremala,seremala,complement,sw_wiktionary,headword,seremala,nomino,,https://sw.wiktionary.org/wiki/seremala
+3,carpenter,carpenter,phrase,,not_checked_english,,,,
+4,mwashi,mwashi,head,kaikki_en,headword,mwashi,noun,yes,https://en.wiktionary.org/wiki/mwashi#Swahili
+4,mwashi,mwashi,head,sw_wiktionary,headword,mwashi,nomino,,https://sw.wiktionary.org/wiki/mwashi
+5,mpaka rangi,mpaka rangi,phrase,kaikki_en,not_found,,,no,
+5,mpaka rangi,mpaka rangi,phrase,sw_wiktionary,not_found,,,,
+5,mpaka rangi,mpaka,head,kaikki_en,headword,mpaka,noun/prep,no,https://en.wiktionary.org/wiki/mpaka#Swahili
+5,mpaka rangi,mpaka,head,sw_wiktionary,headword,mpaka,nomino,,https://sw.wiktionary.org/wiki/mpaka
+5,mpaka rangi,rangi,complement,kaikki_en,headword,rangi,noun,no,https://en.wiktionary.org/wiki/rangi#Swahili
+5,mpaka rangi,rangi,complement,sw_wiktionary,headword,rangi,nomino,,https://sw.wiktionary.org/wiki/rangi
+5,fundi rangi,fundi rangi,phrase,kaikki_en,not_found,,,no,
+5,fundi rangi,fundi rangi,phrase,sw_wiktionary,not_found,,,,
+5,fundi rangi,fundi,head,kaikki_en,headword,fundi,noun,yes,https://en.wiktionary.org/wiki/fundi#Swahili
+5,fundi rangi,fundi,head,sw_wiktionary,headword,fundi,nomino,,https://sw.wiktionary.org/wiki/fundi
+5,fundi rangi,rangi,complement,kaikki_en,headword,rangi,noun,no,https://en.wiktionary.org/wiki/rangi#Swahili
+5,fundi rangi,rangi,complement,sw_wiktionary,headword,rangi,nomino,,https://sw.wiktionary.org/wiki/rangi
+5,mchoraji,mchoraji,head,kaikki_en,headword,mchoraji,name/noun,yes,https://en.wiktionary.org/wiki/mchoraji#Swahili
+5,mchoraji,mchoraji,head,sw_wiktionary,headword,mchoraji,nomino,,https://sw.wiktionary.org/wiki/mchoraji
+6,welder,welder,phrase,,not_checked_english,,,,
+6,fundi wa kuchomelea,fundi wa kuchomelea,phrase,kaikki_en,not_found,,,no,
+6,fundi wa kuchomelea,fundi wa kuchomelea,phrase,sw_wiktionary,not_found,,,,
+6,fundi wa kuchomelea,fundi,head,kaikki_en,headword,fundi,noun,yes,https://en.wiktionary.org/wiki/fundi#Swahili
+6,fundi wa kuchomelea,fundi,head,sw_wiktionary,headword,fundi,nomino,,https://sw.wiktionary.org/wiki/fundi
+6,fundi wa kuchomelea,wa,function_word,kaikki_en,headword,wa,particle/verb,no,https://en.wiktionary.org/wiki/wa#Swahili
+6,fundi wa kuchomelea,wa,function_word,sw_wiktionary,not_found,,,,
+6,fundi wa kuchomelea,kuchomelea,complement,kaikki_en,not_found,,,no,
+6,fundi wa kuchomelea,kuchomelea,complement,sw_wiktionary,headword,kuchomelea,nomino,,https://sw.wiktionary.org/wiki/kuchomelea
+6,fundi wa chuma,fundi wa chuma,phrase,kaikki_en,not_found,,,no,
+6,fundi wa chuma,fundi wa chuma,phrase,sw_wiktionary,not_found,,,,
+6,fundi wa chuma,fundi,head,kaikki_en,headword,fundi,noun,yes,https://en.wiktionary.org/wiki/fundi#Swahili
+6,fundi wa chuma,fundi,head,sw_wiktionary,headword,fundi,nomino,,https://sw.wiktionary.org/wiki/fundi
+6,fundi wa chuma,wa,function_word,kaikki_en,headword,wa,particle/verb,no,https://en.wiktionary.org/wiki/wa#Swahili
+6,fundi wa chuma,wa,function_word,sw_wiktionary,not_found,,,,
+6,fundi wa chuma,chuma,complement,kaikki_en,headword,chuma,noun/verb,no,https://en.wiktionary.org/wiki/chuma#Swahili
+6,fundi wa chuma,chuma,complement,sw_wiktionary,headword,chuma,nomino,,https://sw.wiktionary.org/wiki/chuma
+7,fundi wa magari,fundi wa magari,phrase,kaikki_en,not_found,,,no,
+7,fundi wa magari,fundi wa magari,phrase,sw_wiktionary,not_found,,,,
+7,fundi wa magari,fundi,head,kaikki_en,headword,fundi,noun,yes,https://en.wiktionary.org/wiki/fundi#Swahili
+7,fundi wa magari,fundi,head,sw_wiktionary,headword,fundi,nomino,,https://sw.wiktionary.org/wiki/fundi
+7,fundi wa magari,wa,function_word,kaikki_en,headword,wa,particle/verb,no,https://en.wiktionary.org/wiki/wa#Swahili
+7,fundi wa magari,wa,function_word,sw_wiktionary,not_found,,,,
+7,fundi wa magari,magari,complement,kaikki_en,form_of,gari,noun,no,https://en.wiktionary.org/wiki/gari#Swahili
+7,fundi wa magari,magari,complement,sw_wiktionary,headword,magari,nomino,,https://sw.wiktionary.org/wiki/magari
+8,fundi wa pikipiki,fundi wa pikipiki,phrase,kaikki_en,not_found,,,no,
+8,fundi wa pikipiki,fundi wa pikipiki,phrase,sw_wiktionary,not_found,,,,
+8,fundi wa pikipiki,fundi,head,kaikki_en,headword,fundi,noun,yes,https://en.wiktionary.org/wiki/fundi#Swahili
+8,fundi wa pikipiki,fundi,head,sw_wiktionary,headword,fundi,nomino,,https://sw.wiktionary.org/wiki/fundi
+8,fundi wa pikipiki,wa,function_word,kaikki_en,headword,wa,particle/verb,no,https://en.wiktionary.org/wiki/wa#Swahili
+8,fundi wa pikipiki,wa,function_word,sw_wiktionary,not_found,,,,
+8,fundi wa pikipiki,pikipiki,complement,kaikki_en,headword,pikipiki,noun,no,https://en.wiktionary.org/wiki/pikipiki#Swahili
+8,fundi wa pikipiki,pikipiki,complement,sw_wiktionary,headword,pikipiki,nomino,,https://sw.wiktionary.org/wiki/pikipiki
+9,fundi wa vifaa vya nyumbani,fundi wa vifaa vya nyumbani,phrase,kaikki_en,not_found,,,no,
+9,fundi wa vifaa vya nyumbani,fundi wa vifaa vya nyumbani,phrase,sw_wiktionary,not_found,,,,
+9,fundi wa vifaa vya nyumbani,fundi,head,kaikki_en,headword,fundi,noun,yes,https://en.wiktionary.org/wiki/fundi#Swahili
+9,fundi wa vifaa vya nyumbani,fundi,head,sw_wiktionary,headword,fundi,nomino,,https://sw.wiktionary.org/wiki/fundi
+9,fundi wa vifaa vya nyumbani,wa,function_word,kaikki_en,headword,wa,particle/verb,no,https://en.wiktionary.org/wiki/wa#Swahili
+9,fundi wa vifaa vya nyumbani,wa,function_word,sw_wiktionary,not_found,,,,
+9,fundi wa vifaa vya nyumbani,vifaa,complement,kaikki_en,form_of,kifaa,noun,no,https://en.wiktionary.org/wiki/kifaa#Swahili
+9,fundi wa vifaa vya nyumbani,vifaa,complement,sw_wiktionary,headword,vifaa,nomino,,https://sw.wiktionary.org/wiki/vifaa
+9,fundi wa vifaa vya nyumbani,vya,function_word,kaikki_en,headword,vya,particle,no,https://en.wiktionary.org/wiki/vya#Swahili
+9,fundi wa vifaa vya nyumbani,vya,function_word,sw_wiktionary,headword,vya,nomino,,https://sw.wiktionary.org/wiki/vya
+9,fundi wa vifaa vya nyumbani,nyumbani,complement,kaikki_en,form_of,nyumba,noun,no,https://en.wiktionary.org/wiki/nyumba#Swahili
+9,fundi wa vifaa vya nyumbani,nyumbani,complement,sw_wiktionary,headword,nyumbani,nomino,,https://sw.wiktionary.org/wiki/nyumbani
+9,vifaa vya kielektroniki,vifaa vya kielektroniki,phrase,kaikki_en,not_found,,,no,
+9,vifaa vya kielektroniki,vifaa vya kielektroniki,phrase,sw_wiktionary,not_found,,,,
+9,vifaa vya kielektroniki,vifaa,head,kaikki_en,form_of,kifaa,noun,no,https://en.wiktionary.org/wiki/kifaa#Swahili
+9,vifaa vya kielektroniki,vifaa,head,sw_wiktionary,headword,vifaa,nomino,,https://sw.wiktionary.org/wiki/vifaa
+9,vifaa vya kielektroniki,vya,function_word,kaikki_en,headword,vya,particle,no,https://en.wiktionary.org/wiki/vya#Swahili
+9,vifaa vya kielektroniki,vya,function_word,sw_wiktionary,headword,vya,nomino,,https://sw.wiktionary.org/wiki/vya
+9,vifaa vya kielektroniki,kielektroniki,complement,kaikki_en,headword,kielektroniki,adj,no,https://en.wiktionary.org/wiki/kielektroniki#Swahili
+9,vifaa vya kielektroniki,kielektroniki,complement,sw_wiktionary,headword,kielektroniki,kivumishi,,https://sw.wiktionary.org/wiki/kielektroniki
+9,vifaa / umeme repairer,vifaa umeme repairer,phrase,kaikki_en,not_found,,,no,
+9,vifaa / umeme repairer,vifaa umeme repairer,phrase,sw_wiktionary,not_found,,,,
+9,vifaa / umeme repairer,vifaa,head,kaikki_en,form_of,kifaa,noun,no,https://en.wiktionary.org/wiki/kifaa#Swahili
+9,vifaa / umeme repairer,vifaa,head,sw_wiktionary,headword,vifaa,nomino,,https://sw.wiktionary.org/wiki/vifaa
+9,vifaa / umeme repairer,umeme,complement,kaikki_en,headword,umeme,noun,no,https://en.wiktionary.org/wiki/umeme#Swahili
+9,vifaa / umeme repairer,umeme,complement,sw_wiktionary,headword,umeme,nomino,,https://sw.wiktionary.org/wiki/umeme
+9,vifaa / umeme repairer,repairer,english,,not_checked_english,,,,
+10,fundi wa simu,fundi wa simu,phrase,kaikki_en,not_found,,,no,
+10,fundi wa simu,fundi wa simu,phrase,sw_wiktionary,not_found,,,,
+10,fundi wa simu,fundi,head,kaikki_en,headword,fundi,noun,yes,https://en.wiktionary.org/wiki/fundi#Swahili
+10,fundi wa simu,fundi,head,sw_wiktionary,headword,fundi,nomino,,https://sw.wiktionary.org/wiki/fundi
+10,fundi wa simu,wa,function_word,kaikki_en,headword,wa,particle/verb,no,https://en.wiktionary.org/wiki/wa#Swahili
+10,fundi wa simu,wa,function_word,sw_wiktionary,not_found,,,,
+10,fundi wa simu,simu,complement,kaikki_en,headword,simu,noun,no,https://en.wiktionary.org/wiki/simu#Swahili
+10,fundi wa simu,simu,complement,sw_wiktionary,headword,simu,nomino,,https://sw.wiktionary.org/wiki/simu
+11,fundi wa nguo,fundi wa nguo,phrase,kaikki_en,not_found,,,no,
+11,fundi wa nguo,fundi wa nguo,phrase,sw_wiktionary,headword,fundi wa nguo,nomino,,https://sw.wiktionary.org/wiki/fundi_wa_nguo
+11,fundi wa nguo,fundi,head,kaikki_en,headword,fundi,noun,yes,https://en.wiktionary.org/wiki/fundi#Swahili
+11,fundi wa nguo,fundi,head,sw_wiktionary,headword,fundi,nomino,,https://sw.wiktionary.org/wiki/fundi
+11,fundi wa nguo,wa,function_word,kaikki_en,headword,wa,particle/verb,no,https://en.wiktionary.org/wiki/wa#Swahili
+11,fundi wa nguo,wa,function_word,sw_wiktionary,not_found,,,,
+11,fundi wa nguo,nguo,complement,kaikki_en,headword,nguo,noun,no,https://en.wiktionary.org/wiki/nguo#Swahili
+11,fundi wa nguo,nguo,complement,sw_wiktionary,headword,nguo,nomino,,https://sw.wiktionary.org/wiki/nguo
+12,kinyozi,kinyozi,head,kaikki_en,headword,kinyozi,noun,yes,https://en.wiktionary.org/wiki/kinyozi#Swahili
+12,kinyozi,kinyozi,head,sw_wiktionary,headword,kinyozi,nomino,,https://sw.wiktionary.org/wiki/kinyozi
+13,mfanyakazi wa urembo,mfanyakazi wa urembo,phrase,kaikki_en,not_found,,,no,
+13,mfanyakazi wa urembo,mfanyakazi wa urembo,phrase,sw_wiktionary,not_found,,,,
+13,mfanyakazi wa urembo,mfanyakazi,head,kaikki_en,headword,mfanyakazi,noun,yes,https://en.wiktionary.org/wiki/mfanyakazi#Swahili
+13,mfanyakazi wa urembo,mfanyakazi,head,sw_wiktionary,headword,mfanyakazi,nomino,,https://sw.wiktionary.org/wiki/mfanyakazi
+13,mfanyakazi wa urembo,wa,function_word,kaikki_en,headword,wa,particle/verb,no,https://en.wiktionary.org/wiki/wa#Swahili
+13,mfanyakazi wa urembo,wa,function_word,sw_wiktionary,not_found,,,,
+13,mfanyakazi wa urembo,urembo,complement,kaikki_en,headword,urembo,noun,no,https://en.wiktionary.org/wiki/urembo#Swahili
+13,mfanyakazi wa urembo,urembo,complement,sw_wiktionary,headword,urembo,nomino,,https://sw.wiktionary.org/wiki/urembo
+14,mfanyakazi wa usafi wa nyumbani,mfanyakazi wa usafi wa nyumbani,phrase,kaikki_en,not_found,,,no,
+14,mfanyakazi wa usafi wa nyumbani,mfanyakazi wa usafi wa nyumbani,phrase,sw_wiktionary,not_found,,,,
+14,mfanyakazi wa usafi wa nyumbani,mfanyakazi,head,kaikki_en,headword,mfanyakazi,noun,yes,https://en.wiktionary.org/wiki/mfanyakazi#Swahili
+14,mfanyakazi wa usafi wa nyumbani,mfanyakazi,head,sw_wiktionary,headword,mfanyakazi,nomino,,https://sw.wiktionary.org/wiki/mfanyakazi
+14,mfanyakazi wa usafi wa nyumbani,wa,function_word,kaikki_en,headword,wa,particle/verb,no,https://en.wiktionary.org/wiki/wa#Swahili
+14,mfanyakazi wa usafi wa nyumbani,wa,function_word,sw_wiktionary,not_found,,,,
+14,mfanyakazi wa usafi wa nyumbani,usafi,complement,kaikki_en,headword,usafi,noun,no,https://en.wiktionary.org/wiki/usafi#Swahili
+14,mfanyakazi wa usafi wa nyumbani,usafi,complement,sw_wiktionary,headword,usafi,nomino,,https://sw.wiktionary.org/wiki/usafi
+14,mfanyakazi wa usafi wa nyumbani,wa,function_word,kaikki_en,headword,wa,particle/verb,no,https://en.wiktionary.org/wiki/wa#Swahili
+14,mfanyakazi wa usafi wa nyumbani,wa,function_word,sw_wiktionary,not_found,,,,
+14,mfanyakazi wa usafi wa nyumbani,nyumbani,complement,kaikki_en,form_of,nyumba,noun,no,https://en.wiktionary.org/wiki/nyumba#Swahili
+14,mfanyakazi wa usafi wa nyumbani,nyumbani,complement,sw_wiktionary,headword,nyumbani,nomino,,https://sw.wiktionary.org/wiki/nyumbani
+15,mama fua,mama fua,phrase,kaikki_en,headword,mama fua,noun,no,https://en.wiktionary.org/wiki/mama_fua#Swahili
+15,mama fua,mama fua,phrase,sw_wiktionary,not_found,,,,
+15,mama fua,mama,head,kaikki_en,headword,mama,noun,no,https://en.wiktionary.org/wiki/mama#Swahili
+15,mama fua,mama,head,sw_wiktionary,headword,mama,nomino,,https://sw.wiktionary.org/wiki/mama
+15,mama fua,fua,complement,kaikki_en,headword,fua,verb,no,https://en.wiktionary.org/wiki/fua#Swahili
+15,mama fua,fua,complement,sw_wiktionary,headword,fua,nomino,,https://sw.wiktionary.org/wiki/fua
+15,mfanyakazi wa kufulia,mfanyakazi wa kufulia,phrase,kaikki_en,not_found,,,no,
+15,mfanyakazi wa kufulia,mfanyakazi wa kufulia,phrase,sw_wiktionary,not_found,,,,
+15,mfanyakazi wa kufulia,mfanyakazi,head,kaikki_en,headword,mfanyakazi,noun,yes,https://en.wiktionary.org/wiki/mfanyakazi#Swahili
+15,mfanyakazi wa kufulia,mfanyakazi,head,sw_wiktionary,headword,mfanyakazi,nomino,,https://sw.wiktionary.org/wiki/mfanyakazi
+15,mfanyakazi wa kufulia,wa,function_word,kaikki_en,headword,wa,particle/verb,no,https://en.wiktionary.org/wiki/wa#Swahili
+15,mfanyakazi wa kufulia,wa,function_word,sw_wiktionary,not_found,,,,
+15,mfanyakazi wa kufulia,kufulia,complement,kaikki_en,form_of,fulia,verb,no,https://en.wiktionary.org/wiki/fulia#Swahili
+15,mfanyakazi wa kufulia,kufulia,complement,sw_wiktionary,not_found,,,,
+16,mpishi,mpishi,head,kaikki_en,headword,mpishi,noun,yes,https://en.wiktionary.org/wiki/mpishi#Swahili
+16,mpishi,mpishi,head,sw_wiktionary,headword,mpishi,nomino,,https://sw.wiktionary.org/wiki/mpishi
+17,mtunza bustani,mtunza bustani,phrase,kaikki_en,headword,mtunza bustani,noun,yes,https://en.wiktionary.org/wiki/mtunza_bustani#Swahili
+17,mtunza bustani,mtunza bustani,phrase,sw_wiktionary,not_found,,,,
+17,mtunza bustani,mtunza,head,kaikki_en,headword,mtunza,noun,yes,https://en.wiktionary.org/wiki/mtunza#Swahili
+17,mtunza bustani,mtunza,head,sw_wiktionary,headword,mtunza,nomino,,https://sw.wiktionary.org/wiki/mtunza
+17,mtunza bustani,bustani,complement,kaikki_en,headword,bustani,noun,no,https://en.wiktionary.org/wiki/bustani#Swahili
+17,mtunza bustani,bustani,complement,sw_wiktionary,headword,bustani,nomino,,https://sw.wiktionary.org/wiki/bustani
+17,mfanyikazi wa eneo la nje,mfanyikazi wa eneo la nje,phrase,kaikki_en,not_found,,,no,
+17,mfanyikazi wa eneo la nje,mfanyikazi wa eneo la nje,phrase,sw_wiktionary,not_found,,,,
+17,mfanyikazi wa eneo la nje,mfanyikazi,head,kaikki_en,form_of,mfanyakazi,noun,yes,https://en.wiktionary.org/wiki/mfanyakazi#Swahili
+17,mfanyikazi wa eneo la nje,mfanyikazi,head,sw_wiktionary,headword,mfanyikazi,nomino,,https://sw.wiktionary.org/wiki/mfanyikazi
+17,mfanyikazi wa eneo la nje,wa,function_word,kaikki_en,headword,wa,particle/verb,no,https://en.wiktionary.org/wiki/wa#Swahili
+17,mfanyikazi wa eneo la nje,wa,function_word,sw_wiktionary,not_found,,,,
+17,mfanyikazi wa eneo la nje,eneo,complement,kaikki_en,headword,eneo,noun,no,https://en.wiktionary.org/wiki/eneo#Swahili
+17,mfanyikazi wa eneo la nje,eneo,complement,sw_wiktionary,headword,eneo,nomino,,https://sw.wiktionary.org/wiki/eneo
+17,mfanyikazi wa eneo la nje,la,function_word,kaikki_en,headword,la,intj/particle/verb,no,https://en.wiktionary.org/wiki/la#Swahili
+17,mfanyikazi wa eneo la nje,la,function_word,sw_wiktionary,not_found,,,,
+17,mfanyikazi wa eneo la nje,nje,complement,kaikki_en,headword,nje,adj/adv,no,https://en.wiktionary.org/wiki/nje#Swahili
+17,mfanyikazi wa eneo la nje,nje,complement,sw_wiktionary,headword,nje,nomino,,https://sw.wiktionary.org/wiki/nje
+17,mfanyikazi wa shamba,mfanyikazi wa shamba,phrase,kaikki_en,not_found,,,no,
+17,mfanyikazi wa shamba,mfanyikazi wa shamba,phrase,sw_wiktionary,not_found,,,,
+17,mfanyikazi wa shamba,mfanyikazi,head,kaikki_en,form_of,mfanyakazi,noun,yes,https://en.wiktionary.org/wiki/mfanyakazi#Swahili
+17,mfanyikazi wa shamba,mfanyikazi,head,sw_wiktionary,headword,mfanyikazi,nomino,,https://sw.wiktionary.org/wiki/mfanyikazi
+17,mfanyikazi wa shamba,wa,function_word,kaikki_en,headword,wa,particle/verb,no,https://en.wiktionary.org/wiki/wa#Swahili
+17,mfanyikazi wa shamba,wa,function_word,sw_wiktionary,not_found,,,,
+17,mfanyikazi wa shamba,shamba,complement,kaikki_en,headword,shamba,noun,no,https://en.wiktionary.org/wiki/shamba#Swahili
+17,mfanyikazi wa shamba,shamba,complement,sw_wiktionary,headword,shamba,nomino,,https://sw.wiktionary.org/wiki/shamba
+18,dereva,dereva,head,kaikki_en,headword,dereva,noun,yes,https://en.wiktionary.org/wiki/dereva#Swahili
+18,dereva,dereva,head,sw_wiktionary,headword,dereva,nomino,,https://sw.wiktionary.org/wiki/dereva
+19,utoaji,utoaji,head,kaikki_en,headword,utoaji,noun,no,https://en.wiktionary.org/wiki/utoaji#Swahili
+19,utoaji,utoaji,head,sw_wiktionary,headword,utoaji,nomino,,https://sw.wiktionary.org/wiki/utoaji
+19,courier mfanyikazi,courier mfanyikazi,phrase,kaikki_en,not_found,,,no,
+19,courier mfanyikazi,courier mfanyikazi,phrase,sw_wiktionary,not_found,,,,
+19,courier mfanyikazi,courier,english,,not_checked_english,,,,
+19,courier mfanyikazi,mfanyikazi,head,kaikki_en,form_of,mfanyakazi,noun,yes,https://en.wiktionary.org/wiki/mfanyakazi#Swahili
+19,courier mfanyikazi,mfanyikazi,head,sw_wiktionary,headword,mfanyikazi,nomino,,https://sw.wiktionary.org/wiki/mfanyikazi
+19,mfanyikazi wa uwasilishaji,mfanyikazi wa uwasilishaji,phrase,kaikki_en,not_found,,,no,
+19,mfanyikazi wa uwasilishaji,mfanyikazi wa uwasilishaji,phrase,sw_wiktionary,not_found,,,,
+19,mfanyikazi wa uwasilishaji,mfanyikazi,head,kaikki_en,form_of,mfanyakazi,noun,yes,https://en.wiktionary.org/wiki/mfanyakazi#Swahili
+19,mfanyikazi wa uwasilishaji,mfanyikazi,head,sw_wiktionary,headword,mfanyikazi,nomino,,https://sw.wiktionary.org/wiki/mfanyikazi
+19,mfanyikazi wa uwasilishaji,wa,function_word,kaikki_en,headword,wa,particle/verb,no,https://en.wiktionary.org/wiki/wa#Swahili
+19,mfanyikazi wa uwasilishaji,wa,function_word,sw_wiktionary,not_found,,,,
+19,mfanyikazi wa uwasilishaji,uwasilishaji,complement,kaikki_en,headword,uwasilishaji,noun,no,https://en.wiktionary.org/wiki/uwasilishaji#Swahili
+19,mfanyikazi wa uwasilishaji,uwasilishaji,complement,sw_wiktionary,headword,uwasilishaji,nomino,,https://sw.wiktionary.org/wiki/uwasilishaji
+19,courier,courier,phrase,,not_checked_english,,,,
+20,fundi wa ujenzi,fundi wa ujenzi,phrase,kaikki_en,not_found,,,no,
+20,fundi wa ujenzi,fundi wa ujenzi,phrase,sw_wiktionary,not_found,,,,
+20,fundi wa ujenzi,fundi,head,kaikki_en,headword,fundi,noun,yes,https://en.wiktionary.org/wiki/fundi#Swahili
+20,fundi wa ujenzi,fundi,head,sw_wiktionary,headword,fundi,nomino,,https://sw.wiktionary.org/wiki/fundi
+20,fundi wa ujenzi,wa,function_word,kaikki_en,headword,wa,particle/verb,no,https://en.wiktionary.org/wiki/wa#Swahili
+20,fundi wa ujenzi,wa,function_word,sw_wiktionary,not_found,,,,
+20,fundi wa ujenzi,ujenzi,complement,kaikki_en,headword,ujenzi,noun,no,https://en.wiktionary.org/wiki/ujenzi#Swahili
+20,fundi wa ujenzi,ujenzi,complement,sw_wiktionary,headword,ujenzi,nomino,,https://sw.wiktionary.org/wiki/ujenzi
+20,mfanyikazi wa ujenzi,mfanyikazi wa ujenzi,phrase,kaikki_en,not_found,,,no,
+20,mfanyikazi wa ujenzi,mfanyikazi wa ujenzi,phrase,sw_wiktionary,not_found,,,,
+20,mfanyikazi wa ujenzi,mfanyikazi,head,kaikki_en,form_of,mfanyakazi,noun,yes,https://en.wiktionary.org/wiki/mfanyakazi#Swahili
+20,mfanyikazi wa ujenzi,mfanyikazi,head,sw_wiktionary,headword,mfanyikazi,nomino,,https://sw.wiktionary.org/wiki/mfanyikazi
+20,mfanyikazi wa ujenzi,wa,function_word,kaikki_en,headword,wa,particle/verb,no,https://en.wiktionary.org/wiki/wa#Swahili
+20,mfanyikazi wa ujenzi,wa,function_word,sw_wiktionary,not_found,,,,
+20,mfanyikazi wa ujenzi,ujenzi,complement,kaikki_en,headword,ujenzi,noun,no,https://en.wiktionary.org/wiki/ujenzi#Swahili
+20,mfanyikazi wa ujenzi,ujenzi,complement,sw_wiktionary,headword,ujenzi,nomino,,https://sw.wiktionary.org/wiki/ujenzi
+20,matengenezo ya jumla,matengenezo ya jumla,phrase,kaikki_en,not_found,,,no,
+20,matengenezo ya jumla,matengenezo ya jumla,phrase,sw_wiktionary,not_found,,,,
+20,matengenezo ya jumla,matengenezo,head,kaikki_en,headword,matengenezo,noun,no,https://en.wiktionary.org/wiki/matengenezo#Swahili
+20,matengenezo ya jumla,matengenezo,head,sw_wiktionary,headword,matengenezo,nomino,,https://sw.wiktionary.org/wiki/matengenezo
+20,matengenezo ya jumla,ya,function_word,kaikki_en,headword,ya,particle,no,https://en.wiktionary.org/wiki/ya#Swahili
+20,matengenezo ya jumla,ya,function_word,sw_wiktionary,headword,ya,kiunganishi,,https://sw.wiktionary.org/wiki/ya
+20,matengenezo ya jumla,jumla,complement,kaikki_en,headword,jumla,adv/noun,no,https://en.wiktionary.org/wiki/jumla#Swahili
+20,matengenezo ya jumla,jumla,complement,sw_wiktionary,headword,jumla,nomino,,https://sw.wiktionary.org/wiki/jumla
+6,mtambuzaji,mtambuzaji,head,kaikki_en,not_found,,,no,
+6,mtambuzaji,mtambuzaji,head,sw_wiktionary,not_found,,,,
+6,msuluhishi,msuluhishi,head,kaikki_en,headword,msuluhishi,noun,yes,https://en.wiktionary.org/wiki/msuluhishi#Swahili
+6,msuluhishi,msuluhishi,head,sw_wiktionary,headword,msuluhishi,nomino,,https://sw.wiktionary.org/wiki/msuluhishi
+7,makanika,makanika,head,kaikki_en,headword,makanika,noun,yes,https://en.wiktionary.org/wiki/makanika#Swahili
+7,makanika,makanika,head,sw_wiktionary,headword,makanika,nomino,,https://sw.wiktionary.org/wiki/makanika
+11,mshonaji,mshonaji,head,kaikki_en,headword,mshonaji,noun,yes,https://en.wiktionary.org/wiki/mshonaji#Swahili
+11,mshonaji,mshonaji,head,sw_wiktionary,not_found,,,,
+12,msusi,msusi,head,kaikki_en,headword,msusi,noun,yes,https://en.wiktionary.org/wiki/msusi#Swahili
+12,msusi,msusi,head,sw_wiktionary,headword,msusi,nomino,,https://sw.wiktionary.org/wiki/msusi
+15,dobi,dobi,head,kaikki_en,headword,dobi,noun,yes,https://en.wiktionary.org/wiki/dobi#Swahili
+15,dobi,dobi,head,sw_wiktionary,headword,dobi,nomino,,https://sw.wiktionary.org/wiki/dobi
+16,mpikaji,mpikaji,head,kaikki_en,headword,mpikaji,noun,yes,https://en.wiktionary.org/wiki/mpikaji#Swahili
+16,mpikaji,mpikaji,head,sw_wiktionary,not_found,,,,
+18,mwendeshaji,mwendeshaji,head,kaikki_en,headword,mwendeshaji,noun,yes,https://en.wiktionary.org/wiki/mwendeshaji#Swahili
+18,mwendeshaji,mwendeshaji,head,sw_wiktionary,headword,mwendeshaji,nomino,,https://sw.wiktionary.org/wiki/mwendeshaji

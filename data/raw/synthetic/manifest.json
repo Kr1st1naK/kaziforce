@@ -1,0 +1,209 @@
+{
+  "generator": "kaziforce_api.data.synthetic v2",
+  "seed": 42,
+  "parameters": {
+    "workers_per_area": 12,
+    "area_overrides": {
+      "1": 30,
+      "11": 30
+    },
+    "jobs_per_area": 8,
+    "split_ratios": {
+      "development": 0.4,
+      "validation": 0.2,
+      "test": 0.4
+    },
+    "n_distractors": 200
+  },
+  "areas": {
+    "1": {
+      "name": "Electrician",
+      "occupations": [
+        "electrician"
+      ]
+    },
+    "2": {
+      "name": "Plumber",
+      "occupations": [
+        "plumber"
+      ]
+    },
+    "3": {
+      "name": "Carpenter",
+      "occupations": [
+        "carpenter"
+      ]
+    },
+    "4": {
+      "name": "Mason / bricklayer",
+      "occupations": [
+        "bricklayer"
+      ]
+    },
+    "7": {
+      "name": "Motor-vehicle mechanic",
+      "occupations": [
+        "vehicle technician"
+      ]
+    },
+    "10": {
+      "name": "Mobile-phone repairer",
+      "occupations": [
+        "mobile phone repair technician"
+      ]
+    },
+    "11": {
+      "name": "Tailor / dressmaker",
+      "occupations": [
+        "tailor"
+      ]
+    },
+    "12": {
+      "name": "Hairdresser / barber",
+      "occupations": [
+        "barber",
+        "hairdresser"
+      ]
+    },
+    "15": {
+      "name": "Laundry worker",
+      "occupations": [
+        "laundry worker"
+      ]
+    },
+    "16": {
+      "name": "Cook / catering worker",
+      "occupations": [
+        "cook"
+      ]
+    }
+  },
+  "counts": {
+    "base_workers_per_area": {
+      "1": 30,
+      "2": 12,
+      "3": 12,
+      "4": 12,
+      "7": 12,
+      "10": 12,
+      "11": 30,
+      "12": 12,
+      "15": 12,
+      "16": 12
+    },
+    "groups_per_split": {
+      "development": 64,
+      "test": 64,
+      "validation": 28
+    },
+    "groups_per_area_split": {
+      "1/development": 12,
+      "1/test": 12,
+      "1/validation": 6,
+      "2/development": 5,
+      "2/test": 5,
+      "2/validation": 2,
+      "3/development": 5,
+      "3/test": 5,
+      "3/validation": 2,
+      "4/development": 5,
+      "4/test": 5,
+      "4/validation": 2,
+      "7/development": 5,
+      "7/test": 5,
+      "7/validation": 2,
+      "10/development": 5,
+      "10/test": 5,
+      "10/validation": 2,
+      "11/development": 12,
+      "11/test": 12,
+      "11/validation": 6,
+      "12/development": 5,
+      "12/test": 5,
+      "12/validation": 2,
+      "15/development": 5,
+      "15/test": 5,
+      "15/validation": 2,
+      "16/development": 5,
+      "16/test": 5,
+      "16/validation": 2
+    },
+    "worker_rows": 528,
+    "worker_rows_per_variant": {
+      "formal": 156,
+      "held_out": 60,
+      "known_alias": 156,
+      "minimal": 156
+    },
+    "worker_rows_per_split": {
+      "development": 216,
+      "test": 216,
+      "validation": 96
+    },
+    "worker_rows_per_area_variant": {
+      "1/formal": 30,
+      "1/held_out": 30,
+      "1/known_alias": 30,
+      "1/minimal": 30,
+      "2/formal": 12,
+      "2/known_alias": 12,
+      "2/minimal": 12,
+      "3/formal": 12,
+      "3/known_alias": 12,
+      "3/minimal": 12,
+      "4/formal": 12,
+      "4/known_alias": 12,
+      "4/minimal": 12,
+      "7/formal": 12,
+      "7/known_alias": 12,
+      "7/minimal": 12,
+      "10/formal": 12,
+      "10/known_alias": 12,
+      "10/minimal": 12,
+      "11/formal": 30,
+      "11/held_out": 30,
+      "11/known_alias": 30,
+      "11/minimal": 30,
+      "12/formal": 12,
+      "12/known_alias": 12,
+      "12/minimal": 12,
+      "15/formal": 12,
+      "15/known_alias": 12,
+      "15/minimal": 12,
+      "16/formal": 12,
+      "16/known_alias": 12,
+      "16/minimal": 12
+    },
+    "jobs": 280,
+    "jobs_per_source": {
+      "job_skill_set": 200,
+      "synthetic": 80
+    },
+    "synthetic_jobs_per_area": {
+      "1": 8,
+      "2": 8,
+      "3": 8,
+      "4": 8,
+      "7": 8,
+      "10": 8,
+      "11": 8,
+      "12": 8,
+      "15": 8,
+      "16": 8
+    },
+    "relevance_pairs": 4224
+  },
+  "templates": {
+    "formal": 8,
+    "known_alias": 10,
+    "held_out": 10,
+    "minimal": 10,
+    "job": 4
+  },
+  "inputs_sha256": {
+    "aliases.csv": "22adfa1d5b3b5a089ad761641a6ae4d36db3e41f73f86b055953ce5649016747",
+    "area_esco_map.csv": "af26e0ae59486512d6786a384412ce1fa9bfdf3b309cd960a50d8f5b99d686be",
+    "area_skill_pools.csv": "eeea40e039306cc430d0560a3ebcd42c93dfef5b6a689f08016cd2467833858f",
+    "compatibility_matrix.csv": "ce6f40303b149bc4e4162e8bbdb569a7372d98ed0c9efec3117571fa554b1a10"
+  }
+}

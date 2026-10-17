@@ -1,0 +1,103 @@
+area_id,area,query,rank,esco_uri,esco_label,isco_code,search_hit,in_subset
+5,Painter,painter,1,http://data.europa.eu/esco/occupation/15620506-fb5d-49cd-87a2-1c9047fb406a,construction painter,7131.1,commercial painter and decorator,yes
+5,Painter,painter,2,http://data.europa.eu/esco/occupation/02e94cd6-8e6d-4e9b-b695-edb460c70528,ceramic painter,7316.1.1,painter of ceramic articles,no
+5,Painter,painter,3,http://data.europa.eu/esco/occupation/4ed36f4c-9d5b-4a01-bf59-7f3c7844ce95,scenic painter,3432.4.1,scene painter,no
+5,Painter,painter,4,http://data.europa.eu/esco/occupation/db3b1cb9-8460-4de0-8fc7-aff7a9a74b7e,porcelain painter,7316.1.3,china designer & painter,no
+5,Painter,painter,5,http://data.europa.eu/esco/occupation/a784b063-89cf-441b-9624-deed9dbdeae6,transport equipment painter,7132.3,vessel painter,no
+5,Painter,painter,6,http://data.europa.eu/esco/occupation/41a51397-089d-459d-9b7e-f1cdee5ad6bb,decorative painter,7316.1,tole painter,no
+5,Painter,painter,7,http://data.europa.eu/esco/occupation/6d16c41d-81a7-44a9-836d-7aed46ccb955,glass painter,7316.1.2,stained glass painter,no
+5,Painter,painter,8,http://data.europa.eu/esco/occupation/374d925a-107b-4c99-bc8b-75483441f062,artistic painter,2651.1,street painter,no
+5,Painter,painter,9,http://data.europa.eu/esco/occupation/96186698-f79d-423a-9652-a2a58085d5f1,wood painter,7316.1.4,wood painter and designer,no
+5,Painter,painter,10,http://data.europa.eu/esco/occupation/fb4819db-03fa-4dc1-a471-2cdc24dcbe6f,surface treatment operator,7132.2,marine vessel painter,no
+5,Painter,house painter,1,http://data.europa.eu/esco/occupation/15620506-fb5d-49cd-87a2-1c9047fb406a,construction painter,7131.1,commercial painter and decorator,yes
+5,Painter,house painter,2,http://data.europa.eu/esco/occupation/db3b1cb9-8460-4de0-8fc7-aff7a9a74b7e,porcelain painter,7316.1.3,china designer & painter,no
+5,Painter,house painter,3,http://data.europa.eu/esco/occupation/02e94cd6-8e6d-4e9b-b695-edb460c70528,ceramic painter,7316.1.1,painter of ceramic articles,no
+5,Painter,house painter,4,http://data.europa.eu/esco/occupation/4ed36f4c-9d5b-4a01-bf59-7f3c7844ce95,scenic painter,3432.4.1,scene painter,no
+5,Painter,house painter,5,http://data.europa.eu/esco/occupation/a784b063-89cf-441b-9624-deed9dbdeae6,transport equipment painter,7132.3,vessel painter,no
+5,Painter,house painter,6,http://data.europa.eu/esco/occupation/41a51397-089d-459d-9b7e-f1cdee5ad6bb,decorative painter,7316.1,tole painter,no
+5,Painter,house painter,7,http://data.europa.eu/esco/occupation/6d16c41d-81a7-44a9-836d-7aed46ccb955,glass painter,7316.1.2,stained glass painter,no
+5,Painter,house painter,8,http://data.europa.eu/esco/occupation/374d925a-107b-4c99-bc8b-75483441f062,artistic painter,2651.1,street painter,no
+5,Painter,house painter,9,http://data.europa.eu/esco/occupation/96186698-f79d-423a-9652-a2a58085d5f1,wood painter,7316.1.4,wood painter and designer,no
+5,Painter,house painter,10,http://data.europa.eu/esco/occupation/fb4819db-03fa-4dc1-a471-2cdc24dcbe6f,surface treatment operator,7132.2,marine vessel painter,no
+5,Painter,decorator,1,http://data.europa.eu/esco/occupation/15620506-fb5d-49cd-87a2-1c9047fb406a,construction painter,7131.1,commercial painter and decorator,yes
+5,Painter,decorator,2,http://data.europa.eu/esco/occupation/18fbb1f8-eceb-4bf4-8fc7-932b8f6130cd,paperhanger supervisor,3123.1.15,wallpaper decorator supervisor,no
+5,Painter,decorator,3,http://data.europa.eu/esco/occupation/02e94cd6-8e6d-4e9b-b695-edb460c70528,ceramic painter,7316.1.1,decorator of ceramics,no
+5,Painter,decorator,4,http://data.europa.eu/esco/occupation/a2abd144-2a36-45ea-919c-1fcc6ebc5d45,paperhanger,7131.2,wallpaper decorator,yes
+5,Painter,decorator,5,http://data.europa.eu/esco/occupation/96186698-f79d-423a-9652-a2a58085d5f1,wood painter,7316.1.4,wood decorator,no
+5,Painter,decorator,6,http://data.europa.eu/esco/occupation/db3b1cb9-8460-4de0-8fc7-aff7a9a74b7e,porcelain painter,7316.1.3,porcelain decorator,no
+5,Painter,decorator,7,http://data.europa.eu/esco/occupation/41a51397-089d-459d-9b7e-f1cdee5ad6bb,decorative painter,7316.1,specialist decorator,no
+5,Painter,decorator,8,http://data.europa.eu/esco/occupation/7324e9f5-0f94-497e-af2f-42142e939a94,embroiderer,7533.2,hand decorator,no
+5,Painter,decorator,9,http://data.europa.eu/esco/occupation/375137f7-5fc2-424e-9f63-d7ff4441c11e,jewellery engraver,7313.1.3,jewellery decorator,no
+5,Painter,decorator,10,http://data.europa.eu/esco/occupation/8f10ea9b-bfdf-4a4c-9fa7-b6e02daa93e5,pastry chef,3434.1.2,pastry decorator,no
+13,Beauty worker,beautician,1,http://data.europa.eu/esco/occupation/a1e1a788-2352-4172-8fcf-1f985a6968b0,aesthetician,5142.1,beautician,yes
+13,Beauty worker,beauty,1,http://data.europa.eu/esco/occupation/33e3a746-f209-4a1a-96df-301505531cb2,beauty salon manager,1431.2.1,beauty spa manager,no
+13,Beauty worker,beauty,2,http://data.europa.eu/esco/occupation/4d6d9057-5167-4158-8bc1-cc2f89d73fd7,beauty vocational teacher,2320.1.5,educator in beauty,no
+13,Beauty worker,beauty,3,http://data.europa.eu/esco/occupation/55d60ead-0343-4008-b9e4-fb4b5a179c83,early years teacher,2342.1,educator in beauty,no
+13,Beauty worker,beauty,4,http://data.europa.eu/esco/occupation/d3fd0898-51f7-42a3-8f44-09408fc796f6,beauty salon attendant,5142.2,beauty salon worker,yes
+13,Beauty worker,beauty,5,http://data.europa.eu/esco/occupation/773753ad-c4f7-4052-b3b4-440435199d6b,cosmetics and perfume specialised seller,5223.7.12,beauty specialised seller,no
+13,Beauty worker,beauty,6,http://data.europa.eu/esco/occupation/489b9a38-89a2-425c-95b9-79cec66379e1,pedicurist,5142.8,beauty salon assistant,yes
+13,Beauty worker,beauty,7,http://data.europa.eu/esco/occupation/d4dd502d-9407-456c-a54a-b733fc9cf68b,cosmetics and perfume shop manager,1420.4.14,beauty and aroma store manager,no
+13,Beauty worker,beauty,8,http://data.europa.eu/esco/occupation/72413d91-f212-4ad6-bf95-8b78a37c041a,hair removal technician,5142.3,beauty treatment specialist,yes
+13,Beauty worker,beauty,9,http://data.europa.eu/esco/occupation/a1e1a788-2352-4172-8fcf-1f985a6968b0,aesthetician,5142.1,beauty specialist,yes
+13,Beauty worker,beauty,10,http://data.europa.eu/esco/occupation/bcba793e-44fe-45eb-b0fb-56772529cbab,editorial assistant,3343.2,beauty editorial assistant,no
+18,Driver,driver,1,http://data.europa.eu/esco/occupation/af513bd8-4340-4452-aa30-05a073ecc49a,hearse driver,8322.3,funeral driver,yes
+18,Driver,driver,2,http://data.europa.eu/esco/occupation/45037d43-a8f5-4f46-b332-b2935bc305f4,cargo vehicle driver,8332.2,package delivery driver,no
+18,Driver,driver,3,http://data.europa.eu/esco/occupation/03e02554-15d1-4697-960c-8909e7d36f7e,tram driver,8331.2,driver of trams,no
+18,Driver,driver,4,http://data.europa.eu/esco/occupation/00cee175-1376-43fb-9f02-ba3d7a910a58,bus driver,8331.1,public bus driver,no
+18,Driver,driver,5,http://data.europa.eu/esco/occupation/6f7c1e84-8162-4c20-a575-b57ff624eef5,taxi driver,8322.7,private hire driver,yes
+18,Driver,driver,6,http://data.europa.eu/esco/occupation/c5d779f4-345b-4918-872b-a1cbaeb1d9be,dangerous goods driver,8332.4,hazardous materials driver,no
+18,Driver,driver,7,http://data.europa.eu/esco/occupation/2c90a752-43f0-483d-8f64-3ce5e4535aa8,carriage driver,9332.1,horse-drawn fiacre driver,no
+18,Driver,driver,8,http://data.europa.eu/esco/occupation/3a15ec1b-9250-41a0-9344-feb2956481b7,trolley bus driver,8331.1.1,transit bus driver,no
+18,Driver,driver,9,http://data.europa.eu/esco/occupation/cae71f3f-ad4d-480e-b501-bff22827e60c,bulldozer operator,8342.1,dozer/crawler driver,no
+18,Driver,driver,10,http://data.europa.eu/esco/occupation/976f752c-5f10-42ca-84fb-89aa529af04f,patient transport services driver,8322.5,driver in patient transport services,yes
+18,Driver,chauffeur,1,http://data.europa.eu/esco/occupation/af513bd8-4340-4452-aa30-05a073ecc49a,hearse driver,8322.3,chauffeur,yes
+18,Driver,chauffeur,2,http://data.europa.eu/esco/occupation/6f7c1e84-8162-4c20-a575-b57ff624eef5,taxi driver,8322.7,chauffeur,yes
+18,Driver,chauffeur,3,http://data.europa.eu/esco/occupation/e75305db-9011-4ee0-ab62-8d41a98f807e,private chauffeur,8322.6,personal chauffeur,yes
+19,Delivery / courier worker,courier,1,http://data.europa.eu/esco/occupation/7ed2e153-8da8-4c0d-b4c5-3402c623f34b,postman/postwoman,4412.2,in house courier,no
+19,Delivery / courier worker,courier,2,http://data.europa.eu/esco/occupation/45037d43-a8f5-4f46-b332-b2935bc305f4,cargo vehicle driver,8332.2,courier,no
+19,Delivery / courier worker,courier,3,http://data.europa.eu/esco/occupation/3a959644-beed-4afc-8e57-d5068ae6a43e,bicycle courier,9331.1,cycle courier,no
+19,Delivery / courier worker,courier,4,http://data.europa.eu/esco/occupation/b5f6bb2c-0602-484d-a87f-9cac33f83010,motorcycle delivery person,8321.1,motorcyle courier,yes
+19,Delivery / courier worker,delivery,1,http://data.europa.eu/esco/occupation/0c408028-c48f-4df8-ba5d-c3d3be15f5a2,delivery driver,8322.2,mediterranean food delivery person,yes
+19,Delivery / courier worker,delivery,2,http://data.europa.eu/esco/occupation/b5f6bb2c-0602-484d-a87f-9cac33f83010,motorcycle delivery person,8321.1,motorcycle driver of deliveries,yes
+19,Delivery / courier worker,delivery,3,http://data.europa.eu/esco/occupation/45037d43-a8f5-4f46-b332-b2935bc305f4,cargo vehicle driver,8332.2,package delivery driver,no
+19,Delivery / courier worker,delivery,4,http://data.europa.eu/esco/occupation/7ed2e153-8da8-4c0d-b4c5-3402c623f34b,postman/postwoman,4412.2,delivery woman,no
+19,Delivery / courier worker,delivery,5,http://data.europa.eu/esco/occupation/72d1e9ca-294c-4349-90ed-f99541d447d0,specialised goods distribution manager,1324.3.1.6,"Specialised goods distribution managers plan, coordinate and manage the distribu",no
+19,Delivery / courier worker,delivery,6,http://data.europa.eu/esco/occupation/3afd6af4-0c34-4311-ad73-65adc2571f0c,clothing operations manager,1321.1.1.2,Clothing operations managers schedule orders and delivery times in order to assu,no
+19,Delivery / courier worker,delivery,7,http://data.europa.eu/esco/occupation/0090dd54-057a-4f65-bbe8-f74c4999e8e8,pasta operator,8160.46,Pasta operators manufacture dry pasta products. They unload raw ingredients from,no
+19,Delivery / courier worker,delivery,8,http://data.europa.eu/esco/occupation/21f4eb29-f6e5-4623-acb9-f3ff9c2f525d,public speaking coach,2359.11,"Public speaking coaches provide, often private, instruction to clients in theory",no
+19,Delivery / courier worker,delivery,9,http://data.europa.eu/esco/occupation/518348e6-0095-4f37-ad46-5ef1b8b5ee2f,textile operations manager,3122.4.17,Textile operations managers schedule orders and delivery times in order to assur,no
+19,Delivery / courier worker,delivery,10,http://data.europa.eu/esco/occupation/24413f38-e457-4de1-bba0-5a02b7282e2c,deep-sea fishery worker,6223.1,Deep-sea fishery workers operate on board fishing vessels to catch deep-sea fish,no
+19,Delivery / courier worker,messenger,1,http://data.europa.eu/esco/occupation/7ed2e153-8da8-4c0d-b4c5-3402c623f34b,postman/postwoman,4412.2,motorcycle messenger,no
+19,Delivery / courier worker,messenger,2,http://data.europa.eu/esco/occupation/3a959644-beed-4afc-8e57-d5068ae6a43e,bicycle courier,9331.1,cycle messenger,no
+19,Delivery / courier worker,messenger,3,http://data.europa.eu/esco/occupation/db20c08e-819e-4410-91e2-6ac06add4e27,escort,5169.3,escort messenger,no
+20,General construction / maintenance worker,construction labourer,1,http://data.europa.eu/esco/occupation/fb7e2f4f-1545-42f1-972e-94082e49c6dc,building construction worker,9313.1,construction site labourer,yes
+20,General construction / maintenance worker,construction labourer,2,http://data.europa.eu/esco/occupation/21fe7141-68fa-4db7-9ee2-53097cef541a,waterway construction labourer,9312.1.6,waterway construction labourer,no
+20,General construction / maintenance worker,construction labourer,3,http://data.europa.eu/esco/occupation/18fa8080-3156-429a-bbd7-b3ef559b6721,construction scaffolder,7119.1,scaffolder (construction),no
+20,General construction / maintenance worker,construction labourer,4,http://data.europa.eu/esco/occupation/a10eb17a-3c78-4f7a-a1da-8f31146339d3,garden labourer,9214.1,landscaping labourer,yes
+20,General construction / maintenance worker,construction labourer,5,http://data.europa.eu/esco/occupation/ff8d4065-db44-47c7-a4bd-51b3c306ef70,sorter labourer,9612.2,recycling site sorter labourer,no
+20,General construction / maintenance worker,construction labourer,6,http://data.europa.eu/esco/occupation/e575efca-c3e4-43fe-8c46-327d310f795e,underwater construction supervisor,3123.2,construction diving supervisor,no
+20,General construction / maintenance worker,construction labourer,7,http://data.europa.eu/esco/occupation/7c205166-d862-45fc-90e5-58a3aa3721dd,road construction supervisor,3123.1.20,supervisor of road construction operations,no
+20,General construction / maintenance worker,construction labourer,8,http://data.europa.eu/esco/occupation/ba3bacd4-73e9-4861-a9c0-f89f1f28055a,construction general contractor,1323.1.1,construction site contractor,no
+20,General construction / maintenance worker,construction labourer,9,http://data.europa.eu/esco/occupation/e5e3ea36-4ed9-4c57-987c-9974385551a8,vineyard worker,9211.2,vineyard labourer,no
+20,General construction / maintenance worker,construction labourer,10,http://data.europa.eu/esco/occupation/326027fc-5408-47cd-9b32-fbe770dbbe80,construction quality manager,3112.1.4,construction QA QS manager,no
+20,General construction / maintenance worker,construction worker,1,http://data.europa.eu/esco/occupation/fb7e2f4f-1545-42f1-972e-94082e49c6dc,building construction worker,9313.1,mechanical construction worker,yes
+20,General construction / maintenance worker,construction worker,2,http://data.europa.eu/esco/occupation/79082f76-4b11-4594-8437-2db567331f41,road marker,9312.1.4,construction worker,no
+20,General construction / maintenance worker,construction worker,3,http://data.europa.eu/esco/occupation/47300afa-5496-484c-8f65-14247a98b2b8,civil engineering worker,9312.1,construction worker,no
+20,General construction / maintenance worker,construction worker,4,http://data.europa.eu/esco/occupation/5f68c4c3-9d25-48e2-8efc-5471a80fb155,road construction worker,8342.6,rad construction worker,no
+20,General construction / maintenance worker,construction worker,5,http://data.europa.eu/esco/occupation/73d77554-2016-46fa-ac3d-44a02e8d1a89,sewer construction worker,7126.11,waste water system construction worker,yes
+20,General construction / maintenance worker,construction worker,6,http://data.europa.eu/esco/occupation/8afab6c4-6145-4ea1-a0ae-d2c3438bda7e,shipwright,7214.2,boat construction worker,no
+20,General construction / maintenance worker,construction worker,7,http://data.europa.eu/esco/occupation/21fe7141-68fa-4db7-9ee2-53097cef541a,waterway construction labourer,9312.1.6,waterway construction worker,no
+20,General construction / maintenance worker,construction worker,8,http://data.europa.eu/esco/occupation/c89afd9a-7dad-4bae-9315-5fcadd9ad8b6,electricity distribution worker,7413.1,power lines construction worker,no
+20,General construction / maintenance worker,construction worker,9,http://data.europa.eu/esco/occupation/f8d1bcf9-9ca1-408f-a713-7bdf28c400fd,lift engineer,7412.6,lift construction worker,yes
+20,General construction / maintenance worker,construction worker,10,http://data.europa.eu/esco/occupation/8dded776-dc04-4099-a32c-7c5a41ee00e1,rental service representative in construction and civil engineering machinery,5249.2.1.4,rental service worker in construction and civil engineering machinery,no
+20,General construction / maintenance worker,building maintenance,1,http://data.europa.eu/esco/occupation/92cba6b4-8fca-49bb-b68c-45c5096fedc9,window cleaner,9123.1,building maintenance and cleaning worker,no
+20,General construction / maintenance worker,building maintenance,2,http://data.europa.eu/esco/occupation/b42c5ed4-c6e4-4694-934f-96127719cc43,facilities manager,1219.1.1,building maintenance manager,no
+20,General construction / maintenance worker,building maintenance,3,http://data.europa.eu/esco/occupation/f4a25243-b06a-42a9-9c69-246853df63ad,handyman,9622.1,building maintenance technician,no
+20,General construction / maintenance worker,building maintenance,4,http://data.europa.eu/esco/occupation/33960bab-4423-4808-af6c-ec2b485dba41,building electrician,7411.1.1,building maintenance electrician,yes
+20,General construction / maintenance worker,building maintenance,5,http://data.europa.eu/esco/occupation/680831bb-64fc-4fc8-ae58-c450327d9700,manufacturing facility manager,1219.5,Manufacturing facility managers foresee the maintenance and routine operational ,no
+20,General construction / maintenance worker,building maintenance,6,http://data.europa.eu/esco/occupation/b0480558-269d-4903-9bc7-f390cd6a6964,construction equipment technician,7233.1,building construction equipment maintenance inspector,no
+20,General construction / maintenance worker,building maintenance,7,http://data.europa.eu/esco/occupation/303a1e34-cb16-4054-b323-81e5eec17397,building cleaner,9112.2,maintenance worker,no
+20,General construction / maintenance worker,building maintenance,8,http://data.europa.eu/esco/occupation/b39a74a2-37fe-4fdc-ba8e-5bbbbdce2d89,railway station manager,1324.7,Railway station managers are in charge of organising tasks linked to the operati,no
+20,General construction / maintenance worker,building maintenance,9,http://data.europa.eu/esco/occupation/47300afa-5496-484c-8f65-14247a98b2b8,civil engineering worker,9312.1,Civil engineering workers perform tasks concerning the cleaning and preparation ,no
+20,General construction / maintenance worker,building maintenance,10,http://data.europa.eu/esco/occupation/5df63943-f1bc-4438-90f1-92768a7a23c8,industrial electrician,7411.1.1.2,industrial maintenance electrician,yes
+20,General construction / maintenance worker,handyman,1,http://data.europa.eu/esco/occupation/f4a25243-b06a-42a9-9c69-246853df63ad,handyman,9622.1,building handyman,no
