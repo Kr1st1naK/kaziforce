@@ -16,9 +16,11 @@ sides; absent criteria are dropped and the remaining weights renormalised.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import asdict, dataclass
 
-from kaziforce_api.data.models import EnrichedJob, EnrichedWorker, MatchedSkill
+from kaziforce_api.data.models import EnrichedJob, EnrichedWorker, MatchedSkill, MatchScore
+from kaziforce_api.matching.base import Scorer
 
 CRITERIA = ("skill_overlap", "location", "budget_fit", "availability")
 FULL_TIME = "full-time"
@@ -85,7 +87,7 @@ def combine_present(components: dict[str, float | None], weights: dict[str, floa
     return sum(weights[c] * s for c, s in present.items()) / total if total else 0.0
 
 
-class RuleBasedScorer:
+class RuleBasedScorer(Scorer):
     def __init__(self, weights: RuleBasedWeights = RuleBasedWeights()):
         self.weights = self._checked(weights)
 
@@ -105,6 +107,14 @@ class RuleBasedScorer:
                         for skill in (j.skill for j in job.enrichment.evidence)
                         if skill in job_skills and skill in evidence for e in [evidence[skill]])
         return RuleResult(combine_present(components, w.by_criterion()), components, matched)
+
+    def score_all(self, worker: EnrichedWorker, jobs: Sequence[EnrichedJob]) -> list[MatchScore]:
+        results = []
+        for j in jobs:
+            r = self.score(worker, j)
+            results.append(MatchScore(worker.profile.worker_id, j.profile.posting_id, composite=r.score, rule=r.score,
+                                      components=r.components, matched_skills=list(r.matched_skills)))
+        return results
 
     @staticmethod
     def _checked(weights: RuleBasedWeights) -> RuleBasedWeights:

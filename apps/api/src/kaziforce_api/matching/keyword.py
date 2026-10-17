@@ -17,7 +17,8 @@ import unicodedata
 from collections import Counter
 from collections.abc import Sequence
 
-from kaziforce_api.data.models import EnrichedJob, EnrichedWorker, JobPosting
+from kaziforce_api.data.models import EnrichedJob, EnrichedWorker, JobPosting, MatchScore
+from kaziforce_api.matching.base import Scorer
 
 ENGLISH_FUNCTION_WORDS = frozenset("""
 about above after again against all also although among and any are because been before being below
@@ -56,7 +57,7 @@ def job_text(job: JobPosting) -> str:
     return " ".join([job.title, job.description, *job.required_skills])
 
 
-class KeywordScorer:
+class KeywordScorer(Scorer):
     """Okapi BM25 over the candidate job postings. Reads only the profiles; the enrichment is ignored.
 
     The index (document frequencies, lengths) is built from the postings passed in, i.e. the
@@ -81,3 +82,6 @@ class KeywordScorer:
         tf, length = self._tf[pid], self._length[pid]
         norm = self.k1 * (1 - self.b + self.b * length / self._avg_length) if self._avg_length else self.k1
         return sum(self._idf[t] * tf[t] * (self.k1 + 1) / (tf[t] + norm) for t in tokens(worker_text(worker)) if t in tf)
+
+    def score_all(self, worker: EnrichedWorker, jobs: Sequence[EnrichedJob]) -> list[MatchScore]:
+        return [MatchScore(worker.profile.worker_id, j.profile.posting_id, composite=self.score(worker, j)) for j in jobs]

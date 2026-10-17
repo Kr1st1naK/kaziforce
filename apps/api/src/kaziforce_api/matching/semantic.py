@@ -18,7 +18,8 @@ from collections.abc import Callable, Sequence
 
 import numpy as np
 
-from kaziforce_api.data.models import EnrichedJob, EnrichedWorker
+from kaziforce_api.data.models import EnrichedJob, EnrichedWorker, MatchScore
+from kaziforce_api.matching.base import Scorer
 
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 MODEL_REVISION = "1110a243fdf4706b3f48f1d95db1a4f5529b4d41"  # Hugging Face commit, pinned for reproducibility
@@ -36,7 +37,7 @@ def job_text(job: EnrichedJob) -> str:
     return job.profile.description
 
 
-class SemanticScorer:
+class SemanticScorer(Scorer):
     def __init__(self, model_name: str = MODEL_NAME, revision: str | None = MODEL_REVISION,
                  encoder: Encoder | None = None):
         self.model_name, self.revision = model_name, revision
@@ -63,6 +64,11 @@ class SemanticScorer:
 
     def score(self, worker: EnrichedWorker, job: EnrichedJob) -> float:
         return float(self.score_many(worker, [job])[0])
+
+    def score_all(self, worker: EnrichedWorker, jobs: Sequence[EnrichedJob]) -> list[MatchScore]:
+        scores = self.score_many(worker, jobs)
+        return [MatchScore(worker.profile.worker_id, j.profile.posting_id, composite=float(s), semantic=float(s))
+                for j, s in zip(jobs, scores)]
 
     def info(self) -> dict:
         return {"model": self.model_name, "revision": self.revision, "cached_texts": len(self._cache),
