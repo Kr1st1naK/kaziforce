@@ -9,6 +9,8 @@
 | [`evidence/dev_results.md`](evidence/dev_results.md) | Development-split baseline: seven configurations, P@3/5/10 and MRR by variant, knowledge-graph effect, response time, and how to read them |
 | [`evidence/demo_run.txt`](evidence/demo_run.txt) | Transcript of the end-to-end command-line demo (one worker, top 10) |
 | [`test-results.xml`](test-results.xml) | JUnit record of the latest full test run |
+| [`sprint-2-status.md`](sprint-2-status.md) | Sprint II status: what works, how to run it, components, evaluation evidence, changes from the plan (draft) |
+| [`limitations.md`](limitations.md) | Limitations of the data, vocabulary, graph, matching, evaluation and system, each with its evidence (draft) |
 | [`vocabulary-report.md`](vocabulary-report.md) | How the informal-term vocabulary was checked: dictionary evidence, ESCO mapping, shortlist, decisions (pre-decision snapshot, see its status note) |
 | [`vocabulary-review-sheet.md`](vocabulary-review-sheet.md) | One line per candidate alias, as reviewed (pre-decision snapshot) |
 | [`wireframes/`](wireframes/) | Low-fidelity wireframes of the four screens: worker profile, job posting, ranked matches, explanation |
