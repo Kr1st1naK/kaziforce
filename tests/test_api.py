@@ -5,6 +5,7 @@ import pytest
 
 from kaziforce_api.app import create_app
 from kaziforce_api.matching.semantic import SemanticScorer
+from kaziforce_api.data.store import CsvProfileStore
 from kaziforce_api.service import RecommendationService
 
 EXAMPLE = "3917d39f-d0c0-46c2-aa34-9158711f68f3"  # development known_alias worker, fundi wa umeme
@@ -18,7 +19,7 @@ def _letters(texts):
 
 @pytest.fixture(scope="module")
 def service():
-    return RecommendationService(semantic_factory=lambda: SemanticScorer(encoder=_letters)).start(background=False)
+    return RecommendationService(CsvProfileStore(), semantic_factory=lambda: SemanticScorer(encoder=_letters)).start(background=False)
 
 
 @pytest.fixture()
@@ -34,7 +35,7 @@ def post(client, body, **kw):
 
 def test_health_reports_readiness(client):
     assert client.get("/health").get_json() == {"status": "ok", "ready": True}
-    not_started = create_app(RecommendationService(), start=False).test_client()
+    not_started = create_app(RecommendationService(CsvProfileStore()), start=False).test_client()
     assert not_started.get("/health").get_json() == {"status": "ok", "ready": False}
 
 
@@ -129,7 +130,7 @@ def test_unknown_or_other_split_worker_is_404(client):
 
 
 def test_not_ready_is_503_with_retry_after():
-    client = create_app(RecommendationService(), start=False).test_client()
+    client = create_app(RecommendationService(CsvProfileStore()), start=False).test_client()
     r = post(client, {"worker": TYPED})
     assert r.status_code == 503 and r.get_json()["error"]["code"] == "not_ready" and r.headers["Retry-After"] == "5"
 
