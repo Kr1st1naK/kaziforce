@@ -88,6 +88,31 @@ def load_kg_vocabulary(path: Path | None = None) -> list[dict]:
     return [{**r, "normalized": normalize_alias(r["alias"])} for r in included]
 
 
+class VocabularyExtension:
+    """The Kenya-specific informal-term extension of the ESCO backbone.
+
+    kg_terms() are the only aliases the knowledge graph may contain; loading
+    fails if a held-out alias normalises to the same key as an included one.
+    """
+
+    def __init__(self, aliases_path: Path | None = None):
+        self.aliases_path = aliases_path or _default_aliases_path()
+        self._rows = read_aliases(self.aliases_path)
+        self._kg_terms = load_kg_vocabulary(self.aliases_path)
+
+    def kg_terms(self) -> list[dict]:
+        """Accepted, kg_included=yes rows, each with a `normalized` key."""
+        return [dict(r) for r in self._kg_terms]
+
+    def held_out_terms(self) -> list[dict]:
+        """Accepted rows deliberately kept out of the graph (unseen-term test)."""
+        return [{**r, "normalized": normalize_alias(r["alias"])} for r in held_out_aliases(self._rows)]
+
+    @staticmethod
+    def normalize(text: str) -> str:
+        return normalize_alias(text)
+
+
 def generate_candidate_terms(esco_label: str) -> list[str]:
     """Prompt an LLM for candidate informal/vernacular terms for an ESCO label.
 

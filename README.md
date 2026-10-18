@@ -153,7 +153,7 @@ No open-source licence is granted; please ask before reusing.
 
 | Data | Licence | Where |
 |---|---|---|
-| ESCO classification (occupations, skills) | © European Union; reused under the European Commission reuse policy (Decision 2011/833/EU), with attribution | Skill labels in `data/raw/synthetic/`, ESCO URIs in `data/vocabulary/` |
+| ESCO classification (occupations, skills) | © European Union; reused under the European Commission reuse policy (Decision 2011/833/EU), with attribution | `data/kg/` (graph inputs), skill labels in `data/raw/synthetic/`, ESCO URIs in `data/vocabulary/` |
 | Job Skill Set (Mutlu, 2024) | CC BY-SA 4.0 | 200 cleaned postings in `data/raw/synthetic/jobs.csv` (`source=job_skill_set`); that adapted content stays CC BY-SA 4.0 |
 | Wiktionary (kaikki.org extract, Swahili Wiktionary) | CC BY-SA 4.0 (and GFDL) | Glosses and entry URLs in `data/vocabulary/` |
 

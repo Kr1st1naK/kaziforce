@@ -1,0 +1,64 @@
+$ python scripts/run_recommendation.py --worker-id 3917d39f-d0c0-46c2-aa34-9158711f68f3 --k 10
+# commit c032961, 2026-10-17 07:38 +0300, macOS 15.8.1, Intel Core i5-8279U, 8 GB RAM, CPU only
+
+Configuration: full   Split: development   Candidate jobs: 280
+
+WORKER 3917d39f-d0c0-46c2-aa34-9158711f68f3
+  bio:      Niko Nyeri, ni fundi wa umeme. Experience miaka 20, rates from KSh 2000.
+  skills:   fundi wa umeme
+  location: Nyeri   availability: Part-time   rate: 2000 KES/day
+  enrichment: occupations ['electrician']; 0 stated, 21 inferred skills; unmapped none
+
+TOP 10 JOBS
+
+#1  0.698  (rule 0.800, semantic 0.595)  Electrical fault-finding in an office
+    Meru · 4700 KES/day · Part-time · posting 979d6da3-3b29-43cd-8e3f-8e612197d124
+    rule: skill_overlap 1.00 · location 0.00 · budget_fit 1.00 · availability 1.00
+    matched: install electricity sockets [inferred via fundi wa umeme]; use measurement instruments [inferred via fundi wa umeme]; work in a construction team [inferred via fundi wa umeme]; electrical wiring plans [inferred via fundi wa umeme]
+
+#2  0.695  (rule 0.778, semantic 0.613)  House wiring for new rental units
+    Nairobi - Westlands · 1800 KES/day · Part-time · posting d2a4316a-9449-466f-8539-4ea045d7efd2
+    rule: skill_overlap 1.00 · location 0.00 · budget_fit 0.89 · availability 1.00
+    matched: use precision tools [inferred via fundi wa umeme]; electricity [inferred via fundi wa umeme]; inspect electrical supplies [inferred via fundi wa umeme]; electrical testing methods [inferred via fundi wa umeme]
+
+#3  0.675  (rule 0.789, semantic 0.561)  House wiring for new rental units
+    Eldoret · 1900 KES/day · Part-time · posting ba819166-4ffe-478d-8147-3b11c61622d5
+    rule: skill_overlap 1.00 · location 0.00 · budget_fit 0.95 · availability 1.00
+    matched: react to events in time-critical environments [inferred via fundi wa umeme]; splice cable [inferred via fundi wa umeme]; use safety equipment in construction [inferred via fundi wa umeme]
+
+#4  0.663  (rule 0.800, semantic 0.526)  Install security lights in a compound
+    Nyeri · 5100 KES/day · Full-time · posting f79eb845-9c0b-41e4-8843-45bd6c999940
+    rule: skill_overlap 1.00 · location 1.00 · budget_fit 1.00 · availability 0.00
+    matched: use precision tools [inferred via fundi wa umeme]; electricity [inferred via fundi wa umeme]; install lightning protection system [inferred via fundi wa umeme]; bind wire [inferred via fundi wa umeme]; use measurement instruments [inferred via fundi wa umeme]
+
+#5  0.611  (rule 0.600, semantic 0.622)  House wiring for new rental units
+    Machakos · 3700 KES/day · Weekends · posting 469bc6e0-282f-4bc3-b17b-cf26d0f93625
+    rule: skill_overlap 1.00 · location 0.00 · budget_fit 1.00 · availability 0.00
+    matched: follow health and safety procedures in construction [inferred via fundi wa umeme]; use measurement instruments [inferred via fundi wa umeme]; splice cable [inferred via fundi wa umeme]; install electrical and electronic equipment [inferred via fundi wa umeme]; electrical wiring plans [inferred via fundi wa umeme]
+
+#6  0.596  (rule 0.600, semantic 0.592)  Install a new distribution board
+    Nairobi - Kasarani · 3600 KES/day · Weekends · posting ecbd5bbf-a865-4148-afc8-c61406c174b6
+    rule: skill_overlap 1.00 · location 0.00 · budget_fit 1.00 · availability 0.00
+    matched: test electrical equipment [inferred via fundi wa umeme]; keep records of work progress [inferred via fundi wa umeme]; maintain electrical equipment [inferred via fundi wa umeme]; electricity [inferred via fundi wa umeme]
+
+#7  0.591  (rule 0.600, semantic 0.582)  Rewire an old shop
+    Nairobi - Githurai · 2500 KES/day · Full-time · posting f899bc9e-0213-44c9-a5a2-3c508371875d
+    rule: skill_overlap 1.00 · location 0.00 · budget_fit 1.00 · availability 0.00
+    matched: follow health and safety procedures in construction [inferred via fundi wa umeme]; use safety equipment in construction [inferred via fundi wa umeme]; inspect electrical supplies [inferred via fundi wa umeme]
+
+#8  0.565  (rule 0.600, semantic 0.530)  Rewire an old shop
+    Thika · 3700 KES/day · Full-time · posting 9a8d1917-6975-4b24-91f2-54d7b2915401
+    rule: skill_overlap 1.00 · location 0.00 · budget_fit 1.00 · availability 0.00
+    matched: maintain electrical equipment [inferred via fundi wa umeme]; splice cable [inferred via fundi wa umeme]; install lightning protection system [inferred via fundi wa umeme]
+
+#9  0.497  (rule 0.560, semantic 0.433)  Install a water tank and piping
+    Nairobi - Kibera · 3100 KES/day · Part-time · posting 7b35f82e-b538-4e3a-92ee-6411da74755d
+    rule: skill_overlap 0.40 · location 0.00 · budget_fit 1.00 · availability 1.00
+    matched: use safety equipment in construction [inferred via fundi wa umeme]; follow health and safety procedures in construction [inferred via fundi wa umeme]
+
+#10 0.468  (rule 0.480, semantic 0.456)  Roof timber work for a bungalow
+    Nairobi - Embakasi · 2700 KES/day · Part-time · posting 3ea7605c-1b37-4d21-968f-43089170a300
+    rule: skill_overlap 0.20 · location 0.00 · budget_fit 1.00 · availability 1.00
+    matched: follow health and safety procedures in construction [inferred via fundi wa umeme]
+
+Timing: startup 29.57 s (of which graph, data and job enrichment 0.55 s); query 67 ms
