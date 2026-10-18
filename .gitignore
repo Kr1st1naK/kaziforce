@@ -58,3 +58,4 @@ docs/course/
 
 # Partial evaluation runs (scripts/evaluate.py --max-queries); full runs in results/dev/ are committed
 results/scratch/
+.claude/
