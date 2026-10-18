@@ -13,6 +13,11 @@ all-MiniLM-L6-v2 model and the job embeddings, taking about 20–30 s on CPU. Un
 `/health` reports `"ready": false` and `/recommend` answers 503. After that, a request takes
 well under 0.2 s.
 
+**Profile source.** Stored workers and the job postings are read from PostgreSQL
+(`DATABASE_URL`). Set `KAZIFORCE_PROFILE_SOURCE=csv` to read the frozen CSVs instead
+(e.g. without a database). An unseeded database makes startup fail, and `/recommend` then
+answers 500.
+
 **CORS.** Browser requests are allowed from `http://localhost:3000` (the Next.js dev server).
 Set `KAZIFORCE_CORS_ORIGIN` to change it. Other origins get no CORS headers.
 
@@ -52,7 +57,7 @@ Ranked jobs for one worker, either a **stored** worker (`worker_id`) or a **type
 
 | Field | Type | Rules |
 |---|---|---|
-| `worker_id` | string | A stored worker. For now this means the development split of the synthetic dataset; #41 moves it to PostgreSQL |
+| `worker_id` | string | A worker stored in PostgreSQL (seeded with the development-split workers by `scripts/seed_database.py`) |
 | `worker.biography` | string | Required, non-empty, at most 4000 characters |
 | `worker.skills` | string[] | Optional (default `[]`), at most 50 entries of 200 characters; blank entries are dropped |
 | `worker.location` | string \| null | Optional, at most 200 characters, e.g. `"Nairobi - Kasarani"` |

@@ -2,8 +2,10 @@
 RecommendationService: loads the engine once (graph, postings, model, job
 embeddings) and serves recommendations as JSON-ready dicts.
 
-Loading runs in a background thread so the API can answer "not ready" (503)
-during startup instead of blocking. Every configuration shares one knowledge
+Profiles come from a ProfileStore: PostgreSQL by default (the application
+store), or the frozen CSVs with KAZIFORCE_PROFILE_SOURCE=csv (e.g. without a
+database). Loading runs in a background thread so the API can answer
+"not ready" (503) during startup instead of blocking. Every configuration shares one knowledge
 graph and one SemanticScorer, so the model and its embedding cache load once.
 
 Absent values are None (JSON null), never 0: a score component a configuration
@@ -14,12 +16,13 @@ posting field the posting does not have.
 from __future__ import annotations
 
 import logging
+import os
 import threading
 import time
 from collections.abc import Callable
 
-from kaziforce_api.data.data_loader import DataLoader
 from kaziforce_api.data.models import JobPosting, MatchScore, WorkerProfile
+from kaziforce_api.data.store import CsvProfileStore, PostgresProfileStore, ProfileStore
 from kaziforce_api.matching.semantic import SemanticScorer, job_text
 from kaziforce_api.pipeline import CONFIGURATIONS, Recommender, build_recommender
 from kaziforce_kg.builder import KnowledgeGraphBuilder
@@ -27,7 +30,14 @@ from kaziforce_kg.graph import KnowledgeGraph
 
 log = logging.getLogger(__name__)
 MAX_K = 50
-WORKER_SPLIT = "development"  # worker_id lookups; PostgreSQL replaces this in #41
+PROFILE_SOURCES = ("db", "csv")
+
+
+def default_store() -> ProfileStore:
+    source = os.getenv("KAZIFORCE_PROFILE_SOURCE", "db")
+    if source not in PROFILE_SOURCES:
+        raise ValueError(f"KAZIFORCE_PROFILE_SOURCE must be one of {PROFILE_SOURCES}, not {source!r}")
+    return PostgresProfileStore() if source == "db" else CsvProfileStore()
 
 
 class NotReady(RuntimeError):
@@ -35,8 +45,8 @@ class NotReady(RuntimeError):
 
 
 class RecommendationService:
-    def __init__(self, loader: DataLoader | None = None, semantic_factory: Callable[[], SemanticScorer] = SemanticScorer):
-        self.loader = loader or DataLoader()
+    def __init__(self, store: ProfileStore | None = None, semantic_factory: Callable[[], SemanticScorer] = SemanticScorer):
+        self.store = store or default_store()
         self._semantic_factory = semantic_factory
         self._ready = threading.Event()
         self.startup_error: BaseException | None = None
@@ -57,7 +67,9 @@ class RecommendationService:
     def _load(self) -> None:
         started = time.perf_counter()
         try:
-            jobs = self.loader.jobs()
+            jobs = self.store.jobs()
+            if not jobs:
+                raise RuntimeError("the profile store has no job postings; run scripts/seed_database.py")
             self.kg, semantic = KnowledgeGraphBuilder().build(), self._semantic_factory()
             self.recommenders = {n: build_recommender(n, jobs, kg=self.kg, semantic=semantic, k=MAX_K)
                                  for n in CONFIGURATIONS}
@@ -78,7 +90,7 @@ class RecommendationService:
 
     def worker(self, worker_id: str) -> WorkerProfile:
         """A stored worker profile; KeyError if unknown."""
-        return self.loader.worker(worker_id, WORKER_SPLIT)
+        return self.store.worker(worker_id)
 
     def recommend(self, worker: WorkerProfile, k: int, configuration: str, stored: bool) -> dict:
         if self.startup_error:

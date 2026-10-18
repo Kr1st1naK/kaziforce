@@ -7,12 +7,16 @@ hybrid combination. Output: the top K jobs with the composite score, both
 components, the rule breakdown and the matched skills with how the worker came
 to have each one.
 
+Profiles are read from PostgreSQL (the application store, seeded by
+scripts/seed_database.py), and the ranking is written to match_score. Use
+--source csv to read the frozen CSVs instead (no database; nothing is saved).
+
 Startup (graph, job enrichment, model, job embeddings) is timed separately from
 the query, which is the per-query response time (NFR-01).
 
 Usage:
     python scripts/run_recommendation.py --list 10
-    python scripts/run_recommendation.py --worker-id <id> [--k 10] [--config full]
+    python scripts/run_recommendation.py --worker-id <id> [--k 10] [--config full] [--source db|csv] [--no-save]
 """
 
 from __future__ import annotations
@@ -20,13 +24,12 @@ from __future__ import annotations
 import argparse
 import time
 
-from kaziforce_api.data.data_loader import DataLoader
+from kaziforce_api.data.store import CsvProfileStore, PostgresProfileStore
 from kaziforce_api.matching.semantic import SemanticScorer, job_text
 from kaziforce_api.pipeline import CONFIGURATIONS, build_recommender
 from kaziforce_kg.builder import KnowledgeGraphBuilder
 from kaziforce_kg.enrichment import INFORMAL_TERM, LISTED, OCCUPATION_LABEL, TEXT
 
-SPLIT = "development"
 
 
 def provenance(m, kg_label) -> str:
@@ -46,20 +49,26 @@ def main() -> None:
     parser.add_argument("--worker-id", help="a development-split worker ID (see --list)")
     parser.add_argument("--k", type=int, default=10)
     parser.add_argument("--config", default="full", choices=list(CONFIGURATIONS))
-    parser.add_argument("--list", type=int, metavar="N", help="list N development-split workers and exit")
+    parser.add_argument("--list", type=int, metavar="N", help="list N stored workers and exit")
+    parser.add_argument("--source", choices=["db", "csv"], default="db",
+                        help="db: PostgreSQL (default; ranking saved to match_score); csv: frozen dataset, nothing saved")
+    parser.add_argument("--no-save", action="store_true", help="do not write match_score rows")
     args = parser.parse_args()
 
-    loader = DataLoader()
+    store = PostgresProfileStore() if args.source == "db" else CsvProfileStore()
     if args.list:
-        for w in loader.workers(SPLIT)[: args.list]:
+        for w in store.workers()[: args.list]:
             print(f"{w.worker_id}  {w.biography[:70]}")
         return
     if not args.worker_id:
         parser.error("--worker-id is required (or use --list)")
-    worker = loader.worker(args.worker_id, SPLIT)
+    try:
+        worker = store.worker(args.worker_id)
+    except KeyError:
+        parser.error(f"no stored worker {args.worker_id} in source {args.source}")
 
     t0 = time.perf_counter()
-    jobs = loader.jobs()
+    jobs = store.jobs()
     kg = KnowledgeGraphBuilder().build()
     semantic = SemanticScorer()
     recommender = build_recommender(args.config, jobs, kg=kg, semantic=semantic, k=args.k)
@@ -72,7 +81,7 @@ def main() -> None:
 
     by_id = {j.profile.posting_id: j.profile for j in recommender.jobs}
     enrichment = recommender.enrich(worker).enrichment
-    print(f"Configuration: {args.config}   Split: {SPLIT}   Candidate jobs: {len(jobs)}")
+    print(f"Configuration: {args.config}   Source: {args.source}   Candidate jobs: {len(jobs)}")
     print(f"\nWORKER {worker.worker_id}\n  bio:      {worker.biography}\n  skills:   {', '.join(worker.skills)}")
     print(f"  location: {worker.location or '—'}   availability: {worker.availability or '—'}   "
           f"rate: {fmt(worker.rate_expectation, '.0f')} KES/day")
@@ -91,6 +100,9 @@ def main() -> None:
         if m.matched_skills:
             print("    matched: " + "; ".join(f"{s.skill_label} [{provenance(s, kg.label)}]" for s in m.matched_skills))
 
+    if args.source == "db" and not args.no_save:
+        saved = store.save_match_scores(worker.worker_id, args.config, results)
+        print(f"\nSaved {saved} match_score rows (configuration {args.config}).")
     print(f"\nTiming: startup {t_startup - t0:.2f} s (of which graph, data and job enrichment {t_build - t0:.2f} s); "
           f"query {1000 * (t_query - t_startup):.0f} ms")
 

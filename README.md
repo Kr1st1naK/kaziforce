@@ -44,8 +44,8 @@ kaziforce/
 **Current status.** The frozen vocabulary (`data/vocabulary/`) and the synthetic
 evaluation dataset (`data/raw/synthetic/`) are built and tested. The knowledge
 graph, enrichment, scorers, end-to-end pipeline, evaluation runner and
-`POST /recommend` are built; the explanation generator, the PostgreSQL-backed
-application store and the web interface are in progress.
+`POST /recommend` are built, with PostgreSQL as the application store; the
+explanation generator and the web interface are in progress.
 
 ## Setup from a fresh clone
 
@@ -85,7 +85,7 @@ ruff check apps/api packages scripts tests  # lint
 # data/raw/synthetic/difficulty_report.md)
 python scripts/report_synthetic_difficulty.py
 
-# End-to-end recommendation for one development-split worker (command line)
+# End-to-end recommendation for one stored worker (reads PostgreSQL; add --source csv without a database)
 python scripts/run_recommendation.py --list 5
 python scripts/run_recommendation.py --worker-id <id> --k 10
 
@@ -106,11 +106,15 @@ Optional raw data (only needed to rebuild inputs, not to run anything above):
 `python scripts/download_esco.py` for the ESCO subset, and the manual downloads
 described in `data/raw/*/README.md`.
 
-## Database (optional)
+## Database
 
-The relational schema (proposal Figure 4.6) is defined as versioned SQL
-migrations in `apps/api/src/kaziforce_api/data/migrations/`. Nothing else uses
-the database yet.
+PostgreSQL is the application store: the command-line demo and the REST API read
+worker profiles and job postings from it, and the demo writes each ranking to
+`match_score`. The schema (proposal Figure 4.6, extended in migration 0002) is
+defined as versioned SQL migrations in `apps/api/src/kaziforce_api/data/migrations/`.
+The evaluation deliberately reads the frozen CSVs instead, so its results stay
+traceable through the dataset checksums and run in CI without a database.
+Without a database, use `--source csv` (demo) or `KAZIFORCE_PROFILE_SOURCE=csv` (API).
 
 Copy the environment template and set `DATABASE_URL`:
 ```bash
@@ -129,11 +133,15 @@ psql kaziforce -c "REVOKE CREATE ON SCHEMA public FROM PUBLIC; GRANT USAGE, CREA
 ```
 Then set `DATABASE_URL=postgresql://kaziforce_app:<password>@localhost:5432/kaziforce` in `.env`.
 
-Test the connection, then create the schema:
+Test the connection, create the schema, and load the dataset:
 ```bash
 python -m kaziforce_api.data.db
 python -m kaziforce_api.data.migrate          # safe to re-run; --status lists applied migrations
+python scripts/seed_database.py              # development-split workers + all 280 postings; idempotent
 ```
+
+With `DATABASE_URL` set, `pytest` also runs the PostgreSQL round-trip tests
+(`tests/test_store.py`) in a throwaway schema; without it they are skipped.
 
 ## Development workflow
 
