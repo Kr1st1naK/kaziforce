@@ -2,6 +2,7 @@
 
 | Document | What it is |
 |---|---|
+| [`api.md`](api.md) | REST API contract: `POST /recommend` request, response and error shapes, and what `null` means |
 | [`scoring-policy.md`](scoring-policy.md) | How every configuration scores and ranks, fixed before any score existed: rule-based criteria, weights, the missing-field rule, the BM25 keyword baseline, semantic and hybrid scores, tie-breaking |
 | [`evidence/`](evidence/) | Generated evidence for the thesis, each file stamped with the commit that produced it |
 | [`evidence/kg_stats.md`](evidence/kg_stats.md) | Knowledge graph node and edge counts by type, schema, occupations, withheld-alias check |

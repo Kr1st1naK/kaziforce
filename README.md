@@ -43,8 +43,9 @@ kaziforce/
 
 **Current status.** The frozen vocabulary (`data/vocabulary/`) and the synthetic
 evaluation dataset (`data/raw/synthetic/`) are built and tested. The knowledge
-graph, scorers, explanation generator, API routes and web interface are in
-progress (see `docs/sprint-plan.md`).
+graph, enrichment, scorers, end-to-end pipeline, evaluation runner and
+`POST /recommend` are built; the explanation generator, the PostgreSQL-backed
+application store and the web interface are in progress.
 
 ## Setup from a fresh clone
 
@@ -84,8 +85,15 @@ ruff check apps/api packages scripts tests  # lint
 # data/raw/synthetic/difficulty_report.md)
 python scripts/report_synthetic_difficulty.py
 
-# API (currently a health check only)
-flask --app kaziforce_api.app run          # then: curl http://127.0.0.1:5000/health
+# End-to-end recommendation for one development-split worker (command line)
+python scripts/run_recommendation.py --list 5
+python scripts/run_recommendation.py --worker-id <id> --k 10
+
+# Development-split evaluation (writes results/dev/<time>_<commit>/)
+python scripts/evaluate.py
+
+# REST API: POST /recommend, GET /health (contract: docs/api.md)
+flask --app kaziforce_api.app run          # engine ready after ~30 s; check http://127.0.0.1:5000/health
 ```
 
 **Do not regenerate the synthetic dataset.** It is frozen: its input checksums are
