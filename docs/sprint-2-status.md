@@ -103,8 +103,8 @@ knowledge graph's effect comes from.
 
 | Planned | Done instead | Why |
 |---|---|---|
-| 70/15/15 split | 40/20/40 by group | **[Author: reason for 40/20/40]** (decided in Sprint 2; issue #17) |
-| Graded relevance using location, budget and availability | Binary same-area relevance | **[Author: reason for binary labels]** (decided in Sprint 2; issue #19). Consequences: limitations §5, item 21 |
+| 70/15/15 split | 40/20/40 by group | No model is trained on the data, so the conventional allocation favouring a large training subset does not apply. The development subset supports inspection, the validation subset is reserved for configuration decisions, and the test subset must be large enough to report results separately for each profile variant, including the smaller held_out condition (issue #17) |
+| Graded relevance using location, budget and availability | Binary same-area relevance | Relevance is derived from generator metadata that is not in the profile files, so no recommendation score can influence it. The graded multi-criterion scheme in the original sprint plan was not implemented; the binary rule is simpler, and the labels could not be influenced by any scorer (issue #19). Consequences: limitations §5, item 21 |
 | Weights tuned on validation data, with sensitivity analysis | Weights fixed a priori | Tuning against occupational labels would zero the location, budget and availability weights as an artefact |
 | Embeddings in pgvector | In-memory cache | Unnecessary at 280 postings; pgvector moved to the Sprint III backlog (#45), after the UI |
 | Keyword baseline as token overlap | Okapi BM25 | Comparable with the BM25 baselines in the literature; changed before any score existed |
