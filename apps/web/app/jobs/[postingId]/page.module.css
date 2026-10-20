@@ -1,0 +1,49 @@
+.headline {
+  font-size: 15px;
+  color: var(--muted);
+  margin-bottom: 22px;
+}
+
+.pool {
+  font-size: 16px;
+}
+
+.poolCount {
+  font-size: 26px;
+  font-weight: bold;
+}
+
+.skills {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.skillRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: baseline;
+  padding: 8px 0;
+  border-bottom: 1px solid #d9d9d9;
+}
+
+.skillRow:last-child {
+  border-bottom: none;
+}
+
+.skillLabel {
+  font-size: 15px;
+}
+
+.tag {
+  border: 1.5px solid var(--line);
+  background: var(--fill);
+  padding: 2px 8px;
+  font-size: 12px;
+}
+
+.tagText {
+  border-style: dashed;
+  background: var(--paper);
+}

@@ -1,0 +1,39 @@
+.path {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+}
+
+.step {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.node {
+  display: inline-flex;
+  flex-direction: column;
+  border: 1.5px solid var(--line);
+  background: var(--fill);
+  padding: 5px 10px;
+}
+
+.kind {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: lowercase;
+}
+
+.arrow {
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.direct {
+  font-size: 15px;
+  margin: 0;
+}

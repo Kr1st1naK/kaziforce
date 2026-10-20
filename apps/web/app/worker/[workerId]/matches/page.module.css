@@ -1,0 +1,20 @@
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 22px;
+}
+
+.loading {
+  border: 1.5px dashed var(--absent);
+  padding: 24px;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.empty {
+  border: 1.5px solid var(--line);
+  padding: 24px;
+}

@@ -1,0 +1,17 @@
+$ npm run e2e        # Chromium and WebKit, the engines behind Chrome and Safari (NFR-05)
+# 2026-10-20 11:36 +0300, macOS 15.8.1, Intel Core i5-8279U
+# API: flask --app kaziforce_api.app run (PostgreSQL, 280 postings)
+# Browsers: Version 1.64.1
+
+Running 10 tests using 1 worker
+  ✓   1 [chromium] › e2e/core-workflow.spec.ts:20:5 › a worker submits a profile and gets explained matches (4.8s)
+  ✓   2 [chromium] › e2e/core-workflow.spec.ts:55:5 › an unrecognised term is reported, not silently dropped (FR-10) (1.4s)
+  ✓   3 [chromium] › e2e/core-workflow.spec.ts:67:5 › a criterion with no information reads as not assessed, never as zero (1.9s)
+  ✓   4 [chromium] › e2e/core-workflow.spec.ts:83:5 › a client posts a job and sees how it was understood (4.8s)
+  ✓   5 [chromium] › e2e/core-workflow.spec.ts:112:5 › the form refuses an empty profile before it reaches the API (1.0s)
+  ✓   6 [webkit] › e2e/core-workflow.spec.ts:20:5 › a worker submits a profile and gets explained matches (4.1s)
+  ✓   7 [webkit] › e2e/core-workflow.spec.ts:55:5 › an unrecognised term is reported, not silently dropped (FR-10) (1.9s)
+  ✓   8 [webkit] › e2e/core-workflow.spec.ts:67:5 › a criterion with no information reads as not assessed, never as zero (2.6s)
+  ✓   9 [webkit] › e2e/core-workflow.spec.ts:83:5 › a client posts a job and sees how it was understood (4.9s)
+  ✓  10 [webkit] › e2e/core-workflow.spec.ts:112:5 › the form refuses an empty profile before it reaches the API (1.3s)
+  10 passed (38.2s)
