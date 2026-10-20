@@ -2,6 +2,8 @@
 
 | Document | What it is |
 |---|---|
+| [`traceability.md`](traceability.md) | Every Chapter 4 requirement mapped to its module, tests and evidence, with the gaps named |
+| [`demo.md`](demo.md) | Rehearsed demo runbook: commands in order, expected output, what it writes to the database, and what to do if it goes wrong |
 | [`api.md`](api.md) | REST API contract: `/recommend`, `/workers`, `/jobs` request, response and error shapes, and what `null` means |
 | [`scoring-policy.md`](scoring-policy.md) | How every configuration scores and ranks, fixed before any score existed: rule-based criteria, weights, the missing-field rule, the BM25 keyword baseline, semantic and hybrid scores, tie-breaking |
 | [`evidence/`](evidence/) | Generated evidence for the thesis, each file stamped with the commit that produced it |
