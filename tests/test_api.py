@@ -33,10 +33,10 @@ def post(client, body, **kw):
 
 # Success
 
-def test_health_reports_readiness(client):
-    assert client.get("/health").get_json() == {"status": "ok", "ready": True}
+def test_health_reports_readiness_and_pool_size(client):
+    assert client.get("/health").get_json() == {"status": "ok", "ready": True, "candidate_jobs": 280}
     not_started = create_app(RecommendationService(CsvProfileStore()), start=False).test_client()
-    assert not_started.get("/health").get_json() == {"status": "ok", "ready": False}
+    assert not_started.get("/health").get_json() == {"status": "ok", "ready": False, "candidate_jobs": 0}
 
 
 def test_stored_worker_returns_the_contract_shape(client):
@@ -154,3 +154,67 @@ def test_cors_for_the_web_app_origin_only(client):
     assert ok.status_code == 204 and ok.headers["Access-Control-Allow-Origin"] == "http://localhost:3000"
     other = post(client, {"worker": TYPED}, headers={"Origin": "http://evil.example"})
     assert "Access-Control-Allow-Origin" not in other.headers
+
+
+# POST /workers and POST /jobs: validation and the read-only store (storage itself is tested in test_api_db.py)
+
+JOB = {"title": "House wiring for a new flat", "description": "Need an electrician to wire a new flat in Nyeri.",
+       "required_skills": ["install electricity sockets"], "location": "Nyeri", "budget": 2500}
+
+
+@pytest.mark.parametrize("path, body, field", [
+    ("/workers", {"biography": "  "}, "worker.biography"),
+    ("/workers", {}, "worker.biography"),
+    ("/workers", {"biography": "x", "availability": "Sometimes"}, "worker.availability"),
+    ("/workers", {"biography": "x", "rate_expectation": -5}, "worker.rate_expectation"),
+    ("/workers", {"biography": "x", "skills": "fundi"}, "worker.skills"),
+    ("/workers", {"biography": "x", "worker_id": "abc"}, "worker"),
+    ("/workers", "not an object", "worker"),
+    ("/jobs", {**JOB, "title": ""}, "title"),
+    ("/jobs", {k: v for k, v in JOB.items() if k != "description"}, "description"),
+    ("/jobs", {**JOB, "budget": "2500"}, "budget"),
+    ("/jobs", {**JOB, "required_skills": [1, 2]}, "required_skills"),
+    ("/jobs", {**JOB, "availability": "Evenings"}, "availability"),
+    ("/jobs", {**JOB, "category": "Electrician"}, None),
+    ("/jobs", {**JOB, "title": "x" * 256}, "title"),
+])
+def test_profile_submission_validation(client, path, body, field):
+    r = client.post(path, json=body)
+    assert r.status_code == 400, r.get_json()
+    err = r.get_json()["error"]
+    assert err["code"] == "invalid_request" and err.get("field") == field
+
+
+def test_category_is_rejected_because_matching_never_uses_it(client):
+    r = client.post("/jobs", json={**JOB, "category": "Electrician"})
+    assert r.status_code == 400 and "category" in r.get_json()["error"]["message"]
+
+
+def test_storing_is_refused_when_the_store_is_read_only(client):
+    for path, body in (("/workers", {"biography": "Mimi ni fundi bomba"}), ("/jobs", JOB)):
+        r = client.post(path, json=body)
+        assert r.status_code == 501
+        assert r.get_json()["error"] == {"code": "not_supported",
+                                         "message": "this server cannot store new profiles "
+                                                    "(it is reading the frozen dataset, not a database)"}
+
+
+def test_job_interpretation_shows_stated_skills_only(client):
+    posting_id = "979d6da3-3b29-43cd-8e3f-8e612197d124"  # synthetic electrician posting
+    d = client.get(f"/jobs/{posting_id}").get_json()
+    assert d["posting_id"] == posting_id and d["candidate_jobs"] == 280
+    assert d["job"]["title"] == "Electrical fault-finding in an office"
+    interpretation = d["interpretation"]
+    assert [o["label"] for o in interpretation["occupations"]] == ["electrician"]
+    stated = interpretation["stated_skills"]
+    assert [s["skill_label"] for s in stated] == list(d["job"]["required_skills"])
+    assert all(s["source"] in ("listed", "text") for s in stated)
+    # the posting states 4 skills; its occupation would infer 21 essential ones, which are not reported
+    assert len(stated) == len(d["job"]["required_skills"]) == 4
+    assert [p["occupation"]["label"] for p in interpretation["worker_pool"]] == ["electrician"]
+
+
+def test_unknown_or_malformed_posting_is_404(client):
+    for posting_id in ("not-a-uuid", "11111111-1111-4111-8111-111111111111"):
+        r = client.get(f"/jobs/{posting_id}")
+        assert r.status_code == 404 and r.get_json()["error"]["field"] == "posting_id"

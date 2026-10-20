@@ -9,6 +9,9 @@ through the manifest checksums.
 
 Both stores return the same WorkerProfile / JobPosting objects; the
 round-trip test (tests/test_store.py) checks they are field-for-field equal.
+
+Only PostgresProfileStore can store new profiles; CsvProfileStore raises
+ReadOnlyStore, because the committed dataset is frozen.
 """
 
 from __future__ import annotations
@@ -16,9 +19,17 @@ from __future__ import annotations
 import uuid
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Sequence
+from dataclasses import replace
+
+from psycopg2.extras import execute_values
 
 from kaziforce_api.data.data_loader import DataLoader
 from kaziforce_api.data.models import JobPosting, MatchScore, WorkerProfile
+from kaziforce_api.data.seed import SkillRow
+
+
+class ReadOnlyStore(RuntimeError):
+    """Raised when a store cannot accept new profiles."""
 
 
 class ProfileStore(ABC):
@@ -31,6 +42,18 @@ class ProfileStore(ABC):
     @abstractmethod
     def worker(self, worker_id: str) -> WorkerProfile:
         """The stored worker; KeyError if there is none."""
+
+    @abstractmethod
+    def job(self, posting_id: str) -> JobPosting:
+        """The stored posting; KeyError if there is none."""
+
+    def save_worker(self, profile: WorkerProfile, skills: Sequence[SkillRow]) -> WorkerProfile:
+        """Store a new worker profile and return it with the identifier it was given."""
+        raise ReadOnlyStore(f"{type(self).__name__} cannot store new worker profiles")
+
+    def save_job(self, posting: JobPosting, skills: Sequence[SkillRow]) -> JobPosting:
+        """Store a new job posting and return it with the identifier it was given."""
+        raise ReadOnlyStore(f"{type(self).__name__} cannot store new job postings")
 
 
 class CsvProfileStore(ProfileStore):
@@ -47,6 +70,12 @@ class CsvProfileStore(ProfileStore):
 
     def worker(self, worker_id: str) -> WorkerProfile:
         return self.loader.worker(worker_id, self.split)
+
+    def job(self, posting_id: str) -> JobPosting:
+        for j in self.jobs():
+            if j.posting_id == posting_id:
+                return j
+        raise KeyError(posting_id)
 
 
 def _float(value) -> float | None:
@@ -68,6 +97,7 @@ _JOB_SQL = """
     FROM job_posting p
     LEFT JOIN job_required_skill r ON r.fk_posting_id = p.posting_id
     LEFT JOIN skill s ON s.skill_id = r.fk_skill_id
+    {where}
     GROUP BY p.posting_id ORDER BY p.posting_id
 """
 
@@ -107,9 +137,65 @@ class PostgresProfileStore(ProfileStore):
             raise KeyError(worker_id)
         return self._worker(rows[0])
 
+    @staticmethod
+    def _job(row) -> JobPosting:
+        pid, title, description, location, availability, budget, skills = row
+        return JobPosting(pid, title or "", description, tuple(skills), location, availability, _float(budget))
+
     def jobs(self) -> list[JobPosting]:
-        return [JobPosting(pid, title or "", description, tuple(skills), location, availability, _float(budget))
-                for pid, title, description, location, availability, budget, skills in self._query(_JOB_SQL)]
+        return [self._job(r) for r in self._query(_JOB_SQL.format(where=""))]
+
+    def job(self, posting_id: str) -> JobPosting:
+        try:
+            uuid.UUID(posting_id)
+        except (ValueError, AttributeError, TypeError):
+            raise KeyError(posting_id) from None
+        rows = self._query(_JOB_SQL.format(where="WHERE p.posting_id = %s"), (posting_id,))
+        if not rows:
+            raise KeyError(posting_id)
+        return self._job(rows[0])
+
+    # Writes
+
+    def _skill_ids(self, cur, skills: Sequence[SkillRow]) -> dict[str, str]:
+        if not skills:
+            return {}
+        rows = execute_values(cur, "INSERT INTO skill (skill_name, esco_code, is_informal_term) VALUES %s "
+                                   "ON CONFLICT (skill_name) DO UPDATE SET esco_code = EXCLUDED.esco_code, "
+                                   "is_informal_term = EXCLUDED.is_informal_term RETURNING skill_name, skill_id",
+                              [(s.skill_name, s.esco_code, s.is_informal_term) for s in skills], fetch=True)
+        return dict(rows)
+
+    def save_worker(self, profile: WorkerProfile, skills: Sequence[SkillRow]) -> WorkerProfile:
+        conn = self._connect()
+        try:
+            with conn, conn.cursor() as cur:
+                skill_id = self._skill_ids(cur, skills)
+                cur.execute("INSERT INTO worker_profile (biography, location, availability, rate_expectation) "
+                            "VALUES (%s, %s, %s, %s) RETURNING worker_id::text",
+                            (profile.biography, profile.location, profile.availability, profile.rate_expectation))
+                worker_id = cur.fetchone()[0]
+                execute_values(cur, "INSERT INTO worker_skill (fk_worker_id, fk_skill_id, position) VALUES %s",
+                               [(worker_id, skill_id[s], i) for i, s in enumerate(profile.skills)])
+        finally:
+            conn.close()
+        return replace(profile, worker_id=worker_id)
+
+    def save_job(self, posting: JobPosting, skills: Sequence[SkillRow]) -> JobPosting:
+        conn = self._connect()
+        try:
+            with conn, conn.cursor() as cur:
+                skill_id = self._skill_ids(cur, skills)
+                cur.execute("INSERT INTO job_posting (title, description, budget, location, availability) "
+                            "VALUES (%s, %s, %s, %s, %s) RETURNING posting_id::text",
+                            (posting.title, posting.description, posting.budget, posting.location,
+                             posting.availability))
+                posting_id = cur.fetchone()[0]
+                execute_values(cur, "INSERT INTO job_required_skill (fk_posting_id, fk_skill_id, position) VALUES %s",
+                               [(posting_id, skill_id[s], i) for i, s in enumerate(posting.required_skills)])
+        finally:
+            conn.close()
+        return replace(posting, posting_id=posting_id)
 
     def save_match_scores(self, worker_id: str, configuration: str, scores: Sequence[MatchScore]) -> int:
         """Record a ranking as MatchScore rows (one per ranked posting); returns the number written."""

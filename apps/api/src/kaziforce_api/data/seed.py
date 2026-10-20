@@ -17,7 +17,7 @@ skill rows:
 from __future__ import annotations
 
 import csv
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -35,15 +35,26 @@ class SkillRow:
     is_informal_term: bool
 
 
+class SkillDescriber:
+    """Describes listed skill strings for the skill table. Built once and reused (the lookups are read from disk)."""
+
+    def __init__(self, vocabulary: VocabularyExtension | None = None, kg_dir: Path = DATA_DIR / "kg"):
+        vocabulary = vocabulary or VocabularyExtension()
+        with open(Path(kg_dir) / "skills.csv", newline="", encoding="utf-8") as f:
+            self.esco = {r["label"]: r["uri"] for r in csv.DictReader(f)}
+        self.included = {t["alias"]: t["esco_uri"] for t in vocabulary.kg_terms()}
+        self.withheld = {t["alias"] for t in vocabulary.held_out_terms()}
+
+    def describe(self, names: Iterable[str]) -> list[SkillRow]:
+        """One row per distinct string, in first-seen order."""
+        return [SkillRow(n, self.esco.get(n) or self.included.get(n), n in self.included or n in self.withheld)
+                for n in dict.fromkeys(names)]
+
+
 def skill_rows(workers: Sequence[WorkerProfile], jobs: Sequence[JobPosting],
                vocabulary: VocabularyExtension | None = None, kg_dir: Path = DATA_DIR / "kg") -> list[SkillRow]:
-    vocabulary = vocabulary or VocabularyExtension()
-    with open(Path(kg_dir) / "skills.csv", newline="", encoding="utf-8") as f:
-        esco = {r["label"]: r["uri"] for r in csv.DictReader(f)}
-    included = {t["alias"]: t["esco_uri"] for t in vocabulary.kg_terms()}
-    withheld = {t["alias"] for t in vocabulary.held_out_terms()}
-    names = dict.fromkeys([*(s for w in workers for s in w.skills), *(s for j in jobs for s in j.required_skills)])
-    return [SkillRow(n, esco.get(n) or included.get(n), n in included or n in withheld) for n in names]
+    return SkillDescriber(vocabulary, kg_dir).describe(
+        [*(s for w in workers for s in w.skills), *(s for j in jobs for s in j.required_skills)])
 
 
 def seed(conn, workers: Sequence[WorkerProfile], jobs: Sequence[JobPosting], skills: Sequence[SkillRow]) -> dict:

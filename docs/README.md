@@ -2,7 +2,7 @@
 
 | Document | What it is |
 |---|---|
-| [`api.md`](api.md) | REST API contract: `POST /recommend` request, response and error shapes, and what `null` means |
+| [`api.md`](api.md) | REST API contract: `/recommend`, `/workers`, `/jobs` request, response and error shapes, and what `null` means |
 | [`scoring-policy.md`](scoring-policy.md) | How every configuration scores and ranks, fixed before any score existed: rule-based criteria, weights, the missing-field rule, the BM25 keyword baseline, semantic and hybrid scores, tie-breaking |
 | [`evidence/`](evidence/) | Generated evidence for the thesis, each file stamped with the commit that produced it |
 | [`evidence/kg_stats.md`](evidence/kg_stats.md) | Knowledge graph node and edge counts by type, schema, occupations, withheld-alias check |
@@ -12,7 +12,7 @@
 | [`test-results.xml`](test-results.xml) | JUnit record of the latest full test run |
 | [`vocabulary-report.md`](vocabulary-report.md) | How the informal-term vocabulary was checked: dictionary evidence, ESCO mapping, shortlist, decisions (pre-decision snapshot, see its status note) |
 | [`vocabulary-review-sheet.md`](vocabulary-review-sheet.md) | One line per candidate alias, as reviewed (pre-decision snapshot) |
-| [`wireframes/`](wireframes/) | Low-fidelity wireframes of the four screens: worker profile, job posting, ranked matches, explanation |
+| [`wireframes/`](wireframes/) | Low-fidelity wireframes: worker profile, job posting, ranked matches, match explanation, posting interpretation |
 | [`sprint-plan.md`](sprint-plan.md) | The original six-sprint plan (partly superseded by the three-sprint structure; see its status note) |
 | [`ToDo.md`](ToDo.md) | Early phase checklist from project start (historical) |
 
