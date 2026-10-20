@@ -36,8 +36,19 @@ evaluation runner (`scripts/evaluate.py`) builds its own pipeline from the froze
 dataset and never calls this API, so results always come from exactly the 280 committed
 postings. `GET /health` reports the live pool size, so a demo can state it.
 
-**CORS.** Browser requests are allowed from `http://localhost:3000` (the Next.js dev server).
-Set `KAZIFORCE_CORS_ORIGIN` to change it. Other origins get no CORS headers.
+Profiles and postings stored during a demo or a browser test stay in the database.
+`python scripts/seed_database.py --reset` clears them and re-seeds, leaving exactly the
+frozen dataset. Restart the API afterwards, because it holds the candidate pool in memory.
+
+**CORS.** Browser requests are allowed from `http://localhost:3000` and
+`http://127.0.0.1:3000` (the Next.js dev server, either spelling).
+`KAZIFORCE_CORS_ORIGIN` replaces that list and takes comma-separated origins. Any other
+origin gets no CORS headers, so the browser blocks the response.
+
+**On macOS, use `127.0.0.1:5000`, not `localhost:5000`.** AirPlay Receiver listens on port
+5000 over IPv6 and answers 403, while Flask binds IPv4 only, so `localhost` can reach the
+wrong service. Turn AirPlay Receiver off in System Settings → General → AirDrop & Handoff,
+or keep using `127.0.0.1`.
 
 ## `GET /health`
 

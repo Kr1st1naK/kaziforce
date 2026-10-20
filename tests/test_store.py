@@ -9,7 +9,7 @@ import uuid
 import pytest
 
 from kaziforce_api.data.data_loader import DataLoader
-from kaziforce_api.data.models import MatchScore
+from kaziforce_api.data.models import JobPosting, MatchScore
 from kaziforce_api.data.seed import seed, skill_rows
 from kaziforce_api.data.store import PostgresProfileStore
 from tests.conftest import requires_db
@@ -89,3 +89,31 @@ def test_unknown_or_malformed_worker_id_is_a_key_error(seeded):
     for worker_id in (str(uuid.uuid4()), "not-a-uuid"):
         with pytest.raises(KeyError):
             store.worker(worker_id)
+
+
+def test_reset_empties_every_table_so_a_demo_can_start_clean(pg_connect):
+    """Profiles and postings stored through the API are cleared, and re-seeding restores the frozen dataset."""
+    from kaziforce_api.data.seed import reset
+
+    loader = DataLoader()
+    workers, jobs = loader.workers("development"), loader.jobs()
+    store = PostgresProfileStore(pg_connect)
+    conn = pg_connect()
+    seed(conn, workers, jobs, skill_rows(workers, jobs))
+    conn.close()
+
+    posting = JobPosting("", "Demo posting", "Added during a demo", ("splice cable",), None, None, None)
+    extra = store.save_job(posting, skill_rows([], [posting]))
+    assert len(store.jobs()) == len(jobs) + 1
+
+    conn = pg_connect()
+    deleted = reset(conn)
+    conn.close()
+    assert deleted["worker_profile"] == len(workers) and deleted["job_posting"] == len(jobs) + 1
+    assert store.jobs() == [] and store.workers() == []
+
+    conn = pg_connect()
+    seed(conn, workers, jobs, skill_rows(workers, jobs))
+    conn.close()
+    assert {j.posting_id for j in store.jobs()} == {j.posting_id for j in jobs}
+    assert extra.posting_id not in {j.posting_id for j in store.jobs()}

@@ -36,7 +36,9 @@ REQUEST_FIELDS = {"worker_id", "worker", "k", "configuration"}
 WORKER_FIELDS = {"biography", "skills", "location", "availability", "rate_expectation"}
 JOB_FIELDS = {"title", "description", "required_skills", "location", "availability", "budget"}
 MAX_TEXT, MAX_SKILLS, MAX_SKILL_TEXT, MAX_TITLE = 4000, 50, 200, 255
-DEFAULT_CORS_ORIGIN = "http://localhost:3000"  # Next.js dev server; override with KAZIFORCE_CORS_ORIGIN
+# Next.js dev server, both spellings of the loopback address. Override with
+# KAZIFORCE_CORS_ORIGIN, which takes a comma-separated list.
+DEFAULT_CORS_ORIGINS = "http://localhost:3000,http://127.0.0.1:3000"
 
 
 class InvalidRequest(ValueError):
@@ -158,12 +160,16 @@ def create_app(service: RecommendationService | None = None, start: bool = True)
         if start:
             service.start(background=True)
     app.extensions["kaziforce"] = service
-    cors_origin = os.getenv("KAZIFORCE_CORS_ORIGIN", DEFAULT_CORS_ORIGIN)
+    cors_origins = {
+        origin.strip() for origin in os.getenv("KAZIFORCE_CORS_ORIGIN", DEFAULT_CORS_ORIGINS).split(",")
+        if origin.strip()
+    }
 
     @app.after_request
     def cors(response):
-        if request.headers.get("Origin") == cors_origin:
-            response.headers["Access-Control-Allow-Origin"] = cors_origin
+        origin = request.headers.get("Origin")
+        if origin in cors_origins:
+            response.headers["Access-Control-Allow-Origin"] = origin
             response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
             response.headers["Access-Control-Allow-Headers"] = "Content-Type"
             response.headers["Vary"] = "Origin"
