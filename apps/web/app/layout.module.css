@@ -1,0 +1,22 @@
+.header {
+  border-bottom: 2px solid var(--line);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  width: min(1000px, 100% - 48px);
+  margin: 0 auto;
+  padding: 20px 0 14px;
+}
+
+.brand {
+  font-size: 22px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.nav {
+  display: flex;
+  gap: 20px;
+  font-size: 15px;
+}

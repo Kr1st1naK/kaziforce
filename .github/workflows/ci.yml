@@ -8,6 +8,7 @@ on:
 
 jobs:
   lint-and-test:
+    name: API and knowledge graph
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,3 +30,36 @@ jobs:
 
       - name: Run tests
         run: pytest -v
+
+  web:
+    name: Web interface
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          # Node 24 ships npm 11, which produced package-lock.json. npm 10 hoists
+          # transitive dependencies differently and rejects the lock file.
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npm run type-check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build

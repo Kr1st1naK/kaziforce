@@ -1,0 +1,23 @@
+.summary {
+  font-size: 15px;
+}
+
+.line {
+  margin: 0 0 8px;
+}
+
+.line:last-child {
+  margin-bottom: 0;
+}
+
+.term {
+  font-weight: bold;
+}
+
+.unmapped {
+  color: var(--muted);
+}
+
+.quote {
+  font-style: italic;
+}

@@ -149,11 +149,29 @@ def test_unknown_route_and_wrong_method_are_json(client):
     assert r.status_code == 405 and r.get_json()["error"]["code"] == "method_not_allowed"
 
 
-def test_cors_for_the_web_app_origin_only(client):
-    ok = client.options("/recommend", headers={"Origin": "http://localhost:3000"})
-    assert ok.status_code == 204 and ok.headers["Access-Control-Allow-Origin"] == "http://localhost:3000"
-    other = post(client, {"worker": TYPED}, headers={"Origin": "http://evil.example"})
-    assert "Access-Control-Allow-Origin" not in other.headers
+@pytest.mark.parametrize("origin", ["http://localhost:3000", "http://127.0.0.1:3000"])
+def test_cors_allows_each_spelling_of_the_web_app_origin(client, origin):
+    ok = client.options("/recommend", headers={"Origin": origin})
+    assert ok.status_code == 204 and ok.headers["Access-Control-Allow-Origin"] == origin
+    allowed = post(client, {"worker": TYPED}, headers={"Origin": origin})
+    assert allowed.headers["Access-Control-Allow-Origin"] == origin
+
+
+def test_cors_refuses_any_other_origin(client):
+    for origin in ("http://evil.example", "http://localhost:3001"):
+        other = post(client, {"worker": TYPED}, headers={"Origin": origin})
+        assert "Access-Control-Allow-Origin" not in other.headers
+
+
+def test_cors_origins_can_be_configured(monkeypatch, service):
+    monkeypatch.setenv("KAZIFORCE_CORS_ORIGIN", "https://example.test , http://localhost:4000")
+    configured = create_app(service).test_client()
+    for origin in ("https://example.test", "http://localhost:4000"):
+        response = configured.options("/recommend", headers={"Origin": origin})
+        assert response.headers["Access-Control-Allow-Origin"] == origin
+    assert "Access-Control-Allow-Origin" not in configured.options(
+        "/recommend", headers={"Origin": "http://localhost:3000"}
+    ).headers
 
 
 # POST /workers and POST /jobs: validation and the read-only store (storage itself is tested in test_api_db.py)

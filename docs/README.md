@@ -2,6 +2,8 @@
 
 | Document | What it is |
 |---|---|
+| [`traceability.md`](traceability.md) | Every Chapter 4 requirement mapped to its module, tests and evidence, with the gaps named |
+| [`demo.md`](demo.md) | Rehearsed demo runbook: commands in order, expected output, what it writes to the database, and what to do if it goes wrong |
 | [`api.md`](api.md) | REST API contract: `/recommend`, `/workers`, `/jobs` request, response and error shapes, and what `null` means |
 | [`scoring-policy.md`](scoring-policy.md) | How every configuration scores and ranks, fixed before any score existed: rule-based criteria, weights, the missing-field rule, the BM25 keyword baseline, semantic and hybrid scores, tie-breaking |
 | [`evidence/`](evidence/) | Generated evidence for the thesis, each file stamped with the commit that produced it |
@@ -9,6 +11,8 @@
 | [`evidence/enrichment_example.md`](evidence/enrichment_example.md) | Worked enrichment example (one profile before and after, every inferred skill with its graph path) and the occupation-mapping check over the development split |
 | [`evidence/dev_results.md`](evidence/dev_results.md) | Development-split baseline: seven configurations, P@3/5/10 and MRR by variant, knowledge-graph effect, response time, and how to read them |
 | [`evidence/demo_run.txt`](evidence/demo_run.txt) | Transcript of the end-to-end command-line demo (one worker, top 10) |
+| [`evidence/screens/`](evidence/screens/) | Screenshots of the interface in Chromium and WebKit, captured from the running system |
+| [`evidence/e2e_browsers.txt`](evidence/e2e_browsers.txt) | Transcript of the browser tests passing in Chromium and WebKit (NFR-05) |
 | [`test-results.xml`](test-results.xml) | JUnit record of the latest full test run |
 | [`vocabulary-report.md`](vocabulary-report.md) | How the informal-term vocabulary was checked: dictionary evidence, ESCO mapping, shortlist, decisions (pre-decision snapshot, see its status note) |
 | [`vocabulary-review-sheet.md`](vocabulary-review-sheet.md) | One line per candidate alias, as reviewed (pre-decision snapshot) |

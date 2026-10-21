@@ -57,6 +57,20 @@ def skill_rows(workers: Sequence[WorkerProfile], jobs: Sequence[JobPosting],
         [*(s for w in workers for s in w.skills), *(s for j in jobs for s in j.required_skills)])
 
 
+def reset(conn) -> dict:
+    """Delete every profile, posting, skill and match score, so the database can be re-seeded clean.
+
+    Use after a demo or an end-to-end run, which store real profiles and postings through the API.
+    """
+    tables = ("match_score", "worker_skill", "job_required_skill", "worker_profile", "job_posting", "skill")
+    deleted = {}
+    with conn, conn.cursor() as cur:
+        for table in tables:
+            cur.execute(f"DELETE FROM {table}")
+            deleted[table] = cur.rowcount
+    return deleted
+
+
 def seed(conn, workers: Sequence[WorkerProfile], jobs: Sequence[JobPosting], skills: Sequence[SkillRow]) -> dict:
     """Write everything in one transaction; returns row counts written."""
     with conn, conn.cursor() as cur:

@@ -22,7 +22,7 @@ recommendations that work from the moment a worker or job joins the platform.
 ```
 kaziforce/
 ├── apps/
-│   ├── web/                      # Next.js/React/TypeScript interface (not yet scaffolded)
+│   ├── web/                      # Next.js/React/TypeScript interface (four screens)
 │   └── api/                      # Flask REST API + recommendation engine
 │       └── src/kaziforce_api/
 │           ├── app.py            # Flask entry point
@@ -44,8 +44,10 @@ kaziforce/
 **Current status.** The frozen vocabulary (`data/vocabulary/`) and the synthetic
 evaluation dataset (`data/raw/synthetic/`) are built and tested. The knowledge
 graph, enrichment, scorers, end-to-end pipeline, evaluation runner and
-`POST /recommend` are built, with PostgreSQL as the application store; the
-explanation generator and the web interface are in progress.
+`POST /recommend` are built, with PostgreSQL as the application store, and the
+web interface covers the four screens. The template-based explanation
+generator is in progress; the interface explains a match from the score
+components and graph paths the API returns.
 
 ## Setup from a fresh clone
 
@@ -92,8 +94,11 @@ python scripts/run_recommendation.py --worker-id <id> --k 10
 # Development-split evaluation (writes results/dev/<time>_<commit>/)
 python scripts/evaluate.py
 
-# REST API: POST /recommend, GET /health (contract: docs/api.md)
+# REST API (contract: docs/api.md)
 flask --app kaziforce_api.app run          # engine ready after ~30 s; check http://127.0.0.1:5000/health
+
+# Web interface (needs the API running; see apps/web/README.md)
+cd apps/web && npm install && npm run dev  # http://localhost:3000
 ```
 
 **Do not regenerate the synthetic dataset.** It is frozen: its input checksums are
@@ -138,6 +143,7 @@ Test the connection, create the schema, and load the dataset:
 python -m kaziforce_api.data.db
 python -m kaziforce_api.data.migrate          # safe to re-run; --status lists applied migrations
 python scripts/seed_database.py              # development-split workers + all 280 postings; idempotent
+python scripts/seed_database.py --reset      # clear profiles and postings stored through the API, then re-seed
 ```
 
 With `DATABASE_URL` set, `pytest` also runs the PostgreSQL round-trip tests
@@ -157,7 +163,7 @@ Commit convention: `feat:`, `fix:`, `docs:`, `chore:`, `test:`, `data:` prefixes
 ## Tech stack
 
 Python · NetworkX · Sentence Transformers (all-MiniLM-L6-v2) · Flask ·
-PostgreSQL · Next.js/React/TypeScript (planned)
+PostgreSQL · Next.js / React / TypeScript
 
 ## Licensing
 
