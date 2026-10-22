@@ -60,9 +60,11 @@ def skill_rows(workers: Sequence[WorkerProfile], jobs: Sequence[JobPosting],
 def reset(conn) -> dict:
     """Delete every profile, posting, skill and match score, so the database can be re-seeded clean.
 
-    Use after a demo or an end-to-end run, which store real profiles and postings through the API.
+    Use after a demo or an end-to-end run, which store real accounts, profiles and postings
+    through the API. Accounts go too, so the same phone number can be registered again.
     """
-    tables = ("match_score", "worker_skill", "job_required_skill", "worker_profile", "job_posting", "skill")
+    tables = ("match_score", "worker_skill", "job_required_skill", "worker_profile", "job_posting", "skill",
+              "session", "account")
     deleted = {}
     with conn, conn.cursor() as cur:
         for table in tables:

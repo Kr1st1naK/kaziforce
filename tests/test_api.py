@@ -43,14 +43,14 @@ def test_stored_worker_returns_the_contract_shape(client):
     r = post(client, {"worker_id": EXAMPLE, "k": 3})
     assert r.status_code == 200
     d = r.get_json()
-    assert list(d) == ["configuration", "k", "worker", "enrichment", "results", "timing_ms"]
+    assert list(d) == ["configuration", "k", "worker", "enrichment", "results", "display_threshold", "timing_ms"]
     assert (d["configuration"], d["k"], d["worker"]["worker_id"]) == ("full", 3, EXAMPLE)
     assert d["enrichment"]["terms"] == [{"id": "term:fundi umeme", "label": "fundi wa umeme"}]
     assert [o["label"] for o in d["enrichment"]["occupations"]] == ["electrician"]
     assert [x["rank"] for x in d["results"]] == [1, 2, 3]
     top = d["results"][0]
     assert set(top) == {"rank", "posting_id", "title", "description", "location", "availability", "budget", "scores",
-                        "rule_components", "matched_skills"}
+                        "match_score", "band", "rule_components", "matched_skills"}
     assert set(top["scores"]) == {"composite", "rule", "semantic"}
     assert set(top["rule_components"]) == {"skill_overlap", "location", "budget_fit", "availability"}
     skill = top["matched_skills"][0]
