@@ -13,7 +13,10 @@
 
 import { defineConfig, devices } from "@playwright/test";
 
-const WEB_PORT = 3000; // the port the API allows by default (docs/api.md, CORS)
+const WEB_PORT = 3000;
+// 127.0.0.1, not localhost: the API runs on 127.0.0.1:5000 and the session cookie is
+// SameSite=Lax, so the browser only sends it when both are the same host.
+const WEB_HOST = "127.0.0.1";
 
 export default defineConfig({
   testDir: "./e2e",
@@ -22,14 +25,14 @@ export default defineConfig({
   reporter: [["list"], ["html", { outputFolder: "e2e-report", open: "never" }]],
   timeout: 60_000,
   expect: { timeout: 20_000 },
-  use: { baseURL: `http://localhost:${WEB_PORT}`, trace: "retain-on-failure" },
+  use: { baseURL: `http://${WEB_HOST}:${WEB_PORT}`, trace: "retain-on-failure" },
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
     { name: "webkit", use: { ...devices["Desktop Safari"] } },
   ],
   webServer: {
-    command: `npx next dev --port ${WEB_PORT}`,
-    url: `http://localhost:${WEB_PORT}`,
+    command: `npx next dev --hostname ${WEB_HOST} --port ${WEB_PORT}`,
+    url: `http://${WEB_HOST}:${WEB_PORT}`,
     reuseExistingServer: true,
     timeout: 120_000,
   },
