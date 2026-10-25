@@ -1,0 +1,64 @@
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 15px;
+  text-decoration: none;
+  margin-bottom: var(--space-md);
+}
+
+.back:hover {
+  color: var(--ink);
+}
+
+.heading {
+  margin-bottom: var(--space-lg);
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.pair {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+}
+
+.jobTitle {
+  font-weight: 700;
+}
+
+.swap {
+  color: var(--muted);
+}
+
+.score {
+  border-radius: var(--radius-tag);
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  background: #dcfce7;
+  color: #15803d;
+  white-space: nowrap;
+}
+
+.scoreModerate {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.scoreWeak {
+  background: #f1f5f9;
+  color: var(--muted);
+}
+
+.loading {
+  color: var(--muted);
+}

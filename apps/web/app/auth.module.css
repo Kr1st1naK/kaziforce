@@ -1,0 +1,41 @@
+.centre {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl) var(--space-md);
+}
+
+.card {
+  width: 100%;
+  max-width: 480px;
+  padding: var(--space-xl);
+}
+
+.heading {
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  margin-bottom: var(--space-lg);
+}
+
+.submit {
+  width: 100%;
+}
+
+.alternative {
+  margin-top: var(--space-lg);
+  text-align: center;
+  font-size: 15px;
+}
+
+.alert {
+  margin-bottom: var(--space-lg);
+}
+
+.pins {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}

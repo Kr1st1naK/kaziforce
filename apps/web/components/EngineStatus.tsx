@@ -5,14 +5,12 @@
  *
  * The API loads its model and job embeddings for about half a minute after the
  * server starts and answers 503 until then (docs/api.md). This polls /health
- * until it is ready and then stops, so the wait is visible and explained
- * instead of looking like a hung form. Forms stay usable throughout: the API
- * client waits out a 503 by itself.
+ * until it is ready and then stops. AppShell draws the notice; forms stay
+ * usable throughout, because the API client waits out a 503 by itself.
  */
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { api } from "@/lib/api";
-import styles from "./EngineStatus.module.css";
 
 const POLL_INTERVAL_MS = 3000;
 
@@ -73,30 +71,5 @@ export function EngineStatusProvider({ children }: { children: React.ReactNode }
     <EngineStatusContext.Provider value={{ ready, candidateJobs, unreachable, recheck }}>
       {children}
     </EngineStatusContext.Provider>
-  );
-}
-
-export function EngineBanner() {
-  const { ready, candidateJobs, unreachable, recheck } = useEngineStatus();
-  if (ready) return null;
-  return (
-    <div className={styles.banner} role="status" aria-live="polite">
-      {unreachable ? (
-        <>
-          <strong>Cannot reach the matching service.</strong> Start it with{" "}
-          <code>flask --app kaziforce_api.app run</code>, then{" "}
-          <button type="button" className={styles.link} onClick={recheck}>
-            check again
-          </button>
-          .
-        </>
-      ) : (
-        <>
-          <strong>Preparing the matching engine…</strong> This takes about half a minute after the service starts,
-          while the knowledge graph and the language model load. You can fill in the form meanwhile.
-          {candidateJobs !== null && candidateJobs > 0 && <> {candidateJobs} jobs are loaded.</>}
-        </>
-      )}
-    </div>
   );
 }

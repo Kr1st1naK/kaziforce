@@ -1,0 +1,128 @@
+.heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.tick {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--tint);
+  color: var(--ink);
+  font-size: 18px;
+}
+
+.section {
+  margin-bottom: var(--space-lg);
+}
+
+.sectionHeading {
+  margin-bottom: var(--space-md);
+}
+
+.verbatim {
+  background: var(--tint);
+  border: 1px solid var(--tint-line);
+  border-radius: var(--radius-control);
+  padding: var(--space-md);
+}
+
+.verbatimLabel {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.verbatimText {
+  font-style: italic;
+  font-size: 16px;
+}
+
+.arrow {
+  display: block;
+  text-align: center;
+  color: var(--muted);
+  margin: var(--space-md) 0;
+}
+
+.matchedTo {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: var(--space-md);
+}
+
+.trade {
+  color: var(--primary);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--line);
+}
+
+.chip {
+  background: var(--tint);
+  border: 1px solid var(--tint-line);
+  border-radius: var(--radius-tag);
+  padding: 6px 10px;
+  font-size: 14px;
+}
+
+.disclosure {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: none;
+  padding: var(--space-md) 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.howWeGotThere {
+  margin-top: var(--space-md);
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.poolCount {
+  color: var(--muted);
+  margin-bottom: var(--space-md);
+}
+
+.workers {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.worker {
+  padding: var(--space-md) 0;
+  border-top: 1px solid var(--line);
+  font-size: 16px;
+}
+
+.another {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: var(--space-lg);
+}
+
+.loading {
+  color: var(--muted);
+}
