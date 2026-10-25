@@ -8,7 +8,7 @@ from kaziforce_api.data.data_loader import DataLoader
 from kaziforce_api.data.seed import seed, skill_rows
 from kaziforce_api.data.store import PostgresProfileStore
 from kaziforce_api.matching.semantic import SemanticScorer
-from kaziforce_api.service import RecommendationService
+from kaziforce_api.service import SAMPLE_LENGTH, RecommendationService
 from tests.conftest import requires_db
 
 pytestmark = [pytest.mark.db, requires_db]
@@ -185,6 +185,17 @@ def test_the_trade_list_shows_no_identifiers_scores_or_ranking(client):
         assert set(worker) == {"describes_as", "location", "availability", "rate_expectation"}
     text = str(interpretation)
     assert "worker_id" not in text and "composite" not in text and "rank" not in text
+
+
+def test_a_worker_in_the_trade_list_is_never_cut_mid_word(client):
+    """A client reads these rows: "place sanitary equ" is not something anyone wrote."""
+    register(client, "client")
+    interpretation = client.post("/jobs", json=JOB).get_json()["interpretation"]
+    for pool in interpretation["worker_pool"]:
+        for worker in pool["sample"]:
+            words = worker["describes_as"].rstrip("\u2026")
+            assert words == words.rstrip(" ,")
+            assert len(worker["describes_as"]) <= SAMPLE_LENGTH + 1
 
 
 # Guards between the two roles

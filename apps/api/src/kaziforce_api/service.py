@@ -39,6 +39,16 @@ from kaziforce_kg.graph import KnowledgeGraph
 log = logging.getLogger(__name__)
 MAX_K = 50
 TRADE_SAMPLE_SIZE = 5  # rows shown under "Workers in this trade"
+SAMPLE_LENGTH = 120  # characters of a worker's own words shown in that list
+
+
+def shorten(text: str, limit: int = SAMPLE_LENGTH) -> str:
+    """Trims to a whole word, or a whole skill, so a client never reads half of one."""
+    if len(text) <= limit:
+        return text
+    head = text[:limit]
+    cut = head.rsplit(", ", 1)[0] if ", " in head else head.rsplit(" ", 1)[0]
+    return f"{cut.rstrip(' ,')}\u2026"
 PROFILE_SOURCES = ("db", "csv")
 
 
@@ -220,7 +230,7 @@ class RecommendationService:
     def _worker_sample(worker: WorkerProfile) -> dict:
         """A worker as a client may see them: their own words, and the practical facts. No identifier."""
         describes_as = ", ".join(worker.skills) if worker.skills else worker.biography
-        return {"describes_as": describes_as[:120], "location": worker.location,
+        return {"describes_as": shorten(describes_as), "location": worker.location,
                 "availability": worker.availability, "rate_expectation": worker.rate_expectation}
 
     # Serialisation
@@ -235,6 +245,15 @@ class RecommendationService:
         return {"terms": [self._node_ref(t) for t in enrichment.terms],
                 "occupations": [self._node_ref(o) for o in enrichment.occupations],
                 "unmapped": list(enrichment.unmapped)}
+
+    def _skill_type(self, skill: str) -> str | None:
+        """ESCO's own split: "skill" is something you do, "knowledge" something you know.
+
+        The interface uses it only for grammar ("needs someone to install sockets" against
+        "needs electrical wiring plans"). None for wording that is not in the graph.
+        """
+        node = self.kg.graph.nodes.get(skill)
+        return node.get("skill_type") if node else None
 
     def _node_ref(self, node: str) -> dict:
         return {"id": node, "label": self.kg.label(node)}
@@ -252,6 +271,7 @@ class RecommendationService:
             "band": band(m.composite),
             "rule_components": dict(m.components) if m.rule is not None else None,
             "matched_skills": [{"skill": s.skill, "skill_label": s.skill_label, "source": s.source,
+                                "skill_type": self._skill_type(s.skill),
                                 "graph_path": [{"source": self._node(u), "relation": r, "target": self._node(v)}
                                                for u, r, v in s.graph_path]}
                                for s in m.matched_skills],
