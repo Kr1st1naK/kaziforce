@@ -1,0 +1,107 @@
+{
+  "created_at": "2026-10-25T22:53:02+03:00",
+  "split": "development",
+  "queries": 216,
+  "ks": [
+    3,
+    5,
+    10
+  ],
+  "seed": 42,
+  "partial": false,
+  "configurations": {
+    "keyword": {
+      "enricher": "NullEnricher",
+      "scorer": "KeywordScorer"
+    },
+    "rule_only": {
+      "enricher": "NullEnricher",
+      "scorer": "RuleBasedScorer"
+    },
+    "rule_kg": {
+      "enricher": "ProfileEnricher",
+      "scorer": "RuleBasedScorer"
+    },
+    "semantic_only": {
+      "enricher": "NullEnricher",
+      "scorer": "SemanticScorer"
+    },
+    "semantic_kg": {
+      "enricher": "ProfileEnricher",
+      "scorer": "SemanticScorer"
+    },
+    "hybrid_no_kg": {
+      "enricher": "NullEnricher",
+      "scorer": "HybridScorer"
+    },
+    "full": {
+      "enricher": "ProfileEnricher",
+      "scorer": "HybridScorer"
+    }
+  },
+  "weights": {
+    "rule_based": {
+      "skill_overlap": 0.4,
+      "location": 0.2,
+      "budget": 0.2,
+      "availability": 0.2
+    },
+    "hybrid": {
+      "alpha": 0.5,
+      "beta": 0.5
+    },
+    "bm25": {
+      "k1": 1.2,
+      "b": 0.75
+    }
+  },
+  "semantic_model": {
+    "name": "sentence-transformers/all-MiniLM-L6-v2",
+    "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41"
+  },
+  "git": {
+    "commit": "1ae4e60165bcd88c7d37d2b2da5e226228401a2b",
+    "uncommitted_changes": true,
+    "allow_dirty": true
+  },
+  "data": {
+    "synthetic_generator": "kaziforce_api.data.synthetic v2",
+    "synthetic_seed": 42,
+    "synthetic_inputs_sha256": {
+      "aliases.csv": "22adfa1d5b3b5a089ad761641a6ae4d36db3e41f73f86b055953ce5649016747",
+      "area_esco_map.csv": "af26e0ae59486512d6786a384412ce1fa9bfdf3b309cd960a50d8f5b99d686be",
+      "area_skill_pools.csv": "eeea40e039306cc430d0560a3ebcd42c93dfef5b6a689f08016cd2467833858f",
+      "compatibility_matrix.csv": "ce6f40303b149bc4e4162e8bbdb569a7372d98ed0c9efec3117571fa554b1a10"
+    },
+    "files_sha256": {
+      "raw/synthetic/workers.csv": "e106edaa3c517f90faddcbfec0260ca4b35a217d98f5dd0aba3a229790739c9d",
+      "raw/synthetic/jobs.csv": "0ad361c4b49f357d8c5daf63c5b44a831c2bfdd8bddd597304015410d56faeca",
+      "raw/synthetic/splits.csv": "d7f19cecd7f305c50231332ee933b6649d1a9f7738d1b7bb925ff9f1c2375ddb",
+      "raw/synthetic/ground_truth/relevance.csv": "3074e03254d5d3e2fc71e4a8e696fb5f8e4a6438c7fe1b1b52d8091dc8f9e908",
+      "vocabulary/aliases.csv": "22adfa1d5b3b5a089ad761641a6ae4d36db3e41f73f86b055953ce5649016747"
+    },
+    "kg_outputs_sha256": {
+      "occupations.csv": "ba44f7920983600cf0c0e4e004449a4a4c12afc64eb3af52b305c1e8f6865602",
+      "occupation_broader.csv": "e11c1769197216ddd766dea784e809e3cb5d000a077d5da7130364291cb6410a",
+      "skills.csv": "7bdc38efcd1e6782fa96a059b602868afb3a3fee2e965ee794069d6cf8e41596",
+      "occupation_skills.csv": "0b33c72c734b0ff0df9f5bd2c18466f1ef817b83bb1b584130ca064346442cae",
+      "skill_broader.csv": "c446584b244b858b8b3c7eac38464424eebd3ef4a23139fc71ae780497a573f8",
+      "skill_groups.csv": "4b4f6bfa1a078bacaebcc09176723368a9b9f771530d26fcb0de48d75e91cc51"
+    }
+  },
+  "scoring_policy_sha256": "3e0d2e411cd14063e2535d2099d74d200a9d8aa93c0f0a923830e97189fd0386",
+  "startup_seconds": 23.69,
+  "packages": {
+    "numpy": "1.26.4",
+    "pandas": "3.0.5",
+    "networkx": "3.6.1",
+    "torch": "2.2.2",
+    "sentence-transformers": "5.7.0",
+    "transformers": "4.57.6"
+  },
+  "machine": {
+    "platform": "macOS-15.8.1-x86_64-i386-64bit",
+    "processor": "Intel(R) Core(TM) i5-8279U CPU @ 2.40GHz",
+    "python": "3.12.2"
+  }
+}

@@ -126,22 +126,32 @@
     else, so there is no client profile screen and the client navigation offers only "Post a
     job" and "My postings".
 
+30. **A phone number is personal data, and the accounts table holds one.** DR-07 is about the
+    matching data, and it still holds: a worker profile has no name, no contact detail and no
+    identifier beyond a generated UUID, and the synthetic dataset contains none either. Sign-in
+    changes the picture at the edge of the system, because an account is keyed by a real phone
+    number. That number is never shown to another user, never appears in a recommendation, an
+    explanation or the trade list on the confirmation screen, and is returned by the API only to
+    the account that owns it. It is stored in clear, however, not hashed, because it is the
+    lookup key for signing in. A deployment would need a lawful basis for holding it, a retention
+    period and a deletion route; this project has none of those.
+
 ## 8. System
 
-30. **The application and the evaluation read different sources, by design.** The interface and
+31. **The application and the evaluation read different sources, by design.** The interface and
     the API read PostgreSQL; the evaluation reads the frozen CSV files and never calls the API
     (requirement IR-07). This keeps reported results traceable to the recorded dataset
     checksums, and is demonstrated in `docs/evidence/evaluation_isolation.md`, where the
     evaluation was re-run after the interface work with every metric unchanged. The cost is
     that the two paths can drift; `tests/test_store.py` guards against this by checking that
     every profile read back from the database equals its CSV record field for field.
-31. **The explanation generator is not yet a backend component.** The explanation shown to a
+32. **The explanation generator is not yet a backend component.** The explanation shown to a
     worker is composed by the interface from the matched skills, their provenance and the
     per-criterion scores the API returns. Chapter 4 specifies a backend `ExplanationGenerator`
     producing structured output, and `explainability/explain.py` is still a stub, so FR-09 is
     partly met and NFR-02 (explanation coverage) cannot yet be computed. See
     `docs/traceability.md`.
-32. **One development machine, two dependency stacks.** Development and timing use an 8 GB Intel
+33. **One development machine, two dependency stacks.** Development and timing use an 8 GB Intel
     MacBook (CPU only), which installs an older but compatible torch and NumPy stack. CI runs on
     Linux with the current pins (`requirements.txt`), so embedding values can differ slightly between
     the two.
