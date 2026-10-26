@@ -1,7 +1,7 @@
 # Scoring policy (decided before any score exists)
 
 **Decided and committed 2026-10-16, before any scorer was implemented or any
-score computed** (keyword score revised to BM25 on 2026-10-17, still before any score; see "Revisions" below). These rules are frozen. Any change after results exist is
+score computed** (keyword score revised to BM25 on 2026-10-17, before any score; presentation bands added 2026-10-23, display only; see "Revisions" below). These rules are frozen. Any change after results exist is
 recorded below under "Deviations" with its date and reason, and the affected
 results are re-run and labelled as such.
 
@@ -129,10 +129,46 @@ Jobs are ranked by descending score. Ties are broken by one fixed random order
 of the 280 postings (seed 42), the same order for every configuration, so no
 configuration gains from the incidental order of `jobs.csv`.
 
-## Revisions before any score existed
+## 6. Presentation bands (display only)
+
+A composite score is shown to a person as a whole number out of 100,
+`match_score = round(composite x 100)`, in one of four bands:
+
+| Band | Match score | Shown as |
+|---|---|---|
+| Strong | 80-100 | a card, labelled Strong |
+| Moderate | 65-79 | a card, labelled Moderate |
+| Weak | 55-64 | a card, labelled Weak |
+| Below the threshold | under 55 | not shown; if nothing remains, "No strong matches yet" |
+
+**These affect display only.** They do not reorder results, do not change any score, and are
+not read by the evaluation, which computes Precision@K and MRR from the full ranking
+(`scripts/evaluate.py` reads the frozen CSVs and never calls the API). The bands live in one
+place, `apps/api/src/kaziforce_api/matching/bands.py`, and the API reports each result's band
+alongside its unchanged scores.
+
+**Where 55 comes from.** The top-1 composite score of every development worker was measured
+under the full configuration. The distribution separates by whether the worker's wording is in
+the vocabulary:
+
+| Variant | min | median | max |
+|---|---|---|---|
+| formal | 61 | 77 | 95 |
+| known_alias | 62 | 72 | 82 |
+| minimal | 55 | 72 | 85 |
+| held_out (term withheld from the graph) | 35 | 44 | 59 |
+
+At a threshold of 55, no worker using a known term is ever shown "No strong matches yet", and
+between 84% and 96% of the postings they are shown are genuinely relevant. 96% of workers whose
+term was withheld correctly see "No strong matches yet" instead of a misleading list. A lower
+threshold of 50 shows held-out workers postings that are only 9% relevant; a higher threshold of
+60 begins hiding real matches from sparse profiles (25% of `minimal` workers).
+
+## Revisions
 
 | Date | Change | Reason |
 |---|---|---|
+| 2026-10-23 | Added §6, presentation bands with a display threshold of 55 | The interface must decide what to show and when to say "No strong matches yet". Display only: no score, ranking or evaluation output changes, which `docs/evidence/evaluation_isolation.md` demonstrates by re-running the evaluation |
 | 2026-10-17 | Keyword score changed from Jaccard similarity to Okapi BM25 (k1 = 1.2, b = 0.75); tokeniser unchanged | Comparability with the BM25 baselines in the literature cited in Chapter 2. No scorer had been run on the dataset. |
 
 ## Deviations

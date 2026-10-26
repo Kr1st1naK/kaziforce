@@ -1,0 +1,32 @@
+.subtitle {
+  margin: 8px 0 var(--space-xl);
+}
+
+.alert {
+  margin-bottom: var(--space-lg);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+@media (max-width: 640px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--line);
+}
+
+.hintIcon {
+  font-size: 13px;
+}

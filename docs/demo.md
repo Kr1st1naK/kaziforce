@@ -1,6 +1,6 @@
 # Running the demo
 
-The sequence below was rehearsed end to end on 2026-10-20 (macOS 15.8.1, Intel
+The sequence below was rehearsed end to end on 2026-10-25 (macOS 15.8.1, Intel
 Core i5-8279U, PostgreSQL 14.19). Each step shows what it should print.
 
 Two terminals, both in the repository root, with the Python environment active
@@ -17,8 +17,9 @@ python -m kaziforce_api.data.migrate
 Database is up to date.
 ```
 
-If it instead prints `Applied: 0002_application_store`, that is fine: the
-migration had not run yet.
+If it instead prints `Applied: 0003_accounts`, that is fine: the migration had
+not run yet. That one adds the `account` and `session` tables and the ownership
+columns that link a profile or a posting to whoever created it.
 
 ### 2. Reset and seed
 
@@ -26,13 +27,14 @@ migration had not run yet.
 python scripts/seed_database.py --reset
 ```
 ```
-Deleted: worker_skill 530, job_required_skill 3836, worker_profile 216, job_posting 280, skill 1758
+Deleted: match_score 40, worker_skill 587, job_required_skill 3868, worker_profile 249, job_posting 299, skill 1762, session 44, account 64
 Seeded: skill 1758, worker_profile 216, worker_skill 530, job_posting 280, job_required_skill 3836
 ```
 
 The `Deleted` line counts whatever was there before, so it changes between runs;
 the `Seeded` line is always exactly these numbers. On a first run the `Deleted`
-line is absent.
+line is absent. Accounts and sessions are cleared too, so a phone number used in
+an earlier rehearsal can be registered again.
 
 ### 3. Start the API (terminal 1)
 
@@ -62,56 +64,94 @@ over IPv6 and answers 403.
 ### 4. Start the interface (terminal 2)
 
 ```bash
-cd apps/web && npm run dev
+cd apps/web && npm run dev -- --hostname 127.0.0.1
 ```
 ```
-- Local:         http://localhost:3000
+- Local:         http://127.0.0.1:3000
 ✓ Ready in 827ms
 ```
 
-Open **http://localhost:3000**. Use `localhost:3000` here, not `127.0.0.1:3000`
-— both are allowed, but `localhost` is what the browser address bar will keep.
+Open **http://127.0.0.1:3000**.
+
+**Use `127.0.0.1` here, not `localhost`.** The session cookie is `SameSite=Lax`,
+and the browser counts `localhost:3000` and `127.0.0.1:5000` as different sites,
+so it would withhold the cookie and sign-in would appear to fail. Keeping both
+on `127.0.0.1` avoids it.
 
 ## The demo path
 
-1. **Find work** → describe a worker in their own words, e.g.
-   *"Mimi ni fundi wa umeme, nina uzoefu wa miaka mitano. Niko Nyeri."*, skill
-   *fundi wa umeme*, location Nyeri, Part-time, 2000.
-2. **Your matches** shows "Understood as **electrician**, from the wording
-   *fundi wa umeme*", then ten ranked jobs. Rehearsed top three:
-   *Electrical fault-finding in an office*, *Install security lights in a
-   compound*, *House wiring for new rental units*.
-3. **Why this match?** shows the composite score, the rule and semantic
-   components, the four criteria, and each matched skill with its path:
-   *fundi wa umeme* → maps to → electrician → has essential skill →
-   *install electricity sockets* → required by → this job.
-4. **Post a job** → e.g. *Rewire a small shop*, requiring
-   *install electricity sockets*, in Nyeri, budget 2600.
-5. **Your job posting is live** shows the occupation it was understood as, the
-   skills you listed, and how many registered profiles match that occupation.
+Two journeys. Each starts at **Create an account**, because a profile and a
+posting now belong to someone.
 
-Two things worth showing deliberately:
+### The worker
 
-- **A term the vocabulary does not know.** Enter *fundi wa stima* as the skill.
-  The profile is still accepted, and the matches screen says
-  "Not recognised: *fundi wa stima*. It is kept as written and matched word for
-  word." That is the honest cold-start case, and it is the system's main
+1. **Create an account** → *I'm a worker*, a phone number, a 4-digit PIN twice.
+2. **Create your worker profile** → *What work do you do?*
+   *fundi wa umeme, wiring, solar installation*; *About you*
+   *"Nina uzoefu wa miaka mitano. Domestic and commercial installations."*;
+   Nairobi - Kasarani; Full-time; 2500.
+3. **Your matches** shows the jobs ranked, each with a match score out of 100 and
+   a band — Strong, Moderate or Weak. Rehearsed top three: *Install a new
+   distribution board* (71, Moderate), *House wiring for new rental units* (65,
+   Moderate), *Electrical fault-finding in an office* (63, Weak).
+4. **Why this job?** opens the explanation in plain words first: "This job needs
+   someone to test electrical equipment. That's part of electrical work.",
+   "You're both in Nairobi - Kasarani.", "Your rate of KES 2,500 a day fits their
+   budget."; then "You described yourself as a *fundi wa umeme*. We matched that
+   to the trade *electrician*."
+5. **See the technical detail** opens the numbers behind it: the rule-based and
+   semantic scores, the matched skills with where each came from, the four
+   criteria, and the graph path *"fundi wa umeme"* → MAPS_TO → electrician →
+   HAS_ESSENTIAL_SKILL → *test electrical equipment* → required by → this job.
+
+### The client
+
+Sign out first, or use a second browser window.
+
+6. **Create an account** → *I'm a client*, a different phone number.
+7. **Post a job** → title *Fix bathroom leakage*; skills *replace faucets,
+   plumbing tools*; description *"Need a fundi bomba. Bathroom leaking at the
+   joints, materials are on site."*; budget 2200; Nairobi - Kawangware.
+8. **Your job has been posted.** shows the title back in the client's own words,
+   then "We matched this to the trade **plumber**", the skills it recognised, and
+   *Workers in this trade* — at most five, in their own words, with no score and
+   no ranking.
+9. **My postings** lists the client's own postings, and only theirs.
+
+Matching reads the description and the required skills, not the title. Naming the
+trade only in the title gives the honest "We could not match this to a trade we
+know" instead.
+
+Three things worth showing deliberately:
+
+- **A term the vocabulary does not know.** Create a third worker whose work is
+  *fundi wa stima*. That alias was deliberately withheld from the knowledge
+  graph, so the worker reaches no trade, nothing clears the display threshold,
+  and the screen says "No strong matches yet" with an invitation to edit the
+  profile. That is the honest cold-start case, and it is the system's main
   limitation.
 - **A criterion that cannot be assessed.** Leave the daily rate blank. The
-  explanation screen then shows "Not assessed" against *Budget against your
-  rate*, not 0%, with the reason.
+  explanation says "This job doesn't give a budget, so we couldn't compare it
+  with your rate.", and the technical detail shows *Not assessed* against
+  *Budget fit* — not 0.
+- **The threshold is presentation only.** Nothing below a match score of 55 is
+  shown, but nothing below it was reordered or removed from the evaluation
+  either. `docs/scoring-policy.md` §6 gives the evidence for the number, and
+  `docs/evidence/evaluation_isolation.md` shows that adding it moved no metric.
 
 ## What the demo writes to the database
 
 | Action | Effect |
 |---|---|
 | Browsing, ranking, opening explanations | **Nothing is written.** |
-| Submitting a worker profile | One `worker_profile` row, its `worker_skill` rows, and a `skill` row for any wording not seen before |
-| Posting a job | One `job_posting` row and its `job_required_skill` rows. The posting also joins the live candidate pool, so `candidate_jobs` goes from 280 to 281 and stays there until the API restarts |
+| Creating an account | One `account` row, with the PIN hashed, and one `session` row |
+| Signing in | One more `session` row. Signing out deletes it |
+| Submitting a worker profile | One `worker_profile` row, its `worker_skill` rows, and a `skill` row for any wording not seen before. The account claims it |
+| Posting a job | One `job_posting` row and its `job_required_skill` rows, claimed by the account. The posting also joins the live candidate pool, so `candidate_jobs` goes from 280 to 281 and stays there until the API restarts |
 | — | `match_score` stays empty: the interface does not write ranking rows. Only `scripts/run_recommendation.py` does |
 
-So after a demo with one profile and one posting, expect 217 worker profiles
-and 281 postings. Nothing is corrupted, and the evaluation is unaffected: it
+So after a demo with two accounts, one profile and one posting, expect 217 worker
+profiles and 281 postings. Nothing is corrupted, and the evaluation is unaffected: it
 reads the frozen CSV files, never the database.
 
 ## After the demo
@@ -128,7 +168,10 @@ would otherwise keep serving the postings you added.
 | Symptom | Cause and fix |
 |---|---|
 | The banner says "Cannot reach the matching service" | The API is not running, or it is not on `127.0.0.1:5000`. Check `curl http://127.0.0.1:5000/health`. |
-| The banner says "Preparing the matching engine…" and stays | Still loading; it takes about 30 s. If it lasts minutes, check the API terminal for an error. |
+| The banner says "Preparing the matching service…" and stays | Still loading; it takes about 30 s. If it lasts minutes, check the API terminal for an error. |
+| Sign-in seems to work, then every screen bounces back to sign in | The page is on `localhost:3000` while the API is on `127.0.0.1:5000`. The browser counts those as different sites and withholds the `SameSite=Lax` session cookie. Open `http://127.0.0.1:3000` instead. |
+| "That phone number already has an account" | It was used in an earlier rehearsal. Run step 2, which clears accounts too, or use another number. |
+| "Too many tries. Wait a few minutes and try again." | Five wrong PINs lock the account for 15 minutes. Run step 2 to clear it. |
 | Submitting gives "this server cannot store new profiles" | The API is reading the CSV files instead of PostgreSQL. Make sure `DATABASE_URL` is set in `.env` and `KAZIFORCE_PROFILE_SOURCE` is not set to `csv`. |
 | Submitting gives a 500, or the API fails to start with "no job postings" | The database is not seeded. Run step 2. |
 | The same job appears several times at the top | Postings added in an earlier demo or test run. Run step 2 and restart the API. |

@@ -100,15 +100,58 @@
 24. **Small held-out sample.** The withheld-term condition has 24 development queries, from two
     areas.
 
-## 6. System
+## 7. Authentication
 
-25. **Database not yet used by the application.** The PostgreSQL schema exists as migrations, but
-    the application reads the frozen CSVs until #41 is done. Evaluation will keep reading the CSVs by
-    design, so results stay traceable through the manifest checksums.
-26. **No user interface or API yet.** `POST /recommend` (#38) and the four screens
-    (`docs/wireframes/`) are in progress. The core workflow is demonstrated from the command line
-    (`docs/evidence/demo_run.txt`).
-27. **One development machine, two dependency stacks.** Development and timing use an 8 GB Intel
+28. **The sign-in is a proof of concept, not a security control.** Accounts are a phone number
+    and a 4-digit PIN, with the role (worker or client) stored on the account.
+
+    **What it does.** The PIN is stored only as a PBKDF2-HMAC-SHA256 hash with a per-account
+    salt and 600,000 iterations; the PIN itself is never stored, logged or returned. Sessions
+    are server-side, and the cookie value is stored only as a SHA-256 hash, so a copy of the
+    database does not hand over usable sessions. The cookie is HttpOnly and SameSite=Lax. An
+    account locks for fifteen minutes after five wrong PINs. An unknown number and a wrong PIN
+    produce the same response, so the API does not reveal which numbers are registered.
+
+    **What it does not protect against.** A 4-digit PIN has 10,000 combinations, so anyone
+    holding a copy of the database can recover PINs by brute force whatever hashing is used;
+    the iteration count raises the cost but does not change that conclusion. There is no SMS
+    verification, so a number can be registered by someone who does not hold it. There is no
+    HTTPS in the local deployment, so the PIN and the session cookie cross the network in
+    clear. There is no CSRF token; SameSite=Lax is the only protection. There is no PIN
+    change, no account recovery, no revocation of sessions on other devices, and no per-IP
+    rate limiting. It demonstrates role-based routing and ownership of profiles and postings;
+    it is not a deployable authentication system.
+
+29. **Clients have an account, not a profile.** A client account owns postings and nothing
+    else, so there is no client profile screen and the client navigation offers only "Post a
+    job" and "My postings".
+
+30. **A phone number is personal data, and the accounts table holds one.** DR-07 is about the
+    matching data, and it still holds: a worker profile has no name, no contact detail and no
+    identifier beyond a generated UUID, and the synthetic dataset contains none either. Sign-in
+    changes the picture at the edge of the system, because an account is keyed by a real phone
+    number. That number is never shown to another user, never appears in a recommendation, an
+    explanation or the trade list on the confirmation screen, and is returned by the API only to
+    the account that owns it. It is stored in clear, however, not hashed, because it is the
+    lookup key for signing in. A deployment would need a lawful basis for holding it, a retention
+    period and a deletion route; this project has none of those.
+
+## 8. System
+
+31. **The application and the evaluation read different sources, by design.** The interface and
+    the API read PostgreSQL; the evaluation reads the frozen CSV files and never calls the API
+    (requirement IR-07). This keeps reported results traceable to the recorded dataset
+    checksums, and is demonstrated in `docs/evidence/evaluation_isolation.md`, where the
+    evaluation was re-run after the interface work with every metric unchanged. The cost is
+    that the two paths can drift; `tests/test_store.py` guards against this by checking that
+    every profile read back from the database equals its CSV record field for field.
+32. **The explanation generator is not yet a backend component.** The explanation shown to a
+    worker is composed by the interface from the matched skills, their provenance and the
+    per-criterion scores the API returns. Chapter 4 specifies a backend `ExplanationGenerator`
+    producing structured output, and `explainability/explain.py` is still a stub, so FR-09 is
+    partly met and NFR-02 (explanation coverage) cannot yet be computed. See
+    `docs/traceability.md`.
+33. **One development machine, two dependency stacks.** Development and timing use an 8 GB Intel
     MacBook (CPU only), which installs an older but compatible torch and NumPy stack. CI runs on
     Linux with the current pins (`requirements.txt`), so embedding values can differ slightly between
     the two.

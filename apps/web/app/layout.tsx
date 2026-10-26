@@ -1,33 +1,24 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { EngineBanner, EngineStatusProvider } from "@/components/EngineStatus";
+import { Inter, JetBrains_Mono } from "next/font/google";
+import { EngineStatusProvider } from "@/components/EngineStatus";
+import { SessionProvider } from "@/components/SessionProvider";
 import "./globals.css";
-import styles from "./layout.module.css";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
 export const metadata: Metadata = {
   title: "KaziForce",
-  description: "Explainable knowledge graph-enhanced matching for informal gig work in Kenya",
+  description: "Job matching for Kenyan trades.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${mono.variable}`}>
       <body>
-        <EngineStatusProvider>
-          <header className={styles.header}>
-            <Link className={styles.brand} href="/">
-              KaziForce
-            </Link>
-            <nav className={styles.nav}>
-              <Link href="/worker">Find work</Link>
-              <Link href="/jobs/new">Post a job</Link>
-            </nav>
-          </header>
-          <main>
-            <EngineBanner />
-            {children}
-          </main>
-        </EngineStatusProvider>
+        <SessionProvider>
+          <EngineStatusProvider>{children}</EngineStatusProvider>
+        </SessionProvider>
       </body>
     </html>
   );

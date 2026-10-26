@@ -11,14 +11,36 @@ import type {
   ApiErrorBody,
   ApiErrorCode,
   CreatedWorker,
+  Credentials,
   Health,
   JobInput,
   JobInterpretation,
+  PostingSummary,
   Recommendation,
+  Session,
   WorkerInput,
+  WorkerProfileResponse,
 } from "./types";
 
-export const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:5000";
+const API_PORT = 5000;
+
+/**
+ * Where the API is.
+ *
+ * It defaults to the same host the page was opened from, which matters: the
+ * session cookie is SameSite=Lax, so the browser withholds it on a cross-site
+ * request. Opening the page at localhost:3000 while calling 127.0.0.1:5000
+ * would silently sign the user out on every request. Set NEXT_PUBLIC_API_BASE
+ * to override.
+ */
+function apiBase(): string {
+  const configured = process.env.NEXT_PUBLIC_API_BASE;
+  if (configured) return configured;
+  if (typeof window !== "undefined") return `${window.location.protocol}//${window.location.hostname}:${API_PORT}`;
+  return `http://127.0.0.1:${API_PORT}`;
+}
+
+export const API_BASE = apiBase();
 export const RETRY_BUDGET_MS = 90_000;
 const DEFAULT_RETRY_AFTER_MS = 5_000;
 
@@ -64,7 +86,11 @@ async function toApiError(response: Response): Promise<ApiError> {
   );
 }
 
-type RequestOptions = { method?: "GET" | "POST"; body?: unknown; retryWhileLoading?: boolean };
+type RequestOptions = {
+  method?: "GET" | "POST" | "PUT" | "DELETE";
+  body?: unknown;
+  retryWhileLoading?: boolean;
+};
 
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { method = "GET", body, retryWhileLoading = true } = options;
@@ -75,6 +101,8 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     try {
       response = await fetch(`${API_BASE}${path}`, {
         method,
+        // The session lives in a cookie the API sets, so every call must carry it.
+        credentials: "include",
         headers: body === undefined ? undefined : { "Content-Type": "application/json" },
         body: body === undefined ? undefined : JSON.stringify(body),
       });
@@ -98,12 +126,30 @@ export const api = {
   /** Readiness; never retried, so a status poll returns at once. */
   health: () => request<Health>("/health", { retryWhileLoading: false }),
 
+  createAccount: (credentials: Credentials) =>
+    request<Session>("/auth/accounts", { method: "POST", body: credentials, retryWhileLoading: false }),
+
+  signIn: (credentials: Credentials) =>
+    request<Session>("/auth/sessions", { method: "POST", body: credentials, retryWhileLoading: false }),
+
+  signOut: () => request<{ signed_out: boolean }>("/auth/sessions", { method: "DELETE", retryWhileLoading: false }),
+
+  /** Who is signed in. Never retried, so the shell can route immediately. */
+  session: () => request<Session>("/auth/session", { retryWhileLoading: false }),
+
+  myProfile: () => request<WorkerProfileResponse>("/workers/me"),
+
+  myPostings: () => request<{ postings: PostingSummary[] }>("/jobs"),
+
   createWorker: (worker: WorkerInput) =>
     request<CreatedWorker>("/workers", { method: "POST", body: worker }),
 
   createJob: (job: JobInput) => request<JobInterpretation>("/jobs", { method: "POST", body: job }),
 
   job: (postingId: string) => request<JobInterpretation>(`/jobs/${encodeURIComponent(postingId)}`),
+
+  /** Matches for the signed-in worker; a worker_id is only needed when not signed in. */
+  myMatches: (k: number) => request<Recommendation>("/recommend", { method: "POST", body: { k } }),
 
   recommend: (workerId: string, k: number) =>
     request<Recommendation>("/recommend", { method: "POST", body: { worker_id: workerId, k } }),

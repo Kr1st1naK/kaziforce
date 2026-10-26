@@ -1,44 +1,69 @@
-/** One ranked job (wireframe 03): rank, details, score components, matched skills. */
+"use client";
+
+/** One ranked job, as on the matches screen: rank, title, facts, skill chips, score band. */
 
 import Link from "next/link";
-import type { MatchResult } from "@/lib/types";
-import { MatchedSkillList } from "./SkillBadge";
-import { ScoreValue, formatScore } from "./ScoreValue";
+import type { Band, MatchResult } from "@/lib/types";
 import styles from "./MatchCard.module.css";
 
+const BAND_LABEL: Record<Band, string> = {
+  strong: "Strong",
+  moderate: "Moderate",
+  weak: "Weak",
+  below_threshold: "Below threshold",
+};
+
+const CHIPS_SHOWN = 3;
+
 export function formatKes(amount: number | null): string {
-  return amount === null ? "No budget stated" : `KES ${amount.toLocaleString("en-KE")} per day`;
+  return amount === null ? "Not stated" : `KES ${amount.toLocaleString("en-KE")} / day`;
 }
 
-export function MatchCard({ result, explanationHref }: { result: MatchResult; explanationHref: string }) {
-  const { scores } = result;
+/** A dot plus a word: the band is never carried by colour alone. */
+export function MatchScoreBadge({ score, band }: { score: number; band: Band }) {
   return (
-    <article className={styles.card}>
-      <div className={styles.rank} aria-label={`Rank ${result.rank}`}>
-        #{result.rank}
-      </div>
-      <div className={styles.body}>
-        <h3 className={styles.title}>{result.title}</h3>
-        <p className={styles.details}>
-          {result.location ?? "No location stated"} · {formatKes(result.budget)} ·{" "}
-          {result.availability ?? "No availability stated"}
-        </p>
-        {result.matched_skills.length > 0 ? (
-          <MatchedSkillList skills={result.matched_skills} limit={3} />
-        ) : (
-          <p className={styles.details}>No shared skills; this job matched on its wording alone.</p>
-        )}
-      </div>
-      <div className={styles.side}>
-        <div>
-          <div className={styles.composite}>{formatScore(scores.composite)}</div>
-          <div className={styles.compositeLabel}>Composite score</div>
+    <span className={styles.badge}>
+      <span className={styles.badgeScore}>Match score {score}</span>
+      <span className={`${styles.dot} ${styles[band]}`} aria-hidden="true" />
+      <span className={styles[band]}>{BAND_LABEL[band]}</span>
+    </span>
+  );
+}
+
+export function SkillChips({ skills, shown = CHIPS_SHOWN }: { skills: string[]; shown?: number }) {
+  const visible = skills.slice(0, shown);
+  const hidden = skills.length - visible.length;
+  return (
+    <div className={styles.chips}>
+      {visible.map((skill) => (
+        <span key={skill} className={`mono ${styles.chip}`}>
+          {skill}
+        </span>
+      ))}
+      {hidden > 0 && <span className={styles.more}>+{hidden} more</span>}
+    </div>
+  );
+}
+
+export function MatchCard({ result, href }: { result: MatchResult; href: string }) {
+  return (
+    <article className={`card ${styles.card}`}>
+      <div className={styles.top}>
+        <span className={styles.rank}>#{result.rank}</span>
+        <div className={styles.headline}>
+          <h3 className={styles.title}>{result.title}</h3>
+          <p className={styles.facts}>
+            {[result.location ?? "Not stated", formatKes(result.budget), result.availability ?? "Not stated"].join(
+              " · ",
+            )}
+          </p>
         </div>
-        <div className={styles.components}>
-          Rule <ScoreValue value={scores.rule} /> · Semantic <ScoreValue value={scores.semantic} />
-        </div>
-        <Link className="button" href={explanationHref}>
-          Why this match?
+        <MatchScoreBadge score={result.match_score} band={result.band} />
+      </div>
+      <div className={styles.bottom}>
+        <SkillChips skills={result.matched_skills.map((skill) => skill.skill_label)} />
+        <Link className={`button button-secondary ${styles.why}`} href={href}>
+          Why this job?
         </Link>
       </div>
     </article>

@@ -22,7 +22,7 @@ recommendations that work from the moment a worker or job joins the platform.
 ```
 kaziforce/
 ├── apps/
-│   ├── web/                      # Next.js/React/TypeScript interface (four screens)
+│   ├── web/                      # Next.js/React/TypeScript interface (eight screens)
 │   └── api/                      # Flask REST API + recommendation engine
 │       └── src/kaziforce_api/
 │           ├── app.py            # Flask entry point
@@ -44,10 +44,13 @@ kaziforce/
 **Current status.** The frozen vocabulary (`data/vocabulary/`) and the synthetic
 evaluation dataset (`data/raw/synthetic/`) are built and tested. The knowledge
 graph, enrichment, scorers, end-to-end pipeline, evaluation runner and
-`POST /recommend` are built, with PostgreSQL as the application store, and the
-web interface covers the four screens. The template-based explanation
-generator is in progress; the interface explains a match from the score
-components and graph paths the API returns.
+`POST /recommend` are built, with PostgreSQL as the application store. The web
+interface covers the eight approved screens in `docs/UI views/`, behind a
+phone-and-PIN sign-in that gives a worker's profile and a client's postings an
+owner (a proof of concept, not a production auth system — `docs/limitations.md`
+§7 says what it does and does not protect against). The explanation is composed
+in the interface from the score components, provenance and graph paths the API
+returns: plain words first, with the numbers behind a disclosure.
 
 ## Setup from a fresh clone
 
@@ -98,7 +101,8 @@ python scripts/evaluate.py
 flask --app kaziforce_api.app run          # engine ready after ~30 s; check http://127.0.0.1:5000/health
 
 # Web interface (needs the API running; see apps/web/README.md)
-cd apps/web && npm install && npm run dev  # http://localhost:3000
+cd apps/web && npm install
+npm run dev -- --hostname 127.0.0.1        # http://127.0.0.1:3000
 ```
 
 **Do not regenerate the synthetic dataset.** It is frozen: its input checksums are

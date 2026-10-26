@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Playwright's own output: generated bundles, not source.
+    "e2e-report/**",
+    "test-results/**",
   ]),
 ]);
 

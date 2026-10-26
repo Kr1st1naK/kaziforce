@@ -29,6 +29,7 @@ from collections.abc import Callable, Sequence
 from kaziforce_api.data.models import JobPosting, MatchScore, WorkerProfile
 from kaziforce_api.data.seed import SkillDescriber
 from kaziforce_api.data.store import CsvProfileStore, PostgresProfileStore, ProfileStore
+from kaziforce_api.matching.bands import DISPLAY_THRESHOLD, band, match_score
 from kaziforce_api.matching.semantic import SemanticScorer, job_text
 from kaziforce_api.pipeline import CONFIGURATIONS, Recommender, build_recommender
 from kaziforce_kg.builder import KnowledgeGraphBuilder
@@ -37,6 +38,17 @@ from kaziforce_kg.graph import KnowledgeGraph
 
 log = logging.getLogger(__name__)
 MAX_K = 50
+TRADE_SAMPLE_SIZE = 5  # rows shown under "Workers in this trade"
+SAMPLE_LENGTH = 120  # characters of a worker's own words shown in that list
+
+
+def shorten(text: str, limit: int = SAMPLE_LENGTH) -> str:
+    """Trims to a whole word, or a whole skill, so a client never reads half of one."""
+    if len(text) <= limit:
+        return text
+    head = text[:limit]
+    cut = head.rsplit(", ", 1)[0] if ", " in head else head.rsplit(" ", 1)[0]
+    return f"{cut.rstrip(' ,')}\u2026"
 PROFILE_SOURCES = ("db", "csv")
 
 
@@ -135,6 +147,7 @@ class RecommendationService:
             "worker": self._worker_payload(worker, stored),
             "enrichment": self._enrichment_payload(enrichment),
             "results": [self._result(m) for m in results],
+            "display_threshold": DISPLAY_THRESHOLD,
             "timing_ms": round(elapsed, 1),
         }
 
@@ -154,6 +167,21 @@ class RecommendationService:
         stored = self.store.save_job(posting, self._describer.describe(posting.required_skills))
         self._rebuild([*self._jobs.values(), stored])
         return self.job_interpretation(stored)
+
+    def worker_profile(self, worker: WorkerProfile) -> dict:
+        """One stored worker profile with its enrichment, for the profile screen."""
+        self._require_ready()
+        enrichment = self.recommenders["full"].enrich(worker).enrichment
+        return {"worker_id": worker.worker_id, "worker": self._worker_payload(worker, stored=True),
+                "enrichment": self._enrichment_payload(enrichment)}
+
+    def posting_summary(self, posting: JobPosting) -> dict:
+        """A posting as a row in the client's list: the facts, and the trade it was matched to."""
+        self._require_ready()
+        enrichment = self.recommenders["full"].enricher.enrich(posting.description, posting.required_skills)
+        return {"posting_id": posting.posting_id, "title": posting.title, "location": posting.location,
+                "availability": posting.availability, "budget": posting.budget,
+                "trades": [self._node_ref(o) for o in enrichment.occupations]}
 
     def job_interpretation(self, posting: JobPosting) -> dict:
         """How the engine reads one posting: terms, occupations, its stated skills, and the matching worker pool.
@@ -183,13 +211,27 @@ class RecommendationService:
         """Stored workers whose own enrichment reaches each occupation this posting reaches.
 
         Counted from the profiles themselves, never from the dataset's occupational area labels.
+        Each entry carries a short sample for display: how the worker describes their own work,
+        where they are, when they work and their rate. No identifier, no score and no ranking,
+        so a client cannot enumerate or rank workers from it.
         """
         if not enrichment.occupations:
             return []
         enricher = self.recommenders["full"].enricher
-        reached = [enricher.enrich(w.biography, w.skills).occupations for w in self.store.workers()]
-        return [{"occupation": self._node_ref(o), "workers": sum(o in occupations for occupations in reached)}
-                for o in enrichment.occupations]
+        reached = [(w, enricher.enrich(w.biography, w.skills).occupations) for w in self.store.workers()]
+        pool = []
+        for occupation in enrichment.occupations:
+            matching = [w for w, occupations in reached if occupation in occupations]
+            pool.append({"occupation": self._node_ref(occupation), "workers": len(matching),
+                         "sample": [self._worker_sample(w) for w in matching[:TRADE_SAMPLE_SIZE]]})
+        return pool
+
+    @staticmethod
+    def _worker_sample(worker: WorkerProfile) -> dict:
+        """A worker as a client may see them: their own words, and the practical facts. No identifier."""
+        describes_as = ", ".join(worker.skills) if worker.skills else worker.biography
+        return {"describes_as": shorten(describes_as), "location": worker.location,
+                "availability": worker.availability, "rate_expectation": worker.rate_expectation}
 
     # Serialisation
 
@@ -204,6 +246,15 @@ class RecommendationService:
                 "occupations": [self._node_ref(o) for o in enrichment.occupations],
                 "unmapped": list(enrichment.unmapped)}
 
+    def _skill_type(self, skill: str) -> str | None:
+        """ESCO's own split: "skill" is something you do, "knowledge" something you know.
+
+        The interface uses it only for grammar ("needs someone to install sockets" against
+        "needs electrical wiring plans"). None for wording that is not in the graph.
+        """
+        node = self.kg.graph.nodes.get(skill)
+        return node.get("skill_type") if node else None
+
     def _node_ref(self, node: str) -> dict:
         return {"id": node, "label": self.kg.label(node)}
 
@@ -216,8 +267,11 @@ class RecommendationService:
             "rank": m.rank, "posting_id": m.posting_id, "title": job.title, "description": job.description,
             "location": job.location, "availability": job.availability, "budget": job.budget,
             "scores": {"composite": m.composite, "rule": m.rule, "semantic": m.semantic},
+            "match_score": match_score(m.composite),
+            "band": band(m.composite),
             "rule_components": dict(m.components) if m.rule is not None else None,
             "matched_skills": [{"skill": s.skill, "skill_label": s.skill_label, "source": s.source,
+                                "skill_type": self._skill_type(s.skill),
                                 "graph_path": [{"source": self._node(u), "relation": r, "target": self._node(v)}
                                                for u, r, v in s.graph_path]}
                                for s in m.matched_skills],
