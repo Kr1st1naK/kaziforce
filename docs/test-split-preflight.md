@@ -90,21 +90,94 @@ These are fixed here so that no choice can be made in light of a result.
   result.
 - **One run is enough** because the system is deterministic; see `docs/evidence/determinism.md`.
 
-## 5. The change that enables the run
+## 5. Running it yourself
 
-Exactly one line changes, and it is committed on its own so it is visible in the history:
+The test split is 216 workers, the same size as development, so the run costs about the
+same: **roughly 35 s of startup and 35 s of queries, about a minute and a half in total**
+for all seven configurations.
 
-```python
-EVALUATION_SPLITS = ("development", "test")
-```
-
-with `scripts/evaluate.py` gaining a `--split` argument. The run is then:
+### Step 1 — check the tree is clean
 
 ```bash
+git status --porcelain          # must print nothing
+```
+
+If anything is uncommitted, commit it first. `scripts/evaluate.py` refuses to run on a
+dirty tree, and the run **must not** use `--allow-dirty`: that flag would record
+"uncommitted_changes": true in `run.json` and the results would not map to one commit.
+
+### Step 2 — make the enabling change, and commit it on its own
+
+Two edits. Both are deliberately code, not a flag, so they appear in the history.
+
+In `apps/api/src/kaziforce_api/evaluation/evaluator.py`:
+
+```diff
+-EVALUATION_SPLITS = ("development",)
++EVALUATION_SPLITS = ("development", "test")
+```
+
+In `scripts/evaluate.py`, add the argument and pass it through:
+
+```diff
+     parser.add_argument("--allow-dirty", action="store_true", ...)
++    parser.add_argument("--split", default="development", choices=["development", "test"])
+...
+-    evaluator = Evaluator(loader, recommenders, max_queries=args.max_queries,
++    evaluator = Evaluator(loader, recommenders, split=args.split, max_queries=args.max_queries,
+                           explainer=ExplanationGenerator(kg))
+```
+
+The run folder is chosen by `scripts/evaluate.py` and currently goes to `results/dev/`.
+Send a test run somewhere of its own:
+
+```diff
+-    base = REPO_ROOT / "results" / ("scratch" if args.max_queries else "dev")
++    base = REPO_ROOT / "results" / ("scratch" if args.max_queries else
++                                    "test" if args.split == "test" else "dev")
+```
+
+Then:
+
+```bash
+python -m pytest -q                     # 381 tests; the guard test now expects test to be allowed
+git add -A && git commit -m "evaluation: allow the test split for the final run"
+```
+
+One existing test will fail and must be updated, not deleted:
+`tests/test_evaluation.py::test_only_the_development_split_may_be_evaluated` is
+parametrised over `validation`, `test`, `train`. Drop `test` from that list and leave the
+other two, so the guard is still proved to work.
+
+### Step 3 — run it, once
+
+```bash
+. venv/bin/activate
 python scripts/evaluate.py --split test
 ```
 
-## 6. Immediately after
+Expect it to print the metrics table and `Written to results/test/<timestamp>_<commit>`.
 
-1. Commit the run folder, unread beyond confirming it completed.
-2. Then read the numbers.
+### Step 4 — commit before reading
+
+```bash
+git add results/test && git commit -m "evaluation: test-split run <timestamp>_<commit>"
+```
+
+Confirm only that it completed and that `run.json` says `"split": "test"` and
+`"uncommitted_changes": false`. **Then** read `metrics.md`.
+
+### If something goes wrong mid-run
+
+A crash is not a result. Fix the cause, commit the fix, and run again — that is a first
+run, not a second. What must not happen is a *completed* run being discarded or repeated
+because of what it showed.
+
+## 6. After the run
+
+1. The run folder is committed, unread beyond the two checks above.
+2. Read `metrics.md`.
+3. Record the figures in `docs/traceability.md` against NFR-01, NFR-02 and FR-08, and in
+   Chapter 5.
+4. If a target is missed, it is reported as missed. Any later change to the system
+   produces a **new development-split result**, never a revised test result.
