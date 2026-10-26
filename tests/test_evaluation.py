@@ -9,6 +9,7 @@ import pytest
 from kaziforce_api.data.data_loader import DataLoader
 from kaziforce_api.evaluation.evaluator import ALL, EVALUATION_SPLITS, Evaluator
 from kaziforce_api.evaluation.report import write_run
+from kaziforce_api.explainability.explain import ExplanationGenerator
 from kaziforce_api.matching.semantic import SemanticScorer
 from kaziforce_api.pipeline import KG_ABLATION_PAIRS, build_recommender
 from kaziforce_kg.builder import KnowledgeGraphBuilder
@@ -67,3 +68,53 @@ def test_run_folder_records_code_and_data_versions(run, tmp_path):
     assert "rule_only → rule_kg" in md and "random ranking (expected)" in md and "aaaaaaa" in md
     with pytest.raises(FileExistsError):
         write_run(result, meta, out)  # a run folder is never overwritten
+
+
+def test_computing_coverage_changes_no_ranking_metric():
+    """Explanations are evaluation output, not an input to ranking.
+
+    The same evaluator is run twice over the same queries, once without an explainer and
+    once with one. Every ranking number must be identical; only the coverage columns, and
+    the wall-clock timings, may differ.
+    """
+    loader = DataLoader()
+    jobs, kg, semantic = loader.jobs(), KnowledgeGraphBuilder().build(), SemanticScorer(encoder=_letters)
+    names = ("rule_only", "rule_kg", "full")
+
+    def evaluate(explainer):
+        recommenders = {n: build_recommender(n, jobs, kg=kg, semantic=semantic) for n in names}
+        return Evaluator(loader, recommenders, max_queries=12, explainer=explainer).run()
+
+    without, with_ = evaluate(None), evaluate(ExplanationGenerator(kg))
+
+    ranking = lambda r: [(q.configuration, q.worker_id, q.variant, q.first_relevant_rank,  # noqa: E731
+                          tuple(sorted(q.precision.items()))) for q in r.queries]
+    assert ranking(without) == ranking(with_)
+
+    metrics = ["P@3", "P@5", "P@10", "MRR"]
+    assert [[row[m] for m in metrics] for row in without.summary()] == \
+           [[row[m] for m in metrics] for row in with_.summary()]
+
+    # And the coverage columns are only populated when an explainer is given.
+    assert all(row["explained"] == 0 for row in without.summary())
+    assert any(row["explained"] > 0 for row in with_.summary())
+
+
+def test_coverage_is_counted_over_the_whole_top_k_not_only_what_would_be_displayed():
+    """The display threshold of docs/scoring-policy.md §6 must not reach this metric."""
+    loader = DataLoader()
+    jobs, kg, semantic = loader.jobs(), KnowledgeGraphBuilder().build(), SemanticScorer(encoder=_letters)
+    recommenders = {"full": build_recommender("full", jobs, kg=kg, semantic=semantic)}
+    result = Evaluator(loader, recommenders, max_queries=8, explainer=ExplanationGenerator(kg)).run()
+    # Every query examines exactly the top 10, whatever those results scored.
+    assert {q.explained for q in result.queries} == {10}
+    assert all(q.covered <= q.explained for q in result.queries)
+
+
+def test_the_strict_rule_is_never_above_the_inclusive_one():
+    loader = DataLoader()
+    jobs, kg, semantic = loader.jobs(), KnowledgeGraphBuilder().build(), SemanticScorer(encoder=_letters)
+    recommenders = {n: build_recommender(n, jobs, kg=kg, semantic=semantic) for n in ("rule_kg", "full")}
+    result = Evaluator(loader, recommenders, max_queries=10, explainer=ExplanationGenerator(kg)).run()
+    for q in result.queries:
+        assert q.covered_graph <= q.covered <= q.covered_inclusive <= q.explained

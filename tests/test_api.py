@@ -39,6 +39,18 @@ def test_health_reports_readiness_and_pool_size(client):
     assert not_started.get("/health").get_json() == {"status": "ok", "ready": False, "candidate_jobs": 0}
 
 
+def test_the_api_serves_a_generated_explanation(client):
+    """FR-09: the explanation is generated server-side, not assembled by the interface."""
+    r = client.post("/recommend", json={"worker_id": EXAMPLE, "k": 3})
+    explanation = r.get_json()["results"][0]["explanation"]
+    assert explanation["rank"] == 1 and explanation["posting_id"]
+    assert explanation["covered"] is True
+    assert explanation["reasons"] and all(reason["text"] for reason in explanation["reasons"])
+    assert {reason["kind"] for reason in explanation["reasons"]} <= {"graph_skill", "literal_skill", "criterion"}
+    # No similarity number is ever offered as a reason.
+    assert not any("semantic" in reason["text"].lower() for reason in explanation["reasons"])
+
+
 def test_stored_worker_returns_the_contract_shape(client):
     r = post(client, {"worker_id": EXAMPLE, "k": 3})
     assert r.status_code == 200
@@ -50,7 +62,7 @@ def test_stored_worker_returns_the_contract_shape(client):
     assert [x["rank"] for x in d["results"]] == [1, 2, 3]
     top = d["results"][0]
     assert set(top) == {"rank", "posting_id", "title", "description", "location", "availability", "budget", "scores",
-                        "match_score", "band", "rule_components", "matched_skills"}
+                        "match_score", "band", "rule_components", "matched_skills", "explanation"}
     assert set(top["scores"]) == {"composite", "rule", "semantic"}
     assert set(top["rule_components"]) == {"skill_overlap", "location", "budget_fit", "availability"}
     skill = top["matched_skills"][0]
