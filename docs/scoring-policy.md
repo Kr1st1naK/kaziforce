@@ -164,10 +164,80 @@ term was withheld correctly see "No strong matches yet" instead of a misleading 
 threshold of 50 shows held-out workers postings that are only 9% relevant; a higher threshold of
 60 begins hiding real matches from sparse profiles (25% of `minimal` workers).
 
+## 7. Explanation coverage (NFR-02)
+
+**Fixed on 2026-10-26, before the explanation generator was written and before any
+coverage figure existed.** The definition is recorded here first so it cannot be chosen
+to suit a result.
+
+NFR-02 asks for "an interpretable explanation for at least 85% of the top-K
+recommendations across the evaluation dataset". That sentence needs three things pinned
+down: what is counted, what counts as interpretable, and what is excluded.
+
+### The unit
+
+One **(worker, posting) pair in the top-K of one query under one configuration**. For the
+development split that is 216 workers x K = 10 = 2,160 units per configuration.
+
+Coverage is computed over the **whole top-K, not only the results the interface would
+show**. The display threshold of §6 must not enter this metric. Computing coverage over
+displayed results only would measure the threshold rather than the explanation generator,
+and would let a presentation constant leak into a reported number.
+
+### What counts as interpretable
+
+A recommendation is **covered** when the generator can state **at least one concrete,
+attributable, checkable reason** — something the worker could verify about themselves.
+
+Three reason types are recognised:
+
+| Type | Condition | Example |
+|---|---|---|
+| **Graph-traced skill** | A `MatchedSkill` with `source` in {`informal_term`, `occupation_label`} and a non-empty `graph_path` | "This job needs someone to install electricity sockets. That's part of electrical work." |
+| **Literal skill** | A `MatchedSkill` with `source` in {`listed`, `text`} | "You said you do breaker box repair, and this job mentions it." |
+| **Assessed criterion** | A `components` entry that is not `None` and is > 0 | "You're both in Nyeri." |
+
+### The headline rule: strict
+
+**The NFR-02 figure is the strict rule: a recommendation is covered if and only if at
+least one skill is shared** — graph-traced or literal. A criterion match alone does not
+cover it.
+
+The reason is that a posting sharing no skill with the worker, matched only on location,
+is not a recommendation this system can honestly claim to explain. Counting it would
+inflate coverage with sentences that say nothing about the work. If the strict figure
+falls below 85%, that is the finding, and it is reported as such rather than redefined.
+
+Two further columns are reported alongside it, for comparison and for Chapter 5, but they
+are not the NFR-02 figure:
+
+- **Inclusive** — strict, or at least one positively-scoring assessed criterion.
+- **Graph-traced** — at least one skill reached through the knowledge graph. This is the
+  direct evidence of the graph's contribution, and is near zero by construction for the
+  configurations that use `NullEnricher`.
+
+### What never counts
+
+- **A semantic similarity on its own.** A cosine value is a number, not a reason a worker
+  can check. Counting it would make coverage trivially 100% for every configuration with
+  a semantic component, and the metric meaningless.
+- **An absent criterion** (`None`). It does not count towards coverage, and it does not
+  count against it either; absent criteria are reported separately as what could not be
+  checked.
+- **The composite score, the rank, or the band.**
+
+### Separability
+
+The generator is a component in its own right behind an interface
+(`apps/api/.../explainability/`), which is the fourth component NFR-03 names. It reads a
+completed `MatchScore` and produces an explanation; it never feeds back into scoring or
+ranking, so computing coverage cannot change any other metric.
+
 ## Revisions
 
 | Date | Change | Reason |
 |---|---|---|
+| 2026-10-26 | Added §7, the explanation coverage definition for NFR-02 | The definition had to be fixed before the generator existed, so that the rule could not be chosen to suit the number. Headline rule is strict: a shared skill is required. Evaluation-side only; it reads completed match scores and changes no score, ranking or metric |
 | 2026-10-23 | Added §6, presentation bands with a display threshold of 55 | The interface must decide what to show and when to say "No strong matches yet". Display only: no score, ranking or evaluation output changes, which `docs/evidence/evaluation_isolation.md` demonstrates by re-running the evaluation |
 | 2026-10-17 | Keyword score changed from Jaccard similarity to Okapi BM25 (k1 = 1.2, b = 0.75); tokeniser unchanged | Comparability with the BM25 baselines in the literature cited in Chapter 2. No scorer had been run on the dataset. |
 
