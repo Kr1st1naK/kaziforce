@@ -14,6 +14,8 @@
 | [`evidence/screens/`](evidence/screens/) | Screenshots of the interface in Chromium and WebKit, captured from the running system |
 | [`evidence/e2e_browsers.txt`](evidence/e2e_browsers.txt) | Transcript of the browser tests passing in Chromium and WebKit (NFR-05) |
 | [`test-results.xml`](test-results.xml) | JUnit record of the latest full test run |
+| [`sprint-2-status.md`](sprint-2-status.md) | Sprint II status: what works, how to run it, components, evaluation evidence, changes from the plan (draft) |
+| [`limitations.md`](limitations.md) | Limitations of the data, vocabulary, graph, matching, evaluation and system, each with its evidence (draft) |
 | [`vocabulary-report.md`](vocabulary-report.md) | How the informal-term vocabulary was checked: dictionary evidence, ESCO mapping, shortlist, decisions (pre-decision snapshot, see its status note) |
 | [`vocabulary-review-sheet.md`](vocabulary-review-sheet.md) | One line per candidate alias, as reviewed (pre-decision snapshot) |
 | [`wireframes/`](wireframes/) | Low-fidelity wireframes: worker profile, job posting, ranked matches, match explanation, posting interpretation |
