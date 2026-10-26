@@ -8,7 +8,7 @@ the API.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 # Reason kinds, in descending strength.
 GRAPH_SKILL = "graph_skill"          # a skill reached through the knowledge graph
