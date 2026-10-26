@@ -216,6 +216,19 @@ are not the NFR-02 figure:
   direct evidence of the graph's contribution, and is near zero by construction for the
   configurations that use `NullEnricher`.
 
+### Which configuration the 85% applies to
+
+**The NFR-02 target is assessed against `full`**, the deployed system. Coverage is computed
+and reported for all seven configurations, but the other six are context, not the target.
+
+This matters because three of them cannot produce a reason at all, by construction rather
+than by failure: `keyword`, `semantic_only` and `semantic_kg` have no rule component, so
+they yield no matched skills and no assessed criteria. Their strict coverage is
+necessarily 0. That is a finding in its own right — a ranker built only on a similarity
+number cannot say anything a worker could check — and it is the clearest argument for the
+hybrid design. It is not evidence that the generator is broken, and it must not be
+averaged together with the others into one figure.
+
 ### What never counts
 
 - **A semantic similarity on its own.** A cosine value is a number, not a reason a worker
