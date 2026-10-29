@@ -1,86 +1,99 @@
 /**
- * A criterion the engine could not assess must never read as 0.
+ * The explanation screen renders what the API generated, and composes nothing.
  *
- * "Not assessed" and "0" are different claims: one says we had nothing to
- * compare, the other says we compared and found nothing in common. These tests
- * render both side by side and require them to differ.
+ * These tests feed it text no sentence-builder would ever produce. If any of it
+ * reaches the screen unchanged, the interface is rendering rather than rewriting,
+ * which is the property that keeps the backend generator the single source of the
+ * wording (FR-09).
  */
 
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { CriterionValue, NOT_ASSESSED, ProvenanceBadge } from "@/components/Explanation";
-import type { GraphEdge, MatchedSkill } from "@/lib/types";
+import { PlainExplanation } from "@/components/Explanation";
+import type { Explanation, Reason } from "@/lib/types";
 
-const TERM = { id: "term:fundi umeme", label: "fundi wa umeme", type: "InformalTerm" } as const;
-const OCCUPATION = { id: "esco:electrician", label: "electrician", type: "Occupation" } as const;
-const SKILL = { id: "esco:sockets", label: "install electricity sockets", type: "Skill" } as const;
-
-const VIA_TERM: GraphEdge[] = [
-  { source: TERM, relation: "MAPS_TO", target: OCCUPATION },
-  { source: OCCUPATION, relation: "HAS_ESSENTIAL_SKILL", target: SKILL },
-];
-const VIA_OCCUPATION: GraphEdge[] = [{ source: OCCUPATION, relation: "HAS_ESSENTIAL_SKILL", target: SKILL }];
-
-function skill(partial: Partial<MatchedSkill>): MatchedSkill {
+function reason(partial: Partial<Reason> = {}): Reason {
   return {
+    kind: "graph_skill",
+    text: "This job needs someone to install electricity sockets. That's part of electrical work.",
     skill: "esco:sockets",
     skill_label: "install electricity sockets",
-    source: "listed",
-    skill_type: "skill",
-    graph_path: [],
+    source: "informal_term",
+    occupation: "electrician",
+    term: "fundi wa umeme",
     ...partial,
   };
 }
 
-describe("CriterionValue", () => {
-  it("renders an unassessed criterion as words, and a zero as a zero", () => {
+function explanation(partial: Partial<Explanation> = {}): Explanation {
+  return {
+    worker_id: "w-1",
+    posting_id: "j-1",
+    rank: 1,
+    scores: { composite: 0.84, rule: 0.82, semantic: 0.74 },
+    reasons: [reason()],
+    not_assessed: [],
+    covered: true,
+    ...partial,
+  };
+}
+
+describe("PlainExplanation", () => {
+  it("renders the API's sentences exactly, without rewriting them", () => {
+    const sentences = ["A sentence only the backend would write.", "And a second one."];
+    render(<PlainExplanation explanation={explanation({ reasons: sentences.map((text) => reason({ text })) })} />);
+    for (const sentence of sentences) expect(screen.getByText(sentence)).toBeInTheDocument();
+  });
+
+  it("shows what could not be checked, as its own section and never as a failure", () => {
     const { container } = render(
-      <>
-        <CriterionValue value={null} />
-        <CriterionValue value={0} />
-      </>,
+      <PlainExplanation
+        explanation={explanation({
+          not_assessed: ["This job doesn't give a budget, so we couldn't compare it with your rate."],
+        })}
+      />,
     );
-    expect(container.textContent).toBe(`${NOT_ASSESSED}0`);
-    expect(screen.getByText(NOT_ASSESSED)).toBeInTheDocument();
-    expect(screen.getByText("0")).toBeInTheDocument();
-    expect(container.textContent).not.toBe("00");
+    expect(screen.getByRole("heading", { name: "What we couldn't check" })).toBeInTheDocument();
+    expect(
+      screen.getByText("This job doesn't give a budget, so we couldn't compare it with your rate."),
+    ).toBeInTheDocument();
+    expect(container.textContent).not.toMatch(/\b0\b|failed|no match/i);
   });
 
-  it("sets 'Not assessed' apart from a real score, not by colour alone", () => {
-    const { container: absent } = render(<CriterionValue value={null} />);
-    const { container: zero } = render(<CriterionValue value={0} />);
-    expect(absent.firstElementChild?.className).not.toBe(zero.firstElementChild?.className);
-    expect(absent.firstElementChild).toHaveAttribute("title", expect.stringContaining("missing"));
+  it("hides that section when everything was assessed", () => {
+    render(<PlainExplanation explanation={explanation()} />);
+    expect(screen.queryByRole("heading", { name: "What we couldn't check" })).not.toBeInTheDocument();
   });
 
-  it("shows a score out of 100", () => {
-    const { container } = render(<CriterionValue value={0.85} />);
-    expect(container.textContent).toBe("85");
-  });
-});
-
-describe("ProvenanceBadge", () => {
-  it("uses the four agreed labels", () => {
-    const cases: [MatchedSkill, string][] = [
-      [skill({ source: "listed" }), "Listed by you"],
-      [skill({ source: "text", skill_label: "solar installation" }), "Your own words"],
-      [skill({ source: "informal_term", graph_path: VIA_TERM }), "Inferred via fundi wa umeme"],
-      [skill({ source: "occupation_label", graph_path: VIA_OCCUPATION }), "Inferred via occupation: electrician"],
-    ];
-    for (const [matched, label] of cases) {
-      const { unmount } = render(<ProvenanceBadge skill={matched} />);
-      expect(screen.getByText(label)).toBeInTheDocument();
-      unmount();
-    }
+  it("names the informal term and the trade it reached", () => {
+    render(<PlainExplanation explanation={explanation()} />);
+    expect(screen.getByText(/You described yourself as a/)).toBeInTheDocument();
+    expect(screen.getByText("fundi wa umeme")).toBeInTheDocument();
+    expect(screen.getByText("electrician")).toBeInTheDocument();
   });
 
-  it("never says 'confidence'", () => {
-    const { container } = render(<ProvenanceBadge skill={skill({ source: "informal_term", graph_path: VIA_TERM })} />);
-    expect(container.textContent?.toLowerCase()).not.toContain("confidence");
+  it("has no vocabulary note when nothing came through an informal term", () => {
+    render(
+      <PlainExplanation
+        explanation={explanation({
+          reasons: [reason({ kind: "literal_skill", source: "listed", term: undefined, occupation: undefined })],
+        })}
+      />,
+    );
+    expect(screen.queryByText(/You described yourself as a/)).not.toBeInTheDocument();
   });
 
-  it("falls back to a neutral label for a source it does not know", () => {
-    render(<ProvenanceBadge skill={skill({ source: "something_new" as MatchedSkill["source"] })} />);
-    expect(screen.getByText("Matched")).toBeInTheDocument();
+  it("says so plainly when there was nothing specific", () => {
+    render(<PlainExplanation explanation={explanation({ reasons: [], covered: false })} />);
+    expect(screen.getByText(/Nothing specific lined up/)).toBeInTheDocument();
+  });
+
+  it("shows no score, no component and no raw graph path", () => {
+    const { container } = render(
+      <PlainExplanation explanation={explanation({ reasons: [reason({ score: 1, criterion: "location" })] })} />,
+    );
+    const text = container.textContent ?? "";
+    expect(text).not.toMatch(/Rule-based score|Semantic score|Criteria|MAPS_TO|HAS_ESSENTIAL_SKILL/);
+    expect(text.toLowerCase()).not.toContain("confidence");
   });
 });

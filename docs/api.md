@@ -71,7 +71,7 @@ or keep using `127.0.0.1`.
 
 A proof-of-concept sign-in so a worker's profile and a client's postings belong to
 someone. A person is identified by a Kenyan mobile number and a 4-digit PIN.
-`docs/limitations.md` §7 states plainly what this does and does not protect against.
+`docs/limitations.md` §6 states plainly what this does and does not protect against.
 
 - The PIN is stored as PBKDF2-HMAC-SHA256, 600,000 iterations, with a per-account salt.
   It is never logged and never returned.
@@ -129,7 +129,7 @@ worker. Between them the interface knows where to send the person and which navi
 to draw.
 
 **A client has an account, not a profile.** Clients are not matched, so there is nothing
-to enrich and no profile screen. See `docs/limitations.md` item 29.
+to enrich and no profile screen. See `docs/limitations.md` item 27.
 
 ## `GET /health`
 

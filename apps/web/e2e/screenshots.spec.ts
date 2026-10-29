@@ -91,11 +91,10 @@ test("capture the eight screens", async ({ page, browserName }) => {
   await expect(page.locator("article").first()).toContainText("#1");
   await shot("04-job_matches_for_worker_view");
 
-  // 05 worker_explanation_view, with the technical detail opened
+  // 05 worker_explanation_view
   await page.locator("article").first().getByRole("link", { name: "Why this job?" }).click();
   await expect(page.getByRole("heading", { name: "Why this job suits you" })).toBeVisible();
-  await page.getByRole("button", { name: /See the technical detail/ }).click();
-  await expect(page.getByRole("heading", { name: "Matched skills" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "What lined up" })).toBeVisible();
   await shot("05-worker_explanation_view");
 
   // 06 no_matches: "fundi wa stima" is withheld from the knowledge graph, so a
