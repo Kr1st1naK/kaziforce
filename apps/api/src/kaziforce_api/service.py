@@ -29,6 +29,7 @@ from collections.abc import Callable, Sequence
 from kaziforce_api.data.models import JobPosting, MatchScore, WorkerProfile
 from kaziforce_api.data.seed import SkillDescriber
 from kaziforce_api.data.store import CsvProfileStore, PostgresProfileStore, ProfileStore
+from kaziforce_api.explainability.explain import ExplanationGenerator
 from kaziforce_api.matching.bands import DISPLAY_THRESHOLD, band, match_score
 from kaziforce_api.matching.semantic import SemanticScorer, job_text
 from kaziforce_api.pipeline import CONFIGURATIONS, Recommender, build_recommender
@@ -71,6 +72,7 @@ class RecommendationService:
         self.startup_error: BaseException | None = None
         self.startup_seconds: float | None = None
         self.kg: KnowledgeGraph | None = None
+        self.explainer: ExplanationGenerator | None = None
         self.recommenders: dict[str, Recommender] = {}
         self._jobs: dict[str, JobPosting] = {}
         self._semantic: SemanticScorer | None = None
@@ -93,6 +95,7 @@ class RecommendationService:
             if not jobs:
                 raise RuntimeError("the profile store has no job postings; run scripts/seed_database.py")
             self.kg, self._semantic = KnowledgeGraphBuilder().build(), self._semantic_factory()
+            self.explainer = ExplanationGenerator(self.kg)
             self._describer = SkillDescriber()
             self._rebuild(jobs)
             self.startup_seconds = time.perf_counter() - started
@@ -146,7 +149,7 @@ class RecommendationService:
             "configuration": configuration, "k": k,
             "worker": self._worker_payload(worker, stored),
             "enrichment": self._enrichment_payload(enrichment),
-            "results": [self._result(m) for m in results],
+            "results": [self._result(m, worker) for m in results],
             "display_threshold": DISPLAY_THRESHOLD,
             "timing_ms": round(elapsed, 1),
         }
@@ -261,7 +264,7 @@ class RecommendationService:
     def _node(self, node: str) -> dict:
         return {"id": node, "label": self.kg.label(node), "type": self.kg.type(node)}
 
-    def _result(self, m: MatchScore) -> dict:
+    def _result(self, m: MatchScore, worker: WorkerProfile) -> dict:
         job = self._jobs[m.posting_id]
         return {
             "rank": m.rank, "posting_id": m.posting_id, "title": job.title, "description": job.description,
@@ -275,4 +278,5 @@ class RecommendationService:
                                 "graph_path": [{"source": self._node(u), "relation": r, "target": self._node(v)}
                                                for u, r, v in s.graph_path]}
                                for s in m.matched_skills],
+            "explanation": self.explainer.explain(worker, job, m).to_dict(),
         }

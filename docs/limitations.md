@@ -136,22 +136,35 @@
     lookup key for signing in. A deployment would need a lawful basis for holding it, a retention
     period and a deletion route; this project has none of those.
 
+31. **Explanation coverage fails exactly where the vocabulary does.** Under the definition fixed
+    in `docs/scoring-policy.md` §7, the full system can state a concrete, checkable reason for
+    79.2% of the top-10 results on the development split, against the 85% that NFR-02 asks for.
+    The shortfall is not spread evenly: formal wording reaches 89.2%, a known alias 90.3% and a
+    minimal profile 87.8%, while a withheld alias reaches **0.0%**. A worker whose words the
+    vocabulary does not know reaches no occupation, so no skill is inferred, so no skill is
+    shared, so there is nothing the system can honestly say. The cold-start limitation of item 7
+    is therefore also an explainability limitation, and widening the vocabulary — not changing
+    the generator — is what would close it.
+
 ## 8. System
 
-31. **The application and the evaluation read different sources, by design.** The interface and
+32. **The application and the evaluation read different sources, by design.** The interface and
     the API read PostgreSQL; the evaluation reads the frozen CSV files and never calls the API
     (requirement IR-07). This keeps reported results traceable to the recorded dataset
     checksums, and is demonstrated in `docs/evidence/evaluation_isolation.md`, where the
     evaluation was re-run after the interface work with every metric unchanged. The cost is
     that the two paths can drift; `tests/test_store.py` guards against this by checking that
     every profile read back from the database equals its CSV record field for field.
-32. **The explanation generator is not yet a backend component.** The explanation shown to a
-    worker is composed by the interface from the matched skills, their provenance and the
-    per-criterion scores the API returns. Chapter 4 specifies a backend `ExplanationGenerator`
-    producing structured output, and `explainability/explain.py` is still a stub, so FR-09 is
-    partly met and NFR-02 (explanation coverage) cannot yet be computed. See
-    `docs/traceability.md`.
-33. **One development machine, two dependency stacks.** Development and timing use an 8 GB Intel
+33. **The explanation wording exists twice.** The backend generator
+    (`apps/api/.../explainability/explain.py`) is the specified component and is what the API
+    serves. The interface still composes its own sentences from the same data
+    (`apps/web/lib/explanation.ts`), written before the generator existed. The two agree today
+    and are tested separately, but they are two sources of one truth and will drift. The
+    interface should be changed to render the `explanation` the API already returns; that is a
+    straight deletion of the frontend module, deferred only to keep it away from the final
+    evaluation.
+
+34. **One development machine, two dependency stacks.** Development and timing use an 8 GB Intel
     MacBook (CPU only), which installs an older but compatible torch and NumPy stack. CI runs on
     Linux with the current pins (`requirements.txt`), so embedding values can differ slightly between
     the two.

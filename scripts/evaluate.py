@@ -33,6 +33,7 @@ from pathlib import Path
 from kaziforce_api.data.data_loader import DataLoader
 from kaziforce_api.evaluation.evaluator import Evaluator
 from kaziforce_api.evaluation.report import write_run
+from kaziforce_api.explainability.explain import ExplanationGenerator
 from kaziforce_api.matching.hybrid import HybridWeights
 from kaziforce_api.matching.rule_based import RuleBasedWeights
 from kaziforce_api.matching.semantic import MODEL_NAME, MODEL_REVISION, SemanticScorer, job_text
@@ -99,7 +100,8 @@ def main() -> None:
         semantic.embed([job_text(j) for j in next(iter(recommenders.values())).jobs])
     startup = time.perf_counter() - start
 
-    evaluator = Evaluator(loader, recommenders, max_queries=args.max_queries)
+    evaluator = Evaluator(loader, recommenders, max_queries=args.max_queries,
+                          explainer=ExplanationGenerator(kg))
     print(f"Evaluating {len(recommenders)} configurations on the development split (startup {startup:.1f} s)")
     result = evaluator.run()
     n_queries = len({q.worker_id for q in result.queries})
