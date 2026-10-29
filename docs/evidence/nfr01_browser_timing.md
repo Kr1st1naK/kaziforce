@@ -13,11 +13,11 @@ after 3 discarded warm-up loads. The worker is the same throughout
 
 | Browser | end-to-end median | p95 | max | engine median | p95 | max | browser overhead (median) |
 |---|---|---|---|---|---|---|---|
-| chromium | 594 | 1164 | 1164 | 18.7 | 41.0 | 41.0 | 575 |
-| webkit | 598 | 700 | 700 | 13.7 | 16.5 | 16.5 | 584 |
+| chromium | 471 | 638 | 638 | 14.8 | 15.9 | 15.9 | 456 |
+| webkit | 598 | 697 | 697 | 14.1 | 15.3 | 15.3 | 584 |
 
 All figures in milliseconds. **Budget: 5,000 ms. The slowest single sample in either engine
-is 1164 ms**, so NFR-01 is met with a wide margin.
+is 697 ms**, so NFR-01 is met with a wide margin.
 
 ## Why both numbers are reported
 
