@@ -102,3 +102,62 @@ def test_a_posting_without_a_budget_or_availability_scores_those_criteria_as_nul
     components = result["rule_components"]
     assert components["location"] is None and components["budget_fit"] is None and components["availability"] is None
     assert components["skill_overlap"] == 1.0
+
+
+def test_a_ranking_is_recorded_and_replaced_rather_than_accumulated(client, pg_connect):
+    """FR-11: the application persists the match scores it computes.
+
+    Replacing matters: the matches screen is refreshed, and appending would make the table
+    record how often somebody looked rather than what the engine decided.
+    """
+    worker_id = client.post("/workers", json=WORKER).get_json()["worker_id"]
+
+    def stored() -> list[tuple]:
+        conn = pg_connect()
+        with conn.cursor() as cur:
+            cur.execute("SELECT rank, fk_posting_id::text, composite_score, rule_score, semantic_score, "
+                        "configuration FROM match_score WHERE fk_worker_id = %s ORDER BY rank", (worker_id,))
+            rows = cur.fetchall()
+        conn.close()
+        return rows
+
+    assert stored() == []
+
+    results = client.post("/recommend", json={"worker_id": worker_id, "k": 5}).get_json()["results"]
+    rows = stored()
+    assert [r[0] for r in rows] == [1, 2, 3, 4, 5]
+    assert [r[1] for r in rows] == [r["posting_id"] for r in results]
+    assert float(rows[0][2]) == pytest.approx(results[0]["scores"]["composite"], abs=1e-5)
+    assert {r[5] for r in rows} == {"full"}
+
+    # Asking again replaces the ranking; it does not add a second copy.
+    client.post("/recommend", json={"worker_id": worker_id, "k": 5})
+    assert len(stored()) == 5
+
+    # A different configuration is kept alongside, not instead.
+    client.post("/recommend", json={"worker_id": worker_id, "k": 3, "configuration": "rule_only"})
+    conn = pg_connect()
+    with conn.cursor() as cur:
+        cur.execute("SELECT configuration, count(*) FROM match_score WHERE fk_worker_id = %s "
+                    "GROUP BY configuration ORDER BY configuration", (worker_id,))
+        by_configuration = cur.fetchall()
+    conn.close()
+    assert by_configuration == [("full", 5), ("rule_only", 3)]
+
+
+def test_a_typed_in_profile_records_nothing(client, pg_connect):
+    """There is no worker row to attach a ranking to, and inventing one would be a lie."""
+    conn = pg_connect()
+    with conn.cursor() as cur:
+        cur.execute("SELECT count(*) FROM match_score")
+        before = cur.fetchone()[0]
+    conn.close()
+
+    client.post("/recommend", json={"worker": WORKER, "k": 5})
+
+    conn = pg_connect()
+    with conn.cursor() as cur:
+        cur.execute("SELECT count(*) FROM match_score")
+        after = cur.fetchone()[0]
+    conn.close()
+    assert after == before

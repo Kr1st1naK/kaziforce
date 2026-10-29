@@ -84,11 +84,14 @@ test("a worker signs up, describes their work, and reads an explained match", as
   await expect(page.getByRole("heading", { name: "Why this job suits you" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "What lined up" })).toBeVisible();
   await expect(page.getByText(/That's part of electrical work/).first()).toBeVisible();
+  // The term the worker used, and the trade it reached, are named in words.
+  await expect(page.getByText(/You described yourself as a/)).toBeVisible();
+  await expect(view(page).getByText("fundi wa umeme")).toBeVisible();
+  await expect(view(page).getByText("electrician")).toBeVisible();
 
-  await page.getByRole("button", { name: /See the technical detail/ }).click();
-  await expect(page.getByText("Rule-based score", { exact: false })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Matched skills" })).toBeVisible();
-  await expect(page.getByText(/Listed by you|Your own words|Inferred via/).first()).toBeVisible();
+  // No component score, criterion table or raw graph path is shown to a worker.
+  await expect(page.getByRole("button", { name: /technical detail/ })).toHaveCount(0);
+  await expect(view(page)).not.toContainText(/Rule-based score|Semantic score|MAPS_TO|HAS_ESSENTIAL_SKILL/);
 });
 
 test("a worker who gives no rate is told it could not be checked, not scored zero", async ({ page }) => {
@@ -102,9 +105,8 @@ test("a worker who gives no rate is told it could not be checked, not scored zer
   await page.locator("article").first().getByRole("link", { name: "Why this job?" }).click();
   await expect(page.getByRole("heading", { name: "What we couldn't check" })).toBeVisible();
   await expect(page.getByText(/so we couldn't check|couldn't compare/).first()).toBeVisible();
-
-  await page.getByRole("button", { name: /See the technical detail/ }).click();
-  await expect(page.getByText("Not assessed").first()).toBeVisible();
+  // Absent is said in words, and never reported as a zero.
+  await expect(view(page)).not.toContainText(/scored 0|: 0\b/);
 });
 
 test("a worker whose wording is outside the vocabulary is told so plainly", async ({ page }) => {

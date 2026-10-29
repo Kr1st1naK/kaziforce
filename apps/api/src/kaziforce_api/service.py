@@ -28,7 +28,7 @@ from collections.abc import Callable, Sequence
 
 from kaziforce_api.data.models import JobPosting, MatchScore, WorkerProfile
 from kaziforce_api.data.seed import SkillDescriber
-from kaziforce_api.data.store import CsvProfileStore, PostgresProfileStore, ProfileStore
+from kaziforce_api.data.store import CsvProfileStore, PostgresProfileStore, ProfileStore, ReadOnlyStore
 from kaziforce_api.explainability.explain import ExplanationGenerator
 from kaziforce_api.matching.bands import DISPLAY_THRESHOLD, band, match_score
 from kaziforce_api.matching.semantic import SemanticScorer, job_text
@@ -145,6 +145,10 @@ class RecommendationService:
         results = recommender.rank(worker, k=k)
         enrichment = recommender.enrich(worker).enrichment
         elapsed = 1000 * (time.perf_counter() - started)
+        # Timed first, persisted after: recording the ranking is bookkeeping, not part of
+        # answering the query, and NFR-01 measures the query.
+        if stored:
+            self._persist(worker.worker_id, configuration, results)
         return {
             "configuration": configuration, "k": k,
             "worker": self._worker_payload(worker, stored),
@@ -153,6 +157,24 @@ class RecommendationService:
             "display_threshold": DISPLAY_THRESHOLD,
             "timing_ms": round(elapsed, 1),
         }
+
+    def _persist(self, worker_id: str, configuration: str, results: Sequence[MatchScore]) -> None:
+        """Record the ranking as match_score rows (FR-11), replacing this worker's previous one.
+
+        Replacing rather than appending keeps one current ranking per (worker, configuration):
+        otherwise every refresh of the matches screen would add another ten rows, and the table
+        would record how often somebody looked rather than what the engine decided.
+
+        A failure here must not cost the worker their results. The ranking has already been
+        computed and is about to be returned; a bookkeeping write that fails is logged and
+        swallowed. A read-only store simply cannot do it, which is not an error.
+        """
+        try:
+            self.store.save_match_scores(worker_id, configuration, results, replace=True)
+        except ReadOnlyStore:
+            pass
+        except Exception:
+            log.exception("could not record the ranking for worker %s", worker_id)
 
     # Stored profiles
 

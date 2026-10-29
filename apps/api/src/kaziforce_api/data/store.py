@@ -55,6 +55,11 @@ class ProfileStore(ABC):
         """Store a new job posting and return it with the identifier it was given."""
         raise ReadOnlyStore(f"{type(self).__name__} cannot store new job postings")
 
+    def save_match_scores(self, worker_id: str, configuration: str, scores: Sequence[MatchScore],
+                          replace: bool = False) -> int:
+        """Record a ranking. A store that cannot write says so; the caller decides whether to care."""
+        raise ReadOnlyStore(f"{type(self).__name__} cannot store match scores")
+
 
 class CsvProfileStore(ProfileStore):
     """The frozen dataset's development-split workers and all postings."""
@@ -197,12 +202,21 @@ class PostgresProfileStore(ProfileStore):
             conn.close()
         return replace(posting, posting_id=posting_id)
 
-    def save_match_scores(self, worker_id: str, configuration: str, scores: Sequence[MatchScore]) -> int:
-        """Record a ranking as MatchScore rows (one per ranked posting); returns the number written."""
+    def save_match_scores(self, worker_id: str, configuration: str, scores: Sequence[MatchScore],
+                          replace: bool = False) -> int:
+        """Record a ranking as MatchScore rows (one per ranked posting); returns the number written.
+
+        `replace` drops this worker's previous ranking under the same configuration first, so the
+        table holds the current ranking rather than one row per time anybody looked. The API uses
+        it; a batch run that wants a history does not.
+        """
         rows = [(worker_id, m.posting_id, m.rule, m.semantic, m.composite, m.rank, configuration) for m in scores]
         conn = self._connect()
         try:
             with conn, conn.cursor() as cur:
+                if replace:
+                    cur.execute("DELETE FROM match_score WHERE fk_worker_id = %s AND configuration = %s",
+                                (worker_id, configuration))
                 cur.executemany("INSERT INTO match_score (fk_worker_id, fk_posting_id, rule_score, semantic_score, "
                                 "composite_score, rank, configuration) VALUES (%s, %s, %s, %s, %s, %s, %s)", rows)
         finally:

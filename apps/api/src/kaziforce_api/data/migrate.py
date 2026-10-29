@@ -38,7 +38,7 @@ def applied_versions(conn) -> set[str]:
 
 def migrate() -> list[str]:
     """Apply all pending migrations; return the versions applied."""
-    conn = get_connection()
+    conn = get_connection(statement_timeout_ms=None)  # migrations may run long
     try:
         done = applied_versions(conn)
         applied = []

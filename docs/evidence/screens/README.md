@@ -13,7 +13,7 @@ set beside the design it was built from.
 | `02-create_account.png` | Create an account, filled in | `create_account.png` | — |
 | `03-create_worker_profile_view.png` | Describe your work, filled in | `create_worker_profile_view.png` | FR-01 |
 | `04-job_matches_for_worker_view.png` | Ranked jobs with match score and band | `job_matches_for_worker_view.png` | FR-08 |
-| `05-worker_explanation_view.png` | Why this job suits you, technical detail opened | `worker_explanation_view.png` | FR-09, FR-10 |
+| `05-worker_explanation_view.png` | Why this job suits you: the generated sentences | `worker_explanation_view.png` | FR-09, FR-10 |
 | `06-no_matches.png` | Nothing above the display threshold | `no_matches.png` | FR-08 |
 | `07-job_posting_creation.png` | Post a job, filled in | `job_posting_creation.png` | FR-02 |
 | `08-job_posted_confirmation.png` | How the posting was understood, and the trade list | `job_posted_confirmation.png` | FR-03 |
@@ -32,6 +32,10 @@ graph, so the worker reaches no trade and nothing clears the display threshold o
 Screen 07's posting names a *fundi bomba* — the accepted plumber alias in the frozen
 vocabulary — in its description. Matching reads the description and the required
 skills, not the title.
+
+Screen 05 shows the sentences only. The technical-detail section was removed, so the
+structured evidence behind those sentences — provenance, graph paths, criterion scores — has
+no screenshot. It is recorded instead in `docs/evidence/explanation_payload.md`.
 
 The captures of the earlier four-screen interface were removed when those routes were
 replaced; they remain in the git history up to commit `1ae4e60`.

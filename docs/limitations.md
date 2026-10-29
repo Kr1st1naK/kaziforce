@@ -92,17 +92,37 @@
 21. **Relevance is occupational only.** A posting is relevant if and only if it is in the worker's
     area. Location, budget and availability do not affect relevance, so the rule criteria for them
     cannot raise the metrics; they can only reorder postings within an area, or demote a relevant one.
-22. **One seeded run, no significance testing.** Each configuration was evaluated once
-    (tie-break seed 42), with no confidence intervals. Small differences, e.g. full vs rule_kg MRR
-    0.918 vs 0.924, are observations, not findings.
+22. **One run, because the system is deterministic — not because variance went unmeasured.**
+    Nothing is trained and nothing is sampled at inference, so repeated runs on the same commit
+    and the same frozen dataset produce identical metrics. Two full development runs on one
+    commit were compared and differed in no reported value: 0 of 35 aggregate rows and 0 of
+    1,512 per-query rows; the composite scores are identical bit for bit. Only wall-clock
+    timings differ. Confidence intervals over repeated runs would all have zero width.
+    `docs/evidence/determinism.md` has the comparison. Three things this does **not** claim:
+    it says nothing about **other datasets**, only one was used; it does not establish
+    **significance between configurations**, so a small difference such as full vs rule_kg MRR
+    0.918 vs 0.924 remains an observation on one dataset, and a paired test over the 216
+    per-query observations is the right tool if such a claim is to be made; and it is a claim
+    about **this machine**, since floating-point results could differ in their last bits on
+    other hardware.
 23. **Development split only so far.** Baseline results are on the 216 development queries. The
     validation split is unused, and the test split is reserved for the final evaluation.
 24. **Small held-out sample.** The withheld-term condition has 24 development queries, from two
     areas.
 
-## 7. Authentication
+25. **Explanation coverage fails exactly where the vocabulary does.** Under the definition fixed
+    in `docs/scoring-policy.md` §7, the full system can state a concrete, checkable reason for
+    79.2% of the top-10 results on the development split, against the 85% that NFR-02 asks for.
+    The shortfall is not spread evenly: formal wording reaches 89.2%, a known alias 90.3% and a
+    minimal profile 87.8%, while a withheld alias reaches **0.0%**. A worker whose words the
+    vocabulary does not know reaches no occupation, so no skill is inferred, so no skill is
+    shared, so there is nothing the system can honestly say. The cold-start limitation of item 19
+    is therefore also an explainability limitation, and widening the vocabulary — not changing
+    the generator — is what would close it.
 
-28. **The sign-in is a proof of concept, not a security control.** Accounts are a phone number
+## 6. Authentication
+
+26. **The sign-in is a proof of concept, not a security control.** Accounts are a phone number
     and a 4-digit PIN, with the role (worker or client) stored on the account.
 
     **What it does.** The PIN is stored only as a PBKDF2-HMAC-SHA256 hash with a per-account
@@ -122,11 +142,11 @@
     rate limiting. It demonstrates role-based routing and ownership of profiles and postings;
     it is not a deployable authentication system.
 
-29. **Clients have an account, not a profile.** A client account owns postings and nothing
+27. **Clients have an account, not a profile.** A client account owns postings and nothing
     else, so there is no client profile screen and the client navigation offers only "Post a
     job" and "My postings".
 
-30. **A phone number is personal data, and the accounts table holds one.** DR-07 is about the
+28. **A phone number is personal data, and the accounts table holds one.** DR-07 is about the
     matching data, and it still holds: a worker profile has no name, no contact detail and no
     identifier beyond a generated UUID, and the synthetic dataset contains none either. Sign-in
     changes the picture at the edge of the system, because an account is keyed by a real phone
@@ -136,35 +156,30 @@
     lookup key for signing in. A deployment would need a lawful basis for holding it, a retention
     period and a deletion route; this project has none of those.
 
-31. **Explanation coverage fails exactly where the vocabulary does.** Under the definition fixed
-    in `docs/scoring-policy.md` §7, the full system can state a concrete, checkable reason for
-    79.2% of the top-10 results on the development split, against the 85% that NFR-02 asks for.
-    The shortfall is not spread evenly: formal wording reaches 89.2%, a known alias 90.3% and a
-    minimal profile 87.8%, while a withheld alias reaches **0.0%**. A worker whose words the
-    vocabulary does not know reaches no occupation, so no skill is inferred, so no skill is
-    shared, so there is nothing the system can honestly say. The cold-start limitation of item 7
-    is therefore also an explainability limitation, and widening the vocabulary — not changing
-    the generator — is what would close it.
+## 7. System
 
-## 8. System
-
-32. **The application and the evaluation read different sources, by design.** The interface and
+29. **The application and the evaluation read different sources, by design.** The interface and
     the API read PostgreSQL; the evaluation reads the frozen CSV files and never calls the API
     (requirement IR-07). This keeps reported results traceable to the recorded dataset
     checksums, and is demonstrated in `docs/evidence/evaluation_isolation.md`, where the
     evaluation was re-run after the interface work with every metric unchanged. The cost is
     that the two paths can drift; `tests/test_store.py` guards against this by checking that
     every profile read back from the database equals its CSV record field for field.
-33. **The explanation wording exists twice.** The backend generator
-    (`apps/api/.../explainability/explain.py`) is the specified component and is what the API
-    serves. The interface still composes its own sentences from the same data
-    (`apps/web/lib/explanation.ts`), written before the generator existed. The two agree today
-    and are tested separately, but they are two sources of one truth and will drift. The
-    interface should be changed to render the `explanation` the API already returns; that is a
-    straight deletion of the frontend module, deferred only to keep it away from the final
-    evaluation.
+30. **A worker is shown sentences, not numbers.** The explanation screen renders the generated
+    sentences and nothing else: no component scores, no criterion table, no raw graph path. The
+    sentences are themselves derived from those graph paths and score components, so FR-09 is
+    met, but the structured evidence is no longer visible in the interface and therefore not
+    capturable as a screenshot. It is recorded instead in
+    `docs/evidence/explanation_payload.md`, generated by `scripts/explanation_example.py` from
+    the frozen development split. Two consequences for the thesis: the four provenance labels
+    ("Listed by you", "Your own words", "Inferred via *fundi wa umeme*", "Inferred via
+    occupation: *electrician*") no longer appear on screen, though the provenance itself is
+    still stated in words by the vocabulary note; and "Not assessed" is no longer rendered as a
+    literal label, because an unassessed criterion is now said in a sentence instead. Whether a
+    worker would want the detail on demand is a usability question, and no usability study was
+    conducted (NFR-04).
 
-34. **One development machine, two dependency stacks.** Development and timing use an 8 GB Intel
+31. **One development machine, two dependency stacks.** Development and timing use an 8 GB Intel
     MacBook (CPU only), which installs an older but compatible torch and NumPy stack. CI runs on
     Linux with the current pins (`requirements.txt`), so embedding values can differ slightly between
     the two.

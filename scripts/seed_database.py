@@ -32,7 +32,7 @@ def main() -> None:
                         help="delete everything first, including profiles and postings stored through the API")
     args = parser.parse_args()
 
-    conn = get_connection()
+    conn = get_connection(statement_timeout_ms=None)  # bulk inserts, thousands of rows per statement
     try:
         pending = [p.stem for p in migration_files() if p.stem not in applied_versions(conn)]
         if pending:

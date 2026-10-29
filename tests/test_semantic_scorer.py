@@ -4,7 +4,14 @@ import numpy as np
 import pytest
 
 from kaziforce_api.data.models import EnrichedJob, EnrichedWorker, JobPosting, WorkerProfile
-from kaziforce_api.matching.semantic import MODEL_NAME, MODEL_REVISION, SemanticScorer, job_text, worker_text
+from kaziforce_api.matching.semantic import (
+    BATCH_SIZE,
+    MODEL_NAME,
+    MODEL_REVISION,
+    SemanticScorer,
+    job_text,
+    worker_text,
+)
 from kaziforce_kg.builder import KnowledgeGraphBuilder
 from kaziforce_kg.enrichment import NullEnricher, ProfileEnricher
 
@@ -71,3 +78,56 @@ def test_real_model_ranks_a_related_job_above_an_unrelated_one():
     related, unrelated = scorer.score_many(w, [wiring, payroll])
     assert 0.0 <= unrelated < related <= 1.0
     assert scorer.embed(["test"]).shape == (1, 384)
+
+
+# Timeouts (IR-06)
+
+def test_the_timeout_bounds_the_wait_and_does_not_block_on_the_thread():
+    """A slow encode must stop the caller waiting, not be waited for."""
+    import time
+
+    from kaziforce_api.matching import semantic as semantic_module
+
+    def glacial(texts):
+        time.sleep(5)
+        return np.zeros((len(texts), 3))
+
+    scorer = SemanticScorer()
+    scorer._encoder, scorer._injected = glacial, False  # not injected: exercise the threaded path
+    original = semantic_module.ENCODE_BUDGET_S
+    semantic_module.ENCODE_BUDGET_S = 0.2
+    try:
+        started = time.perf_counter()
+        with pytest.raises(semantic_module.EncodeTimeout, match="longer than"):
+            scorer.embed(["one", "two"])
+        waited = time.perf_counter() - started
+    finally:
+        semantic_module.ENCODE_BUDGET_S = original
+    # The encode takes 5 s; the caller must give up in well under that.
+    assert waited < 2, f"the caller waited {waited:.1f}s, so the timeout is being blocked on"
+
+
+def test_an_injected_encoder_is_called_directly():
+    """Tests and CI must not spawn threads or depend on a timeout."""
+    scorer = SemanticScorer(encoder=lambda texts: np.ones((len(texts), 3)))
+    assert scorer.embed(["one"]).shape == (1, 3)
+
+
+@pytest.mark.slow
+def test_the_real_model_is_passed_every_text_in_one_call():
+    """Splitting the list would change the embeddings by ~1e-7 and break reproducibility.
+
+    sentence-transformers sorts by length internally to minimise padding, so the batches it
+    forms depend on the whole list. This records that the code passes the list whole, by
+    comparing against an explicitly chunked encode and requiring them to differ.
+    """
+    texts = [f"Electrical work in Nyeri, job number {i}." * (1 + i % 7) for i in range(100)]
+    scorer = SemanticScorer()
+    whole = scorer.embed(texts)
+
+    raw = SemanticScorer()._load()
+    chunked = np.concatenate([np.asarray(raw(texts[i:i + BATCH_SIZE])) for i in range(0, len(texts), BATCH_SIZE)])
+    chunked = chunked / np.linalg.norm(chunked, axis=1, keepdims=True)
+
+    assert not np.array_equal(whole, chunked), "chunking no longer changes the result; re-check the comment"
+    assert np.abs(whole - chunked).max() < 1e-5  # small, but not nothing
