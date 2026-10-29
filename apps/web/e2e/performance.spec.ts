@@ -79,7 +79,10 @@ test("the matches screen is on the worker's screen within NFR-01's budget", asyn
 
   const browser: number[] = [];
   for (let i = 0; i < WARMUP + SAMPLES; i += 1) {
-    await page.goto("/worker/profile"); // leave the route, so it is genuinely re-requested
+    // Leave the route so it is genuinely re-requested, and let that navigation finish:
+    // WebKit aborts an in-flight load if the next one starts on top of it.
+    await page.goto("/worker/profile");
+    await expect(view(page).getByRole("button", { name: /profile/i })).toBeVisible();
     const started = Date.now();
     await page.goto("/worker/matches");
     await expect(page.locator("article").first()).toContainText("#1");
