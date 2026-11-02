@@ -17,6 +17,7 @@ tokens) and `data/accounts.py` (accounts, sessions, ownership). Tests:
 | POST | `/recommend` | Ranked jobs for a stored worker or a typed-in profile | Optional |
 | POST | `/workers` | Store a worker profile; returns its identifier and enrichment | Optional |
 | GET | `/workers/me` | The signed-in worker's own profile and enrichment | Worker |
+| PUT | `/workers/me` | Replace the signed-in worker's own profile | Worker |
 | POST | `/jobs` | Store a job posting, add it to the candidate pool, return how it was understood | Optional |
 | GET | `/jobs` | The signed-in client's own postings | Client |
 | GET | `/jobs/{posting_id}` | How a stored posting was understood | Optional |
@@ -378,6 +379,16 @@ not know appears in `enrichment.unmapped` and the profile is still stored (FR-10
 The signed-in worker's own profile, in the same shape `POST /workers` returns, so the
 profile screen can show what the engine made of their words. 404 while the account has no
 profile; 403 for a client.
+
+## `PUT /workers/me`
+
+Replaces the signed-in worker's profile with the body, which takes exactly the fields and
+rules `POST /workers` takes. The replacement is whole, not partial: a field left out is
+cleared, so the edit form always submits all of them. The worker keeps their `worker_id`,
+so rankings already recorded stay attached to the same person; they are recomputed the
+next time matches are asked for, not here. Returns the profile in the shape
+`GET /workers/me` returns. 404 while the account has no profile; 403 for a client; 501
+when the store cannot accept writes.
 
 ## `POST /jobs`
 

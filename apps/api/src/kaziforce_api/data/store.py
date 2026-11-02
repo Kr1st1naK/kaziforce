@@ -51,6 +51,10 @@ class ProfileStore(ABC):
         """Store a new worker profile and return it with the identifier it was given."""
         raise ReadOnlyStore(f"{type(self).__name__} cannot store new worker profiles")
 
+    def update_worker(self, profile: WorkerProfile, skills: Sequence[SkillRow]) -> WorkerProfile:
+        """Replace a stored worker profile in place, keeping its identifier."""
+        raise ReadOnlyStore(f"{type(self).__name__} cannot change stored worker profiles")
+
     def save_job(self, posting: JobPosting, skills: Sequence[SkillRow]) -> JobPosting:
         """Store a new job posting and return it with the identifier it was given."""
         raise ReadOnlyStore(f"{type(self).__name__} cannot store new job postings")
@@ -185,6 +189,30 @@ class PostgresProfileStore(ProfileStore):
         finally:
             conn.close()
         return replace(profile, worker_id=worker_id)
+
+    def update_worker(self, profile: WorkerProfile, skills: Sequence[SkillRow]) -> WorkerProfile:
+        """Overwrite the profile with this worker_id, replacing its skill list outright.
+
+        The skills are deleted and re-inserted rather than diffed, so `position` stays the
+        order the worker typed. The skill rows themselves are left alone: they are shared
+        vocabulary, and another profile may still point at one this worker dropped.
+        """
+        conn = self._connect()
+        try:
+            with conn, conn.cursor() as cur:
+                skill_id = self._skill_ids(cur, skills)
+                cur.execute("UPDATE worker_profile SET biography = %s, location = %s, availability = %s, "
+                            "rate_expectation = %s WHERE worker_id = %s RETURNING worker_id::text",
+                            (profile.biography, profile.location, profile.availability,
+                             profile.rate_expectation, profile.worker_id))
+                if cur.fetchone() is None:
+                    raise KeyError(profile.worker_id)
+                cur.execute("DELETE FROM worker_skill WHERE fk_worker_id = %s", (profile.worker_id,))
+                execute_values(cur, "INSERT INTO worker_skill (fk_worker_id, fk_skill_id, position) VALUES %s",
+                               [(profile.worker_id, skill_id[s], i) for i, s in enumerate(profile.skills)])
+        finally:
+            conn.close()
+        return profile
 
     def save_job(self, posting: JobPosting, skills: Sequence[SkillRow]) -> JobPosting:
         conn = self._connect()

@@ -9,6 +9,7 @@ recommendation engine (IR-02).
     GET    /auth/session      who is signed in, and what they own
     POST   /recommend         ranked jobs for the signed-in worker, a worker_id, or a typed-in profile
     GET    /workers/me        the signed-in worker's profile
+    PUT    /workers/me        replace the signed-in worker's profile
     POST   /workers           store a worker profile; a signed-in worker account claims it
     POST   /jobs              store a posting, add it to the candidate pool, return how it was understood
     GET    /jobs              the signed-in client's postings
@@ -304,13 +305,19 @@ def create_app(service: RecommendationService | None = None, start: bool = True,
             accounts.claim_worker_profile(account.account_id, created["worker_id"])
         return jsonify(created), 201
 
-    @app.get("/workers/me")
+    @app.route("/workers/me", methods=["GET", "PUT", "OPTIONS"])
     def my_worker_profile():
+        if request.method == "OPTIONS":
+            return "", 204
         account = require("worker")
         worker_id = accounts.worker_profile_id(account.account_id)
         if worker_id is None:
             return error(404, "not_found", "This account has no profile yet.")
-        return jsonify(service.worker_profile(service.worker(worker_id)))
+        if request.method == "GET":
+            return jsonify(service.worker_profile(service.worker(worker_id)))
+        # An edit replaces the profile whole: the form always submits every field, so a
+        # partial body would silently clear whatever it left out.
+        return jsonify(service.update_worker(worker_id, parse_worker(request.get_json(silent=True))))
 
     @app.route("/jobs", methods=["GET", "POST", "OPTIONS"])
     def jobs_route():

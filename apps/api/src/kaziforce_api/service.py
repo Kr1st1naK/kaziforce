@@ -25,6 +25,7 @@ import os
 import threading
 import time
 from collections.abc import Callable, Sequence
+from dataclasses import replace
 
 from kaziforce_api.data.models import JobPosting, MatchScore, WorkerProfile
 from kaziforce_api.data.seed import SkillDescriber
@@ -185,6 +186,18 @@ class RecommendationService:
         enrichment = self.recommenders["full"].enrich(stored).enrichment
         return {"worker_id": stored.worker_id, "worker": self._worker_payload(stored, stored=True),
                 "enrichment": self._enrichment_payload(enrichment)}
+
+    def update_worker(self, worker_id: str, profile: WorkerProfile) -> dict:
+        """Overwrite a stored worker profile, returning it in the shape worker_profile() returns.
+
+        The worker keeps their identifier, so the rankings already recorded against it stay
+        attached to the same person. They are not recomputed here: the matches screen asks for
+        a fresh ranking on its next visit, and that is what replaces them.
+        """
+        self._require_ready()
+        stored = self.store.update_worker(replace(profile, worker_id=worker_id),
+                                          self._describer.describe(profile.skills))
+        return self.worker_profile(stored)
 
     def create_job(self, posting: JobPosting) -> dict:
         """Store a new posting, add it to the live candidate pool, and return how it was understood."""
