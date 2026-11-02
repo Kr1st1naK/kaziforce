@@ -11,9 +11,11 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import Page from "@/app/create-account/page";
 
+let query = "";
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), replace: vi.fn(), back: vi.fn() }),
   usePathname: () => "/create-account",
+  useSearchParams: () => new URLSearchParams(query),
 }));
 
 const createAccount = vi.fn();
@@ -37,7 +39,23 @@ async function typePin(label: RegExp | string, digits: string) {
   }
 }
 
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => {
+  vi.clearAllMocks();
+  query = "";
+});
+
+describe("the role the landing page chose", () => {
+  it.each([
+    ["role=worker", "I'm a worker"],
+    ["role=client", "I'm a client"],
+    ["", "I'm a worker"],
+    ["role=admin", "I'm a worker"],
+  ])("starts %j with %s selected", (search, label) => {
+    query = search;
+    render(<Page />);
+    expect(screen.getByRole("radio", { name: label })).toBeChecked();
+  });
+});
 
 describe("the phone number", () => {
   it("shows the digits in blocks of three as they are typed", async () => {

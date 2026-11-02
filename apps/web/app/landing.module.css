@@ -1,0 +1,230 @@
+/*
+ * The landing page only. The warm canvas, the freer use of the orange accent, the
+ * rounder heading face and the larger spacing are all set on .landing, so they reach
+ * nothing outside it: no token in globals.css is changed, and no application screen
+ * is drawn from anything in this file. Still flat: no shadows, no gradients.
+ */
+
+.landing {
+  --canvas: #fbf5ec;
+  --surface: #fffdf9;
+  --ink: #2a1d12;
+  --muted: #6b5a49;
+  --line: #ecdfcd;
+  --tint: #fdebd6;
+  --tint-line: #f6d3ac;
+  --radius: 16px;
+  --radius-tag: 999px;
+
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+.top {
+  padding: var(--space-lg) var(--space-md);
+}
+
+.topInner {
+  max-width: 1040px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  font-family: var(--font-heading), var(--font-inter), system-ui, sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.signIn {
+  font-weight: 600;
+}
+
+.main {
+  flex: 1;
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 4rem var(--space-md) 5rem;
+}
+
+.hero {
+  text-align: center;
+}
+
+.heading {
+  font-family: var(--font-heading), var(--font-inter), system-ui, sans-serif;
+  font-size: clamp(2.25rem, 6vw, 3.5rem);
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  max-width: 18ch;
+  margin: 0 auto var(--space-lg);
+}
+
+.lead {
+  font-size: 20px;
+  line-height: 30px;
+  color: var(--muted);
+  max-width: 40ch;
+  margin: 0 auto 4rem;
+}
+
+.path {
+  list-style: none;
+  margin: 0 auto 4rem;
+  padding: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: var(--space-xl);
+  flex-wrap: wrap;
+}
+
+.step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  align-items: center;
+  justify-content: center;
+  min-width: 220px;
+  padding: var(--space-lg);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.stepLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.stepBody {
+  font-family: var(--font-heading), var(--font-inter), system-ui, sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.written {
+  quotes: "“" "”";
+}
+
+.trade {
+  display: inline-block;
+  background: var(--primary);
+  color: var(--on-primary);
+  border-radius: var(--radius-tag);
+  padding: 4px 16px;
+}
+
+.jobs {
+  color: var(--primary);
+}
+
+.arrow {
+  position: absolute;
+  right: calc(-1 * var(--space-xl) / 2);
+  top: 50%;
+  transform: translate(50%, -50%);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.entries {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.entry {
+  min-width: 240px;
+  border-radius: 999px;
+  padding: 16px 28px;
+  font-size: 18px;
+  text-align: center;
+}
+
+.entrySecond {
+  background: var(--tint);
+  color: var(--primary-hover);
+  border: 1px solid var(--tint-line);
+}
+
+.how {
+  margin-top: 6rem;
+  padding: var(--space-xl);
+  background: var(--tint);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.howHeading {
+  font-family: var(--font-heading), var(--font-inter), system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: var(--space-xl);
+}
+
+.howRow {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-xl);
+}
+
+.howItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  font-size: 18px;
+  line-height: 26px;
+}
+
+.howNumber {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-weight: 800;
+}
+
+.footer {
+  padding: var(--space-xl) var(--space-md);
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 800px) {
+  .path {
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+  }
+
+  .arrow {
+    right: auto;
+    top: auto;
+    bottom: -2.25rem;
+    left: 50%;
+    transform: translate(-50%, 0) rotate(90deg);
+  }
+}

@@ -19,20 +19,11 @@
 import Link from "next/link";
 import { Suspense, use, useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { formatKes } from "@/components/MatchCard";
 import { ApiErrorMessage, useGuard } from "@/components/SessionProvider";
+import { WorkerCard } from "@/components/WorkerCard";
 import { api } from "@/lib/api";
-import type { JobInterpretation, TradeWorker } from "@/lib/types";
+import type { JobInterpretation } from "@/lib/types";
 import styles from "./page.module.css";
-
-function workerLine(worker: TradeWorker): string {
-  return [
-    worker.describes_as,
-    worker.location ?? "Location not stated",
-    worker.availability ?? "Availability not stated",
-    worker.rate_expectation === null ? "Rate not stated" : formatKes(worker.rate_expectation),
-  ].join(" · ");
-}
 
 export default function Page({ params }: { params: Promise<{ postingId: string }> }) {
   const waiting = useGuard("client");
@@ -157,9 +148,9 @@ function Posting({ params }: { params: Promise<{ postingId: string }> }) {
             {trade.label}s.
           </p>
           <ul className={styles.workers}>
-            {pool.sample.map((worker) => (
-              <li key={workerLine(worker)} className={styles.worker}>
-                {workerLine(worker)}
+            {pool.sample.map((worker, index) => (
+              <li key={`${index}-${worker.describes_as}`}>
+                <WorkerCard worker={worker} trade={trade.label} />
               </li>
             ))}
           </ul>

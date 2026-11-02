@@ -64,8 +64,13 @@ test("capture the eight screens", async ({ page, browserName }) => {
   const shot = (name: string) => page.screenshot({ path: OUT(browserName, name), fullPage: true });
   await page.setViewportSize({ width: 1280, height: 900 });
 
-  // 01 sign_in
+  // 00 landing, the page a visitor arrives at
   await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await shot("00-landing");
+
+  // 01 sign_in
+  await page.goto("/sign-in");
   await expect(page.getByRole("button", { name: "Continue" })).toBeVisible();
   await shot("01-sign_in");
 

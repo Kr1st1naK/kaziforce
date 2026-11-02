@@ -76,7 +76,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       /* the session is gone either way */
     }
     setSession(null);
-    router.push("/");
+    router.push("/sign-in");
   }, [router]);
 
   return (
@@ -105,7 +105,7 @@ export function useGuard(role: Role): boolean {
   useEffect(() => {
     if (loading) return;
     if (!session) {
-      router.replace("/");
+      router.replace("/sign-in");
     } else if (session.account.role !== role) {
       router.replace(homeFor(session));
     }

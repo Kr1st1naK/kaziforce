@@ -11,22 +11,37 @@
  */
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import { PIN_LENGTH, PinField, PhoneField, RoleToggle } from "@/components/AuthFields";
 import { ApiErrorMessage, homeFor, useRedirectIfSignedIn, useSession } from "@/components/SessionProvider";
 import { ApiError, api } from "@/lib/api";
 import { phoneError } from "@/lib/phone";
-import type { Role } from "@/lib/types";
+import { ROLES, type Role } from "@/lib/types";
 import styles from "../auth.module.css";
 
 const MISMATCH = "The two PINs are different.";
 
+/** The landing page links here with ?role=worker or ?role=client; anything else starts as a worker. */
+function startingRole(value: string | null): Role {
+  return ROLES.find((role) => role === value) ?? "worker";
+}
+
 export default function Page() {
+  // useSearchParams needs a Suspense boundary above it for the page to be built statically.
+  return (
+    <Suspense>
+      <CreateAccount />
+    </Suspense>
+  );
+}
+
+function CreateAccount() {
   useRedirectIfSignedIn();
   const router = useRouter();
   const { setSession } = useSession();
-  const [role, setRole] = useState<Role>("worker");
+  const params = useSearchParams();
+  const [role, setRole] = useState<Role>(() => startingRole(params.get("role")));
   const [phone, setPhone] = useState("");
   const [pin, setPin] = useState("");
   const [confirmation, setConfirmation] = useState("");
@@ -113,7 +128,7 @@ export default function Page() {
         </form>
 
         <p className={styles.alternative}>
-          <Link href="/">Already have an account? Sign in</Link>
+          <Link href="/sign-in">Already have an account? Sign in</Link>
         </p>
       </div>
     </main>
