@@ -5,11 +5,17 @@
  *
  * No category field: the schema keeps the column, but matching never reads it,
  * so asking for one would imply it affects the result.
+ *
+ * The form empties itself the moment a posting is accepted. Next keeps this route
+ * mounted in a hidden Activity after the client is sent to the confirmation screen,
+ * so state left behind here would still be filled in when they come back to post
+ * the next job.
  */
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { AmountInput, Select, TextArea, TextInput } from "@/components/FormFields";
 import { ApiErrorMessage, useGuard, useSession } from "@/components/SessionProvider";
 import { ApiError, api } from "@/lib/api";
@@ -32,6 +38,17 @@ export default function Page() {
   const [availability, setAvailability] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+
+  const clear = () => {
+    setTitle("");
+    setSkills("");
+    setDescription("");
+    setBudget("");
+    setLocation("");
+    setAvailability("");
+    setErrors({});
+  };
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -57,6 +74,7 @@ export default function Page() {
         availability: (availability as Availability) || null,
         budget: Number(budget),
       });
+      clear();
       await refresh();
       router.push(`/client/postings/${created.posting_id}`);
     } catch (error) {
@@ -151,7 +169,7 @@ export default function Page() {
           </div>
 
           <div className={styles.actions}>
-            <button type="button" className="link" onClick={() => router.back()} disabled={busy}>
+            <button type="button" className="link" onClick={() => setConfirming(true)} disabled={busy}>
               Cancel
             </button>
             <button className="button" type="submit" disabled={busy}>
@@ -160,6 +178,18 @@ export default function Page() {
           </div>
         </form>
       </div>
+
+      {confirming && (
+        <ConfirmDialog
+          question="Clear this form?"
+          detail="Everything you have typed will be removed and you can start again."
+          onConfirm={() => {
+            clear();
+            setConfirming(false);
+          }}
+          onCancel={() => setConfirming(false)}
+        />
+      )}
     </AppShell>
   );
 }

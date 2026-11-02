@@ -1,15 +1,26 @@
 "use client";
 
-/** Create an account: phone number, a 4-digit PIN, and the role it belongs to. */
+/**
+ * Create an account: phone number, a 4-digit PIN, and the role it belongs to.
+ *
+ * The confirmation PIN is typed, never prefilled from the first one. Prefilling it
+ * would remove the only thing it does: a PIN mistyped once would be confirmed
+ * against itself and the person would be locked out of their own account. Instead
+ * the mismatch is reported as soon as the second PIN is complete, and either field
+ * can be revealed to check it.
+ */
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { PinField, PhoneField, RoleToggle } from "@/components/AuthFields";
+import { PIN_LENGTH, PinField, PhoneField, RoleToggle } from "@/components/AuthFields";
 import { ApiErrorMessage, homeFor, useRedirectIfSignedIn, useSession } from "@/components/SessionProvider";
 import { ApiError, api } from "@/lib/api";
+import { phoneError } from "@/lib/phone";
 import type { Role } from "@/lib/types";
 import styles from "../auth.module.css";
+
+const MISMATCH = "The two PINs are different.";
 
 export default function Page() {
   useRedirectIfSignedIn();
@@ -22,12 +33,17 @@ export default function Page() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
 
+  // Reported as soon as the second PIN is complete, rather than waiting for submit:
+  // the digits are hidden, so the sooner it is said the less there is to retype.
+  const mismatch = confirmation.length === PIN_LENGTH && confirmation !== pin;
+
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     const found: Record<string, string> = {};
-    if (!phone.trim()) found.phone = "Enter your phone number.";
-    if (pin.length !== 4) found.pin = "Choose a 4-digit PIN.";
-    else if (confirmation !== pin) found.confirmation = "The two PINs are different.";
+    const badPhone = phoneError(phone);
+    if (badPhone) found.phone = badPhone;
+    if (pin.length !== PIN_LENGTH) found.pin = `Choose a ${PIN_LENGTH}-digit PIN.`;
+    else if (confirmation !== pin) found.confirmation = MISMATCH;
     setErrors(found);
     if (Object.keys(found).length > 0) return;
 
@@ -66,18 +82,30 @@ export default function Page() {
             </div>
           )}
 
-          <PhoneField value={phone} onChange={setPhone} error={errors.phone} disabled={busy} />
+          <PhoneField
+            value={phone}
+            onChange={setPhone}
+            error={errors.phone}
+            hint="Your Kenyan mobile number without the leading 0."
+            disabled={busy}
+          />
 
-          <div className={styles.pins}>
-            <PinField label="Create a 4-digit PIN" value={pin} onChange={setPin} error={errors.pin} disabled={busy} />
-            <PinField
-              label="Confirm PIN"
-              value={confirmation}
-              onChange={setConfirmation}
-              error={errors.confirmation}
-              disabled={busy}
-            />
-          </div>
+          <PinField
+            label={`Create a ${PIN_LENGTH}-digit PIN`}
+            value={pin}
+            onChange={setPin}
+            error={errors.pin}
+            disabled={busy}
+            showToggle
+          />
+          <PinField
+            label="Confirm PIN"
+            value={confirmation}
+            onChange={setConfirmation}
+            error={errors.confirmation ?? (mismatch ? MISMATCH : undefined)}
+            disabled={busy}
+            showToggle
+          />
 
           <button className={`button ${styles.submit}`} type="submit" disabled={busy}>
             {busy ? "Creating your account…" : "Create account"}

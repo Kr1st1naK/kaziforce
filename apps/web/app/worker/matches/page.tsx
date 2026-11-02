@@ -6,6 +6,9 @@
  * Only matches at or above the display threshold are shown. If none reaches it,
  * the screen says so plainly rather than listing weak matches — the threshold
  * is presentation only and changes no score (docs/scoring-policy.md §6).
+ *
+ * Without a profile there is nothing to match against, so the screen asks for one
+ * instead of showing a heading and a wait that would never end.
  */
 
 import Link from "next/link";
@@ -40,6 +43,26 @@ export default function Page() {
   }, [hasProfile]);
 
   if (waiting) return null;
+
+  if (!hasProfile) {
+    return (
+      <AppShell>
+        <h1>Create your profile first</h1>
+        <p className={`subtitle ${styles.subtitle}`}>
+          We match jobs against what you tell us about your work, so there is nothing to rank yet.
+        </p>
+
+        <div className={`card ${styles.empty}`}>
+          <p className={styles.emptyBody}>
+            Tell us what work you do, where you work and when you are free. Your matches appear as soon as you save it.
+          </p>
+          <Link className="button" href="/worker/profile">
+            Create your profile
+          </Link>
+        </div>
+      </AppShell>
+    );
+  }
 
   const shown = recommendation?.results.filter((result) => result.band !== "below_threshold") ?? [];
 

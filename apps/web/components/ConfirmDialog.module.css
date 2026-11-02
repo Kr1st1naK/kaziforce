@@ -1,0 +1,38 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  background: rgb(15 23 42 / 45%);
+}
+
+.dialog {
+  width: 100%;
+  max-width: 420px;
+  border-color: var(--line-strong);
+}
+
+.question {
+  margin-bottom: var(--space-sm);
+}
+
+.detail {
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+
+@media (max-width: 480px) {
+  .actions {
+    flex-direction: column-reverse;
+  }
+}

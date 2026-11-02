@@ -81,22 +81,11 @@
   font-size: 14px;
 }
 
-.disclosure {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: none;
-  background: none;
-  padding: var(--space-md) 0 0;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.howWeGotThere {
+.plain {
   margin-top: var(--space-md);
   color: var(--muted);
   font-size: 15px;
+  max-width: 64ch;
 }
 
 .poolCount {
