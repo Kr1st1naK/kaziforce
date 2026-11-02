@@ -125,6 +125,9 @@ test("capture the eight screens", async ({ page, browserName }) => {
   // 08 job_posted_confirmation
   await view(page).getByRole("button", { name: /Post job/ }).click();
   await expect(page.getByRole("heading", { name: "Your job has been posted." })).toBeVisible();
+  // The heading is static and the interpretation streams in under it, so waiting on
+  // the heading alone can capture the screen still saying "Loading…".
+  await expect(view(page).getByRole("heading", { name: "How we understood your posting" })).toBeVisible();
   await shot("08-job_posted_confirmation");
 
   // 09 the client's postings list, composed from the confirmation row style.
