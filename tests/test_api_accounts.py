@@ -22,7 +22,7 @@ JOB = {"title": "Rewire a small shop", "description": "We need an electrician in
 
 
 @pytest.fixture(scope="module")
-def app(pg_connect, stub_encoder):
+def app(pg_connect, stub_encoder, crypto):
     loader = DataLoader()
     workers, jobs = loader.workers("development"), loader.jobs()
     conn = pg_connect()
@@ -30,7 +30,7 @@ def app(pg_connect, stub_encoder):
     conn.close()
     service = RecommendationService(PostgresProfileStore(pg_connect),
                                     semantic_factory=lambda: SemanticScorer(encoder=stub_encoder))
-    return create_app(service.start(background=False), accounts=AccountStore(pg_connect))
+    return create_app(service.start(background=False), accounts=AccountStore(pg_connect, crypto))
 
 
 @pytest.fixture

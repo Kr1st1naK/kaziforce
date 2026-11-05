@@ -3,13 +3,20 @@ AccountStore: accounts, sessions, and the ownership links to profiles and postin
 
 Every method takes or returns plain values; the PIN never leaves auth.py and
 the raw session token is returned once, at creation, and never stored.
+
+The phone number is stored encrypted (`phone_enc`) and found by a keyed hash (`phone_hash`);
+see crypto.py. Nothing here decrypts it except `session_account`, which hands a person their
+own number back.
 """
 
 from __future__ import annotations
 
+import logging
 import uuid
 from collections.abc import Callable
 from datetime import datetime, timezone
+
+import psycopg2.errors
 
 from kaziforce_api.auth import (
     Account,
@@ -20,6 +27,9 @@ from kaziforce_api.auth import (
     new_session_token,
     pin_matches,
 )
+from kaziforce_api.crypto import CryptoError, FieldCrypto, load_from_env
+
+log = logging.getLogger(__name__)
 
 
 def _is_uuid(value: str) -> bool:
@@ -31,28 +41,34 @@ def _is_uuid(value: str) -> bool:
 
 
 class AccountStore:
-    def __init__(self, connect: Callable | None = None):
+    def __init__(self, connect: Callable | None = None, crypto: FieldCrypto | None = None):
         if connect is None:
             from kaziforce_api.data.db import get_connection as connect
         self._connect = connect
+        # Read at construction, so an app without its keys fails to start, not on the first sign-in.
+        self.crypto = crypto if crypto is not None else load_from_env()
 
     # Accounts
 
     def create(self, phone: str, pin: str, role: str) -> Account:
         """Create an account. Raises AuthError if the phone number is already registered."""
         pin_hash, salt, iterations = hash_pin(pin)
+        phone_hash, phone_enc = self.crypto.phone_hash(phone), self.crypto.encrypt_phone(phone)
+        taken = AuthError("That phone number already has an account.", "already_exists", "phone")
         conn = self._connect()
         try:
             with conn, conn.cursor() as cur:
-                cur.execute("SELECT 1 FROM account WHERE phone = %s", (phone,))
+                cur.execute("SELECT 1 FROM account WHERE phone_hash = %s", (phone_hash,))
                 if cur.fetchone():
-                    raise AuthError("That phone number already has an account.", "already_exists", "phone")
+                    raise taken
                 cur.execute(
-                    "INSERT INTO account (phone, role, pin_hash, pin_salt, pin_iterations) "
-                    "VALUES (%s, %s, %s, %s, %s) RETURNING account_id::text",
-                    (phone, role, pin_hash, salt, iterations),
+                    "INSERT INTO account (phone_hash, phone_enc, role, pin_hash, pin_salt, pin_iterations) "
+                    "VALUES (%s, %s, %s, %s, %s, %s) RETURNING account_id::text",
+                    (phone_hash, phone_enc, role, pin_hash, salt, iterations),
                 )
                 return Account(cur.fetchone()[0], phone, role)
+        except psycopg2.errors.UniqueViolation:
+            raise taken from None  # two sign-ups for one number at once
         finally:
             conn.close()
 
@@ -67,8 +83,8 @@ class AccountStore:
             with conn.cursor() as cur:
                 cur.execute(
                     "SELECT account_id::text, role, pin_hash, pin_salt, pin_iterations, failed_attempts, locked_until "
-                    "FROM account WHERE phone = %s FOR UPDATE",
-                    (phone,),
+                    "FROM account WHERE phone_hash = %s FOR UPDATE",
+                    (self.crypto.phone_hash(phone),),
                 )
                 row = cur.fetchone()
                 if row is None:
@@ -114,13 +130,21 @@ class AccountStore:
         try:
             with conn, conn.cursor() as cur:
                 cur.execute(
-                    "SELECT a.account_id::text, a.phone, a.role FROM session s "
+                    "SELECT a.account_id::text, a.phone_enc, a.role FROM session s "
                     "JOIN account a ON a.account_id = s.fk_account_id "
                     "WHERE s.token_hash = %s AND s.expires_at > now()",
                     (hash_token(token),),
                 )
                 row = cur.fetchone()
-                return Account(*row) if row else None
+                if row is None:
+                    return None
+                account_id, phone_enc, role = row
+                try:
+                    return Account(account_id, self.crypto.decrypt_phone(phone_enc), role)
+                except CryptoError:
+                    # A key that does not match the data: no one can be shown their number, so no one is signed in.
+                    log.error("an account's phone could not be decrypted: is the field key the one the data was written with?")
+                    return None
         finally:
             conn.close()
 

@@ -9,6 +9,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Tests build their own keys. Setting this before anything imports the app keeps a machine
+# with no .env (CI) from being treated as production and refusing to start without keys.
+os.environ.setdefault("KAZIFORCE_ENV", "test")
+
 DATABASE_URL = os.getenv("DATABASE_URL")
 requires_db = pytest.mark.skipif(not DATABASE_URL, reason="DATABASE_URL not set (no database)")
 
@@ -40,6 +44,16 @@ def pg_connect():
         with admin.cursor() as cur:
             cur.execute(f"DROP SCHEMA {name} CASCADE")
         admin.close()
+
+
+@pytest.fixture(scope="module")
+def crypto():
+    """Fresh random keys, so no test depends on, or leaks, a real one."""
+    from kaziforce_api.crypto import FieldCipher, FieldCrypto, generate_key
+    import base64
+
+    key = base64.urlsafe_b64decode(generate_key())
+    return FieldCrypto(FieldCipher({"v1": key}), base64.urlsafe_b64decode(generate_key()))
 
 
 @pytest.fixture(scope="module")
