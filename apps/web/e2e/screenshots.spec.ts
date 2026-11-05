@@ -75,7 +75,20 @@ test("capture the eight screens", async ({ page, browserName }) => {
   // 00 landing, the page a visitor arrives at
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  // The startup notice shows until the first health check answers. A full-page capture taken while it is
+  // there is as tall as the page plus the notice, which leaves a strip below the footer once it has gone.
+  await expect(page.getByRole("status")).toHaveCount(0);
   await shot("00-landing");
+
+  // 00 again at a phone's width, in Chromium only (one capture is enough for the figure)
+  if (browserName === "chromium") {
+    await page.setViewportSize({ width: 375, height: 800 });
+    await page.goto("/");
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(page.getByRole("status")).toHaveCount(0);
+    await shot("00-landing-375");
+    await page.setViewportSize({ width: 1280, height: 900 });
+  }
 
   // 01 sign_in
   await page.goto("/sign-in");
