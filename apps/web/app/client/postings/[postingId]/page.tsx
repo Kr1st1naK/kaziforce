@@ -150,7 +150,7 @@ function Posting({ params }: { params: Promise<{ postingId: string }> }) {
           <ul className={styles.workers}>
             {pool.sample.map((worker, index) => (
               <li key={`${index}-${worker.describes_as}`}>
-                <WorkerCard worker={worker} trade={trade.label} />
+                <WorkerCard worker={worker} trade={trade.label} postingId={postingId} />
               </li>
             ))}
           </ul>

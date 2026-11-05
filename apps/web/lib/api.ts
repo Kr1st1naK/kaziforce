@@ -11,6 +11,7 @@ import type {
   ApiErrorBody,
   ApiErrorCode,
   CreatedWorker,
+  ClientWorkerView,
   Credentials,
   Health,
   JobInput,
@@ -19,6 +20,8 @@ import type {
   Recommendation,
   Session,
   WorkerInput,
+  WorkerSignUp,
+  WorkerUpdate,
   WorkerProfileResponse,
 } from "./types";
 
@@ -126,7 +129,7 @@ export const api = {
   /** Readiness; never retried, so a status poll returns at once. */
   health: () => request<Health>("/health", { retryWhileLoading: false }),
 
-  createAccount: (credentials: Credentials) =>
+  createAccount: (credentials: Credentials | WorkerSignUp) =>
     request<Session>("/auth/accounts", { method: "POST", body: credentials, retryWhileLoading: false }),
 
   signIn: (credentials: Credentials) =>
@@ -140,8 +143,12 @@ export const api = {
   myProfile: () => request<WorkerProfileResponse>("/workers/me"),
 
   /** Replace the signed-in worker's profile. The body carries every field; a missing one is cleared. */
-  updateMyProfile: (worker: WorkerInput) =>
+  updateMyProfile: (worker: WorkerUpdate) =>
     request<WorkerProfileResponse>("/workers/me", { method: "PUT", body: worker }),
+
+  /** A consenting worker's profile and phone number, for a signed-in client. 404 if they have withdrawn. */
+  clientWorker: (publicId: string) =>
+    request<ClientWorkerView>(`/workers/${encodeURIComponent(publicId)}`, { retryWhileLoading: false }),
 
   myPostings: () => request<{ postings: PostingSummary[] }>("/jobs"),
 

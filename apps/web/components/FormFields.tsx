@@ -112,6 +112,35 @@ export function TextInput({
   );
 }
 
+/** A tick box with its own sentence, for an agreement the person must be able to see and read. */
+export function Checkbox({
+  label,
+  checked,
+  onChange,
+  hint,
+  error,
+  disabled,
+}: Pick<Base, "hint" | "error" | "disabled"> & { label: string; checked: boolean; onChange: (checked: boolean) => void }) {
+  const id = useId();
+  return (
+    <div className={styles.field}>
+      <div className={styles.check}>
+        <input
+          id={id}
+          type="checkbox"
+          checked={checked}
+          disabled={disabled}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
+          onChange={(event) => onChange(event.target.checked)}
+        />
+        <label htmlFor={id}>{label}</label>
+      </div>
+      <Messages hint={hint} error={error} id={id} />
+    </div>
+  );
+}
+
 export function Select({
   label,
   value,

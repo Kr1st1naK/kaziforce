@@ -24,6 +24,9 @@ export type Session = {
 
 export type Credentials = { phone: string; pin: string; role?: Role };
 
+/** What a worker gives at sign-up. A client gives none of it. */
+export type WorkerSignUp = Credentials & { first_name: string; last_name: string; contact_consent: true };
+
 export type WorkerInput = {
   biography: string;
   skills: string[];
@@ -137,12 +140,19 @@ export type CreatedWorker = { worker_id: string; worker: Worker; enrichment: Enr
 /** A posting's stated skills only: matching never uses skills inferred for a posting. */
 export type StatedSkill = { skill: string; skill_label: string; source: "listed" | "text" };
 
-/** A worker as a client may see them: their own words and the practical facts. No identifier. */
+/**
+ * A worker as a client may see them: their own words and the practical facts.
+ *
+ * `public_id` and `name` are present together, and only for a worker who has a name and has
+ * agreed to be shown. Everyone else is anonymous. Neither says anything about fit.
+ */
 export type TradeWorker = {
   describes_as: string;
   location: string | null;
   availability: Availability | null;
   rate_expectation: number | null;
+  public_id?: string;
+  name?: string;
 };
 
 export type WorkerPoolEntry = { occupation: NodeRef; workers: number; sample: TradeWorker[] };
@@ -167,7 +177,30 @@ export type PostingSummary = {
   trades: NodeRef[];
 };
 
-export type WorkerProfileResponse = { worker_id: string; worker: Worker; enrichment: Enrichment };
+/**
+ * A worker's own name, whether clients may see it with their phone number, and the number.
+ * The names are null for an account made before names existed, until the worker adds them.
+ */
+export type OwnContact = { first_name: string | null; last_name: string | null; consent: boolean; phone: string };
+
+export type WorkerProfileResponse = { worker_id: string; worker: Worker; enrichment: Enrichment; contact: OwnContact };
+
+/** What the edit form submits. The name and consent are sent together, or not at all. */
+export type WorkerUpdate = WorkerInput & { first_name?: string; last_name?: string; contact_consent?: boolean };
+
+/** A consenting worker as a client sees them. No score, no rank, no internal identifier. */
+export type ClientWorkerView = {
+  public_id: string;
+  first_name: string;
+  last_name: string;
+  trade: string | null;
+  skills: string[];
+  biography: string;
+  location: string | null;
+  availability: Availability | null;
+  rate_expectation: number | null;
+  contact: { phone_e164: string; phone_local: string };
+};
 
 export type ApiErrorCode =
   | "invalid_request"
@@ -175,6 +208,7 @@ export type ApiErrorCode =
   | "forbidden"
   | "already_exists"
   | "locked"
+  | "rate_limited"
   | "invalid_credentials"
   | "not_found"
   | "method_not_allowed"

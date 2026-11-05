@@ -9,28 +9,55 @@
  * turns the same screen back into the form. Editing saves over the stored profile
  * (PUT /workers/me) and returns to the reading view; it does not create a second one.
  *
- * No name or contact field: profiles hold no personally identifying
- * information (DR-07).
+ * The profile holds no personally identifying information (DR-07). A worker's name and
+ * whether clients may see it belong to the account, and are edited here only because this is
+ * where a worker looks after how they appear. They are saved by the same PUT, and left out of
+ * it when the account has no name yet.
  */
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
-import { AmountInput, Select, TextArea } from "@/components/FormFields";
+import { AmountInput, Checkbox, Select, TextArea, TextInput } from "@/components/FormFields";
 import { formatKes } from "@/components/MatchCard";
 import { ApiErrorMessage, useGuard, useSession } from "@/components/SessionProvider";
 import { ApiError, api } from "@/lib/api";
 import { SUGGESTED_LOCATIONS } from "@/lib/locations";
-import { AVAILABILITY, type Availability, type Worker } from "@/lib/types";
+import { MAX_NAME, nameError, tidyName } from "@/lib/names";
+import { formatPhone } from "@/lib/phone";
+import { AVAILABILITY, type Availability, type OwnContact, type Worker } from "@/lib/types";
 import styles from "./page.module.css";
 
-type Fields = { skills: string; biography: string; location: string; availability: string; rate: string };
+type Fields = {
+  skills: string;
+  biography: string;
+  location: string;
+  availability: string;
+  rate: string;
+  firstName: string;
+  lastName: string;
+  consent: boolean;
+};
 
-const EMPTY: Fields = { skills: "", biography: "", location: "", availability: "", rate: "" };
+const EMPTY: Fields = {
+  skills: "",
+  biography: "",
+  location: "",
+  availability: "",
+  rate: "",
+  firstName: "",
+  lastName: "",
+  consent: false,
+};
 
-function toFields(worker: Worker): Fields {
+const CONSENT_LABEL = "Clients who post a job in my trade can see my name and phone number.";
+
+function toFields(worker: Worker, contact: OwnContact | null): Fields {
   return {
+    firstName: contact?.first_name ?? "",
+    lastName: contact?.last_name ?? "",
+    consent: contact?.consent ?? false,
     skills: worker.skills.join(", "),
     biography: worker.biography,
     location: worker.location ?? "",
@@ -40,11 +67,28 @@ function toFields(worker: Worker): Fields {
 }
 
 /** What the worker saved, laid out to be read rather than filled in. */
-function ProfileView({ worker, onEdit }: { worker: Worker; onEdit: () => void }) {
+function ProfileView({ worker, contact, onEdit }: { worker: Worker; contact: OwnContact | null; onEdit: () => void }) {
+  const name = contact?.first_name && contact.last_name ? `${contact.first_name} ${contact.last_name}` : null;
   return (
     <>
       <div className="card">
         <dl className={styles.details}>
+          <div className={styles.detail}>
+            <dt className={styles.term}>Your name</dt>
+            <dd className={styles.value}>{name ?? <span className={styles.unset}>Not added yet</span>}</dd>
+          </div>
+
+          <div className={styles.detail}>
+            <dt className={styles.term}>Shown to clients</dt>
+            <dd className={styles.value}>
+              {contact?.consent ? (
+                `Yes: clients who post a job in your trade can see your name and your number, +254 ${formatPhone(contact.phone)}.`
+              ) : (
+                <span className={styles.unset}>No. Your name and number are hidden from clients.</span>
+              )}
+            </dd>
+          </div>
+
           <div className={styles.detail}>
             <dt className={styles.term}>What you do</dt>
             <dd className={styles.value}>
@@ -106,6 +150,7 @@ export default function Page() {
   const existing = session?.worker_profile_id ?? null;
 
   const [saved, setSaved] = useState<Worker | null>(null);
+  const [contact, setContact] = useState<OwnContact | null>(null);
   const [loaded, setLoaded] = useState(false);
   // null until the worker chooses: a profile that exists opens as something to read,
   // and one that does not opens as the form. Both are decided from the session, which
@@ -116,17 +161,18 @@ export default function Page() {
   const [busy, setBusy] = useState(false);
   const [confirming, setConfirming] = useState(false);
 
-  const set = <K extends keyof Fields>(key: K) => (value: string) => setFields((current) => ({ ...current, [key]: value }));
+  const set = <K extends keyof Fields>(key: K) => (value: Fields[K]) => setFields((current) => ({ ...current, [key]: value }));
 
   useEffect(() => {
     if (!existing) return;
     let cancelled = false;
     api
       .myProfile()
-      .then(({ worker }) => {
+      .then(({ worker, contact: own }) => {
         if (cancelled) return;
         setSaved(worker);
-        setFields(toFields(worker));
+        setContact(own);
+        setFields(toFields(worker, own));
       })
       .catch((caught) => !cancelled && setErrors({ form: ApiErrorMessage(caught) }))
       .finally(() => !cancelled && setLoaded(true));
@@ -141,6 +187,16 @@ export default function Page() {
     if (!fields.skills.trim()) found.skills = "Tell us what work you do.";
     if (!fields.biography.trim()) found.biography = "Add a short description of your work.";
     if (!fields.location) found.location = "Choose where you work.";
+
+    // The name belongs to the account, not the profile. It is sent only when there is one to send:
+    // an account from before names existed has none, and can save the rest of its profile without.
+    const hasName = Boolean(fields.firstName.trim() || fields.lastName.trim());
+    if (saved && (hasName || fields.consent)) {
+      const badFirst = nameError(fields.firstName, "first name");
+      const badLast = nameError(fields.lastName, "last name");
+      if (badFirst) found.first_name = fields.consent && !hasName ? "Add your first and last name before sharing them." : badFirst;
+      if (badLast) found.last_name = badLast;
+    }
     setErrors(found);
     if (Object.keys(found).length > 0) return;
 
@@ -158,9 +214,19 @@ export default function Page() {
     setBusy(true);
     try {
       if (saved) {
-        const { worker } = await api.updateMyProfile(input);
+        const { worker, contact: own } = await api.updateMyProfile(
+          hasName || fields.consent
+            ? {
+                ...input,
+                first_name: tidyName(fields.firstName),
+                last_name: tidyName(fields.lastName),
+                contact_consent: fields.consent,
+              }
+            : input,
+        );
         setSaved(worker);
-        setFields(toFields(worker));
+        setContact(own);
+        setFields(toFields(worker, own));
         setErrors({});
         setEditing(false);
         setBusy(false);
@@ -181,7 +247,7 @@ export default function Page() {
 
   /** Cancel on a new profile clears the form; on an edit it puts back what was saved. */
   const discard = () => {
-    setFields(saved ? toFields(saved) : EMPTY);
+    setFields(saved ? toFields(saved, contact) : EMPTY);
     setErrors({});
     setConfirming(false);
     if (saved) setEditing(false);
@@ -213,7 +279,7 @@ export default function Page() {
         </p>
       )}
 
-      {!loading && saved && !showForm && <ProfileView worker={saved} onEdit={() => setEditing(true)} />}
+      {!loading && saved && !showForm && <ProfileView worker={saved} contact={contact} onEdit={() => setEditing(true)} />}
 
       {!loading && showForm && (
         <div className="card">
@@ -267,6 +333,35 @@ export default function Page() {
               error={errors.rate_expectation}
               hint="Adding this helps us find better matches."
             />
+
+            {saved && (
+              <>
+                <TextInput
+                  label="First name"
+                  value={fields.firstName}
+                  onChange={set("firstName")}
+                  error={errors.first_name}
+                  maxLength={MAX_NAME}
+                  disabled={busy}
+                />
+                <TextInput
+                  label="Last name"
+                  value={fields.lastName}
+                  onChange={set("lastName")}
+                  error={errors.last_name}
+                  maxLength={MAX_NAME}
+                  disabled={busy}
+                />
+                <Checkbox
+                  label={CONSENT_LABEL}
+                  checked={fields.consent}
+                  onChange={set("consent")}
+                  error={errors.contact_consent}
+                  hint="Turn this off and clients can no longer see your name, your number or a link to your profile."
+                  disabled={busy}
+                />
+              </>
+            )}
 
             <div className={styles.actions}>
               <button type="button" className="link" onClick={() => setConfirming(true)} disabled={busy}>
