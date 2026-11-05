@@ -3,6 +3,7 @@
 /** The controls shared by sign-in and create-account: role toggle, phone number, PIN. */
 
 import { useId, useRef, useState } from "react";
+import { PHONE_DIGITS, formatPhone, phoneDigits } from "@/lib/phone";
 import { ROLES, type Role } from "@/lib/types";
 import styles from "./AuthFields.module.css";
 
@@ -73,11 +74,14 @@ export function PhoneField({
           autoComplete="tel-national"
           className={styles.phoneInput}
           placeholder="712 345 678"
-          value={value}
+          // Nine digits shown as three blocks of three, so the field is two characters
+          // wider than the number it holds. The caller is given the digits alone.
+          maxLength={PHONE_DIGITS + 2}
+          value={formatPhone(value)}
           disabled={disabled}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
-          onChange={(event) => onChange(event.target.value)}
+          onChange={(event) => onChange(phoneDigits(event.target.value))}
         />
       </div>
       {hint && !error && (

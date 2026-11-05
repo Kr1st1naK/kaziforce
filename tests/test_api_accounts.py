@@ -150,6 +150,44 @@ def test_a_second_profile_is_refused(client):
     assert again.status_code == 409 and again.get_json()["error"]["code"] == "already_exists"
 
 
+def test_a_worker_edits_their_profile_in_place(client):
+    register(client, "worker")
+    worker_id = client.post("/workers", json=PROFILE).get_json()["worker_id"]
+
+    edited = {**PROFILE, "location": "Thika", "rate_expectation": 3200,
+              "skills": ["fundi wa umeme", "solar installation"]}
+    saved = client.put("/workers/me", json=edited)
+    assert saved.status_code == 200
+    body = saved.get_json()
+    # The same profile, not a second one: the identifier is kept, so the rankings
+    # already recorded against it still belong to this worker.
+    assert body["worker_id"] == worker_id
+    assert client.get("/auth/session").get_json()["worker_profile_id"] == worker_id
+
+    mine = client.get("/workers/me").get_json()["worker"]
+    assert mine["location"] == "Thika" and mine["rate_expectation"] == 3200
+    assert mine["skills"] == ["fundi wa umeme", "solar installation"]
+
+
+def test_an_edit_clears_a_field_the_body_leaves_empty(client):
+    register(client, "worker")
+    client.post("/workers", json=PROFILE)
+    assert client.put("/workers/me", json={**PROFILE, "availability": None,
+                                           "rate_expectation": None}).status_code == 200
+    mine = client.get("/workers/me").get_json()["worker"]
+    assert mine["availability"] is None and mine["rate_expectation"] is None
+
+
+def test_editing_a_profile_that_does_not_exist_is_a_404(client):
+    register(client, "worker")
+    assert client.put("/workers/me", json=PROFILE).status_code == 404
+
+
+def test_a_client_cannot_edit_a_worker_profile(client):
+    register(client, "client")
+    assert client.put("/workers/me", json=PROFILE).status_code == 403
+
+
 def test_a_worker_without_a_profile_is_told_to_create_one(client):
     register(client, "worker")
     assert client.get("/workers/me").status_code == 404

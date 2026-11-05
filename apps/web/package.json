@@ -10,9 +10,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "type-check": "tsc --noEmit",
-    "e2e": "playwright test --grep-invert \"capture the four screens\"",
+    "e2e": "playwright test --grep-invert \"capture the eight screens\"",
     "e2e:report": "playwright show-report e2e-report",
-    "e2e:screenshots": "playwright test --grep \"capture the four screens\""
+    "e2e:screenshots": "playwright test --grep \"capture the eight screens\""
   },
   "dependencies": {
     "next": "16.4.2",

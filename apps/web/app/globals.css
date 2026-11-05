@@ -1,6 +1,14 @@
 /* Tokens from docs/UI views/DESIGN.md. Flat by rule: no shadows, no gradients. */
 
+/*
+ * The palette is light only. Saying so is not decoration: without it a browser on
+ * a dark-mode machine draws its own dark chrome for native controls — the open
+ * list of a <select> came out dark grey against this palette. The list itself is
+ * drawn by the operating system, so this is as far as theming it reaches.
+ */
 :root {
+  color-scheme: light;
+
   --canvas: #f8fafc;
   --surface: #ffffff;
   --ink: #0f172a;

@@ -183,3 +183,16 @@
     MacBook (CPU only), which installs an older but compatible torch and NumPy stack. CI runs on
     Linux with the current pins (`requirements.txt`), so embedding values can differ slightly between
     the two.
+
+32. **A client is shown an unordered sample of workers, not matches.** The confirmation screen
+    lists a sample of the workers in the posting's trade, with the count, and the cards carry no
+    score, no rank and no numbering. This is deliberate and not an omission. Matching runs from
+    worker to job only: the relevance labels (a posting is relevant to a worker if and only if
+    it is in their occupational area, item 21) were built for that direction, and there are no
+    labels and no evaluation for ranking workers against a posting (Chapter 4 scopes
+    job-to-worker matching out). Any order the page imposed would be read as a ranking, whether
+    it was by recency, rate, location or arrival, so the only presentation that does not claim
+    something unevaluated is no order at all. The sample is returned by the API in the order the
+    store yields it, which carries no meaning and may differ between requests. Consequence for
+    the thesis: a client cannot see which workers suit their job best. Bidirectional matching,
+    with its own labels and evaluation, is future work.

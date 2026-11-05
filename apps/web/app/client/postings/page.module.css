@@ -24,13 +24,17 @@
 }
 
 .title {
+  display: block;
   font-size: 16px;
   font-weight: 600;
+  line-height: 24px;
 }
 
 .facts {
+  display: block;
   color: var(--muted);
   font-size: 15px;
+  line-height: 22px;
   margin-top: 2px;
 }
 
@@ -48,6 +52,8 @@
   color: var(--muted);
 }
 
-.actions {
-  margin-top: var(--space-lg);
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-md);
 }

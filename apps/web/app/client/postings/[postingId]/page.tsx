@@ -8,25 +8,22 @@
  * infer from the trade are deliberately left out, because matching uses stated
  * requirements only (docs/scoring-policy.md §1). The worker list carries no
  * score and no ranking.
+ *
+ * How the posting was read is said in plain sentences, in the open — not behind a
+ * disclosure control and not in the engine's own vocabulary. This is the same
+ * decision the worker's explanation screen makes (components/Explanation.tsx):
+ * a client judging whether we understood them is not helped by the name of the
+ * taxonomy we consulted.
  */
 
 import Link from "next/link";
 import { Suspense, use, useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { formatKes } from "@/components/MatchCard";
 import { ApiErrorMessage, useGuard } from "@/components/SessionProvider";
+import { WorkerCard } from "@/components/WorkerCard";
 import { api } from "@/lib/api";
-import type { JobInterpretation, TradeWorker } from "@/lib/types";
+import type { JobInterpretation } from "@/lib/types";
 import styles from "./page.module.css";
-
-function workerLine(worker: TradeWorker): string {
-  return [
-    worker.describes_as,
-    worker.location ?? "Location not stated",
-    worker.availability ?? "Availability not stated",
-    worker.rate_expectation === null ? "Rate not stated" : formatKes(worker.rate_expectation),
-  ].join(" · ");
-}
 
 export default function Page({ params }: { params: Promise<{ postingId: string }> }) {
   const waiting = useGuard("client");
@@ -50,7 +47,6 @@ function Posting({ params }: { params: Promise<{ postingId: string }> }) {
   const { postingId } = use(params);
   const [data, setData] = useState<JobInterpretation | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [showWorking, setShowWorking] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -121,44 +117,27 @@ function Posting({ params }: { params: Promise<{ postingId: string }> }) {
           </p>
         )}
 
-        <button
-          type="button"
-          className={styles.disclosure}
-          onClick={() => setShowWorking((shown) => !shown)}
-          aria-expanded={showWorking}
-        >
-          <span aria-hidden="true">{showWorking ? "▾" : "▸"}</span> See how we got there
-        </button>
-
-        {showWorking && (
-          <p className={styles.howWeGotThere}>
-            {interpretation.terms.length > 0 ? (
-              <>
-                You wrote <span className="mono">{interpretation.terms[0].label}</span>, which our trade vocabulary maps
-                to <span className="mono">{trade?.label}</span>. The skills above are the ones you listed; matching uses
-                those only.
-              </>
-            ) : (
-              <>
-                We read the words of your posting against the ESCO trade taxonomy
-                {trade ? (
-                  <>
-                    {" "}
-                    and matched <span className="mono">{trade.label}</span>
-                  </>
-                ) : null}
-                . The skills above are the ones you listed; matching uses those only.
-              </>
-            )}
-            {interpretation.unmapped.length > 0 && (
-              <>
-                {" "}
-                We didn&apos;t recognise {interpretation.unmapped.map((entry) => `“${entry}”`).join(", ")}, so we kept
-                it as written.
-              </>
-            )}
-          </p>
-        )}
+        <p className={styles.plain}>
+          {interpretation.terms.length > 0 ? (
+            <>
+              You wrote &ldquo;{interpretation.terms[0].label}&rdquo;, which is another way of saying{" "}
+              {trade?.label}, so that is the trade we read your posting as.
+            </>
+          ) : (
+            <>
+              We read the words of your posting
+              {trade ? <> and they describe the work {trade.label}s do</> : null}.
+            </>
+          )}{" "}
+          We match on the skills you listed above, and nothing else.
+          {interpretation.unmapped.length > 0 && (
+            <>
+              {" "}
+              We didn&apos;t recognise {interpretation.unmapped.map((entry) => `“${entry}”`).join(", ")}, so we
+              kept it exactly as you wrote it.
+            </>
+          )}
+        </p>
       </div>
 
       {trade && pool && (
@@ -169,9 +148,9 @@ function Posting({ params }: { params: Promise<{ postingId: string }> }) {
             {trade.label}s.
           </p>
           <ul className={styles.workers}>
-            {pool.sample.map((worker) => (
-              <li key={workerLine(worker)} className={styles.worker}>
-                {workerLine(worker)}
+            {pool.sample.map((worker, index) => (
+              <li key={`${index}-${worker.describes_as}`}>
+                <WorkerCard worker={worker} trade={trade.label} />
               </li>
             ))}
           </ul>

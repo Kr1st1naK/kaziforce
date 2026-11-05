@@ -181,7 +181,7 @@ test("signing in returns a worker to their matches", async ({ page }) => {
   await expect(page).toHaveURL(/\/worker\/matches$/);
 
   await page.getByRole("button", { name: /Sign out/ }).click();
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/\/sign-in$/);
 
   await view(page).getByLabel("Phone number").fill(number);
   await fillPin(page, /4-digit PIN/, PIN);
@@ -198,7 +198,7 @@ test("the wrong PIN is refused, and the form says so", async ({ page }) => {
   await page.getByRole("button", { name: "Continue" }).click();
   // Scoped: Next's route announcer is also role="alert".
   await expect(view(page).getByRole("alert")).toContainText(/not right/);
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/\/sign-in$/);
 });
 
 test("no PIN is left behind in the page after signing up", async ({ page }) => {
@@ -216,6 +216,6 @@ test("no PIN is left behind in the page after signing up", async ({ page }) => {
 
 test("a signed-out visitor is sent to sign in", async ({ page }) => {
   await page.goto("/worker/matches");
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/\/sign-in$/);
   await expect(page.getByRole("button", { name: "Continue" })).toBeVisible();
 });

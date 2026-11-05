@@ -6,6 +6,11 @@
  * There is no design for this screen; the rows reuse the row style of the
  * confirmation screen so nothing new is invented. Each row opens that posting's
  * confirmation view.
+ *
+ * A row is two lines: the title, then the facts beneath it. On one line they run
+ * together once a title has no trailing punctuation, and a list of several becomes
+ * hard to scan. "Post a job" sits above the list rather than inside the card, so it
+ * does not read as part of the last posting.
  */
 
 import Link from "next/link";
@@ -54,39 +59,42 @@ export default function Page() {
       )}
 
       {postings !== null && (
-        <div className="card">
-          {postings.length === 0 ? (
-            <p className={styles.empty}>You haven&apos;t posted a job yet.</p>
-          ) : (
-            <ul className={styles.rows}>
-              {postings.map((posting) => (
-                <li key={posting.posting_id}>
-                  <Link className={styles.row} href={`/client/postings/${posting.posting_id}`}>
-                    <span className={styles.title}>{posting.title}</span>
-                    <span className={styles.facts}>
-                      {[
-                        posting.location ?? "Location not stated",
-                        formatKes(posting.budget),
-                        posting.availability ?? "No strict timeline",
-                      ].join(" · ")}
-                      {posting.trades.length > 0 && (
-                        <>
-                          {" · "}
-                          <span className={styles.trade}>{posting.trades[0].label}</span>
-                        </>
-                      )}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-          <div className={styles.actions}>
+        <>
+          <div className={styles.toolbar}>
             <Link className="button" href="/client/post">
               Post a job
             </Link>
           </div>
-        </div>
+
+          <div className="card">
+            {postings.length === 0 ? (
+              <p className={styles.empty}>You haven&apos;t posted a job yet.</p>
+            ) : (
+              <ul className={styles.rows}>
+                {postings.map((posting) => (
+                  <li key={posting.posting_id}>
+                    <Link className={styles.row} href={`/client/postings/${posting.posting_id}`}>
+                      <span className={styles.title}>{posting.title}</span>
+                      <span className={styles.facts}>
+                        {[
+                          posting.location ?? "Location not stated",
+                          formatKes(posting.budget),
+                          posting.availability ?? "No strict timeline",
+                        ].join(" · ")}
+                        {posting.trades.length > 0 && (
+                          <>
+                            {" · "}
+                            <span className={styles.trade}>{posting.trades[0].label}</span>
+                          </>
+                        )}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </>
       )}
     </AppShell>
   );

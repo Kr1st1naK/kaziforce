@@ -139,6 +139,10 @@ export const api = {
 
   myProfile: () => request<WorkerProfileResponse>("/workers/me"),
 
+  /** Replace the signed-in worker's profile. The body carries every field; a missing one is cleared. */
+  updateMyProfile: (worker: WorkerInput) =>
+    request<WorkerProfileResponse>("/workers/me", { method: "PUT", body: worker }),
+
   myPostings: () => request<{ postings: PostingSummary[] }>("/jobs"),
 
   createWorker: (worker: WorkerInput) =>
