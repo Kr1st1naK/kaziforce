@@ -85,7 +85,9 @@ posting now belong to someone.
 
 ### The worker
 
-1. **Create an account** → *I'm a worker*, a phone number, a 4-digit PIN twice.
+1. **Create an account** → *I'm a worker*, a first and last name, a phone number, a 4-digit
+   PIN twice, and tick the agreement that clients who post a job in your trade can see your
+   name and phone number. (A client is asked for none of this.)
 2. **Create your worker profile** → *What work do you do?*
    *fundi wa umeme, wiring, solar installation*; *About you*
    *"Nina uzoefu wa miaka mitano. Domestic and commercial installations."*;
@@ -117,7 +119,16 @@ Sign out first, or use a second browser window.
    then "We matched this to the trade **plumber**", the skills it recognised, and
    *Workers in this trade* — at most five, in their own words, with no score and
    no ranking.
+   With the demo plumbers seeded (`python scripts/seed_demo_workers.py`, phones
+   700 000 001 to 003, PIN 4821), three cards show a name as a link. Opening
+   **Amina Wanjiru** gives her trade, her own words, and a tap-to-call number
+   (+254 700 000 001, a made-up number; do not ring it). The other cards are
+   anonymous, as for any worker who has not given a name and agreed.
 9. **My postings** lists the client's own postings, and only theirs.
+10. **Withdrawing.** Sign in as a demo plumber (700 000 001, PIN 4821), open
+    **My profile** → **Edit profile**, untick the agreement and save. The client's
+    page for that worker now says it is not available, and their card is
+    anonymous. Run the seed script again to switch the demo workers back on.
 
 Matching reads the description and the required skills, not the title. Naming the
 trade only in the title gives the honest "We could not match this to a trade we

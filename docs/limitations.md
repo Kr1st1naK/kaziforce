@@ -146,15 +146,42 @@
     else, so there is no client profile screen and the client navigation offers only "Post a
     job" and "My postings".
 
-28. **A phone number is personal data, and the accounts table holds one.** DR-07 is about the
-    matching data, and it still holds: a worker profile has no name, no contact detail and no
-    identifier beyond a generated UUID, and the synthetic dataset contains none either. Sign-in
-    changes the picture at the edge of the system, because an account is keyed by a real phone
-    number. That number is never shown to another user, never appears in a recommendation, an
-    explanation or the trade list on the confirmation screen, and is returned by the API only to
-    the account that owns it. It is stored in clear, however, not hashed, because it is the
-    lookup key for signing in. A deployment would need a lawful basis for holding it, a retention
-    period and a deletion route; this project has none of those.
+28. **A phone number and a name are personal data, and the accounts table holds them.** DR-07 is
+    about the matching data, and it still holds: a worker profile has no name, no contact detail and
+    no identifier beyond generated UUIDs, and the synthetic dataset contains none either. The
+    account is where personal data lives. An account is keyed by a real phone number, and a worker
+    now also gives a first and last name at sign-up.
+
+    **What changed.** Both are encrypted in the application, not just on disk: AES-256-GCM with a
+    random nonce per value and a key-version prefix, under a key held in the server's environment.
+    The phone number is found at sign-in by an HMAC under a second key, so the table holds no
+    plaintext number and a copy of it cannot be searched for one. Names live on the account and
+    never on the worker profile, and never reach the embedding, the enrichment or the scoring.
+    The mechanism, the four places a value is decrypted and the migration are in
+    `docs/privacy-and-keys.md`.
+
+    **Who sees them.** Not other workers, and not matching. A *client* sees a worker's name and
+    phone number only if that worker ticked the agreement at sign-up (or later on their profile)
+    and has not withdrawn it: unticking it hides the name, the number and the profile link on the
+    next request, and the profile endpoint then answers exactly as it does for a worker who does
+    not exist. A client is never given a name field and there is no client profile. Anyone, of any
+    role, is shown their own number.
+
+    **The privacy implication, for Chapter 6.** This is a deliberate reversal of this item's
+    earlier wording, which said the number was never shown to another user. A worker's
+    contact details now reach strangers: any client, and a client account needs only an
+    unverified phone number to create (item 38). The safeguards are consent, withdrawal,
+    a per-account rate limit on profile views (item 38), and that only workers in a trade's
+    first-five list can be reached. They reduce the exposure; they do not make it consensual
+    in a verified sense. Nothing stops a client keeping a number once seen, and withdrawing
+    consent does not recall it. A deployment would need a lawful basis (in Kenya, the Data
+    Protection Act, 2019), a retention period, a way for a worker to see who viewed them and
+    to delete their account, and a privacy notice. This project has none of those.
+
+    **Existing accounts.** Accounts made before names existed have no name and are not
+    consenting, so they appear as anonymous cards and cannot be opened. A worker adds a name and
+    ticks the agreement on their profile when they choose. Nothing is shown about them that they
+    did not agree to.
 
 ## 7. System
 
@@ -185,14 +212,89 @@
     the two.
 
 32. **A client is shown an unordered sample of workers, not matches.** The confirmation screen
-    lists a sample of the workers in the posting's trade, with the count, and the cards carry no
-    score, no rank and no numbering. This is deliberate and not an omission. Matching runs from
-    worker to job only: the relevance labels (a posting is relevant to a worker if and only if
-    it is in their occupational area, item 21) were built for that direction, and there are no
-    labels and no evaluation for ranking workers against a posting (Chapter 4 scopes
-    job-to-worker matching out). Any order the page imposed would be read as a ranking, whether
-    it was by recency, rate, location or arrival, so the only presentation that does not claim
-    something unevaluated is no order at all. The sample is returned by the API in the order the
-    store yields it, which carries no meaning and may differ between requests. Consequence for
-    the thesis: a client cannot see which workers suit their job best. Bidirectional matching,
-    with its own labels and evaluation, is future work.
+    lists a sample of the workers in the posting's trade, with the count. The cards carry no
+    score, no rank and no numbering, and are drawn the same whether or not the worker has a name.
+    This is deliberate and not an omission. Matching runs from worker to job only: the relevance
+    labels (a posting is relevant to a worker if and only if it is in their occupational area,
+    item 21) were built for that direction, and there are no labels and no evaluation for ranking
+    workers against a posting (Chapter 4 scopes job-to-worker matching out). Any order the page
+    imposed would be read as a ranking, whether it was by recency, rate, location or arrival, so
+    the only presentation that does not claim something unevaluated is no order at all. The sample
+    is the first five matching workers by `worker_id`, a random identifier, so it is arbitrary
+    and fixed: the same five appear for every posting in the trade until the pool changes.
+
+    **What the cards now add.** A worker who has a name and has consented is shown with their name,
+    as a link to a page with their trade, facts, their own words and a number to ring. That is a
+    way to *contact* a worker, not a statement that they *fit* the job, and the design keeps the
+    two apart: a named card is no larger, no earlier and no more emphasised than an anonymous
+    one; there is no "recommended" and no sort; consenting does not change which workers are in
+    the sample or how many there are (a test holds this). It is still true that a client cannot
+    see which workers suit their job best. Bidirectional matching, with its own labels and
+    evaluation, is future work. The page also gives a client nothing to compare two workers
+    by except what each wrote about themselves.
+
+    **The consequence of the sample (item 36).** Because the five are fixed and random, a
+    worker who consents is usually not among them, and so usually cannot be reached.
+
+## 8. Privacy and security
+
+33. **`POST /recommend` with a `worker_id` needs no sign-in.** Anyone who has a worker's
+    internal identifier can ask for that worker's ranked jobs and gets back their profile (words,
+    location, availability, rate). It returns no name and no phone number, and a test holds
+    that, and a client is never given the internal identifier (they get a separate `public_id`,
+    and only for consenting workers). It remains an open endpoint: it was built for the
+    command-line demo and the evaluation, and the project never closed it. It is reachable by
+    anyone who can guess or learn a UUID. A deployment should require a signed-in worker and
+    their own `worker_id`.
+
+34. **The keys live in the server's environment.** There is no key-management service, no hardware
+    module and no automated rotation. Anyone who can read the process environment or the `.env`
+    file can read every encrypted value, and the keys sit on the same machine as the database.
+    The `v1:` prefix and the multi-key cipher exist so rotation can be added; the script that
+    re-encrypts the rows and recomputes the lookup hash does not exist. Losing a key loses the data
+    it protects. In development a missing key falls back to a fixed, public one with a warning,
+    which protects nothing; only a non-development environment refuses to start without keys.
+
+35. **No disk encryption, and no TLS to the database, on the development machine.** Application-level
+    encryption protects a copy of the database, a backup or a query result. It does not protect a
+    running server, a memory dump, or the process's own environment. The local PostgreSQL
+    reports TLS off, and the data directory is not encrypted at rest. Whole-disk encryption and a
+    TLS database connection belong to the host and were not set up.
+
+36. **Contactable workers are rarely visible.** A trade list shows five workers, chosen by a random
+    identifier (item 32). A worker who signs up, names themselves and consents is therefore unlikely
+    to appear in it: in a trade of fifty, about one chance in ten. The feature works, but for most
+    workers it will not be reached. Showing consenting workers first would fix the arithmetic and
+    would be an ordering that favours a group, which this project has declined to build
+    (item 32). The demo seed (`scripts/seed_demo_workers.py`) gives its three workers identifiers that
+    sort ahead of the random ones so a demonstration is reliable; that is a demonstration
+    accommodation, and the end-to-end tests rely on it for the same reason.
+
+37. **A 4-digit PIN is weak against anyone holding the database.** Item 26 says so; it is repeated here
+    because it limits everything above it. PBKDF2 at 600,000 iterations raises the cost of trying
+    each PIN and cannot make 10,000 possibilities a large number: a copy of the table yields every
+    PIN in seconds, which signs the attacker in as that person, and a signed-in worker's contact
+    details are then theirs to change. A server-side pepper with upgrade-on-login would put a secret
+    outside the database; it is proposed and not built (`docs/privacy-and-keys.md`).
+
+38. **Consent and identity are not verified, and the limit on viewing is soft.** There is no SMS
+    verification, so a worker account can be created with a number its owner does not hold, with
+    a name the person did not choose, and ticked as consenting on their behalf. The name is
+    whatever was typed. A client account needs only a number and a PIN, takes seconds to make, and
+    is not limited per address, so the rate limit on `GET /workers/<public_id>` (30 views a
+    minute per account, counting misses) slows a person using one account and not one making many.
+    It is in memory, per process, and forgets on restart. An unknown number is told it already
+    has an account when it signs up, so sign-up reveals which numbers are registered (the sign-in
+    response does not).
+
+39. **Plain HTTP until deployment.** The PIN, the session cookie, a worker's name and their phone number
+    cross the network unencrypted in the local setup. HTTPS has been *prepared for* and not done:
+    the API refuses to start in production without a named origin and sends security headers and
+    HSTS there, but the list of places that still assume `http://` (the web app's default API
+    address, the development CORS origins, the Flask development server, the database URL,
+    the end-to-end suite) is in `docs/privacy-and-keys.md`. No claim is made here about how the
+    system behaves behind TLS: it has not been run that way.
+
+40. **The access log records who viewed whom.** A profile view is `GET /workers/<public_id>`, so the
+    web server's request log ties a client's address to a worker's page. The id is opaque and the log
+    is the server's, not the application's, and no retention rule exists for it.

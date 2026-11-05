@@ -16,8 +16,9 @@ tokens) and `data/accounts.py` (accounts, sessions, ownership). Tests:
 | GET | `/auth/session` | Who is signed in, and what they own | Any |
 | POST | `/recommend` | Ranked jobs for a stored worker or a typed-in profile | Optional |
 | POST | `/workers` | Store a worker profile; returns its identifier and enrichment | Optional |
-| GET | `/workers/me` | The signed-in worker's own profile and enrichment | Worker |
-| PUT | `/workers/me` | Replace the signed-in worker's own profile | Worker |
+| GET | `/workers/me` | The signed-in worker's own profile and enrichment, with their own name, consent and number | Worker |
+| PUT | `/workers/me` | Replace the signed-in worker's own profile; optionally their name and consent | Worker |
+| GET | `/workers/{public_id}` | A consenting worker's profile and phone number | Client |
 | POST | `/jobs` | Store a job posting, add it to the candidate pool, return how it was understood | Optional |
 | GET | `/jobs` | The signed-in client's own postings | Client |
 | GET | `/jobs/{posting_id}` | How a stored posting was understood | Optional |
@@ -84,11 +85,16 @@ someone. A person is identified by a Kenyan mobile number and a 4-digit PIN.
 - Phone numbers are normalised to `254XXXXXXXXX`. `0712345678`, `712345678`,
   `254712345678` and `+254 712 345 678` are the same account. Responses give the local
   form (`0712345678`).
+- **The phone number and a worker's name are encrypted** (AES-256-GCM) in the database, and the
+  number is found by an HMAC of it, so no plaintext is stored. See `docs/privacy-and-keys.md`.
+  The API needs `KAZIFORCE_FIELD_KEY` and `KAZIFORCE_PHONE_HMAC_KEY`, and outside development
+  it will not start without them or without `KAZIFORCE_CORS_ORIGIN`.
 
 ### `POST /auth/accounts`
 
 ```json
-{ "phone": "0712345678", "pin": "4821", "role": "worker" }
+{ "phone": "0712345678", "pin": "4821", "role": "worker",
+  "first_name": "Amina", "last_name": "Wanjiru", "contact_consent": true }
 ```
 
 | Field | Rules |
@@ -96,6 +102,11 @@ someone. A person is identified by a Kenyan mobile number and a 4-digit PIN.
 | `phone` | Required, a Kenyan mobile number in any of the forms above |
 | `pin` | Required, exactly 4 digits |
 | `role` | Required, `worker` or `client` |
+| `first_name`, `last_name` | **Workers: required.** Trimmed, runs of spaces made single, 1–60 characters, letters in any script with single spaces, hyphens, apostrophes or full stops between parts. **Clients: not accepted** (400, `field` names it) |
+| `contact_consent` | **Workers: required, and must be the JSON value `true`.** It records the worker's agreement that clients who post a job in their trade can see their name and phone number. **Clients: not accepted** |
+
+A worker who does not agree cannot create an account: consent is a condition of sign-up, and is
+withdrawable afterwards (`PUT /workers/me`). Sign-in (`POST /auth/sessions`) takes none of these.
 
 **Response 201** is the session payload below, and sets the session cookie. A phone
 number already registered is a 409 `already_exists`; the role is **not** part of the
@@ -370,15 +381,24 @@ When a signed-in worker creates a profile, the account claims it, and `/auth/ses
 reports its `worker_profile_id`. An account may hold one profile: a second attempt is a 409
 `already_exists`. A client account creating a profile is a 403.
 
-No name or contact field is accepted: profiles hold no personally identifying information (DR-07).
+The profile takes no name or contact field: it holds no personally identifying information (DR-07).
+A worker's name lives on their *account* (`POST /auth/accounts`) and is edited with `PUT /workers/me`.
 Duplicate skills entries are collapsed, keeping the first of each. A term the knowledge graph does
 not know appears in `enrichment.unmapped` and the profile is still stored (FR-10).
 
 ## `GET /workers/me`
 
 The signed-in worker's own profile, in the same shape `POST /workers` returns, so the
-profile screen can show what the engine made of their words. 404 while the account has no
-profile; 403 for a client.
+profile screen can show what the engine made of their words, plus their own contact details:
+
+```json
+{ "worker_id": "e5a7c1d2-…", "worker": { … }, "enrichment": { … },
+  "contact": { "first_name": "Amina", "last_name": "Wanjiru", "consent": true, "phone": "0712345678" } }
+```
+
+`first_name` and `last_name` are `null`, and `consent` is `false`, for an account made before names
+existed, until the worker adds them. This is the one place a worker's own name is decrypted for them.
+404 while the account has no profile; 403 for a client.
 
 ## `PUT /workers/me`
 
@@ -387,8 +407,48 @@ rules `POST /workers` takes. The replacement is whole, not partial: a field left
 cleared, so the edit form always submits all of them. The worker keeps their `worker_id`,
 so rankings already recorded stay attached to the same person; they are recomputed the
 next time matches are asked for, not here. Returns the profile in the shape
-`GET /workers/me` returns. 404 while the account has no profile; 403 for a client; 501
-when the store cannot accept writes.
+`GET /workers/me` returns (including `contact`). 404 while the account has no profile; 403 for a
+client; 501 when the store cannot accept writes.
+
+**Name and consent are the exception to "replaced whole".** They belong to the account, so
+`first_name`, `last_name` and `contact_consent` may be sent with the profile fields, and **if left out
+they stay as they are**. Rules: a name is stored whole (both or neither); `contact_consent` must be a
+boolean; consent cannot be `true` while there is no first and last name (400, `field`
+`contact_consent`). `contact_consent: false` takes effect at once: the next request for the worker's
+profile answers 404, and their card goes back to anonymous.
+
+## `GET /workers/{public_id}`
+
+A consenting worker's profile and phone number, for a signed-in **client**. 401 without a session,
+403 for a worker. `public_id` is the random identifier a trade-list card carries
+(`worker_pool[].sample[].public_id`); it is not the internal `worker_id`, which is never returned to
+a client.
+
+```json
+{
+  "public_id": "3e2bc19b-aaf5-4365-9737-147958c886ae",
+  "first_name": "Amina", "last_name": "Wanjiru",
+  "trade": "plumber",
+  "skills": ["fundi bomba", "replace faucets"],
+  "biography": "Fundi bomba mwenye uzoefu wa miaka sita.",
+  "location": "Nairobi - Kasarani", "availability": "Full-time", "rate_expectation": 2400.0,
+  "contact": { "phone_e164": "+254700000001", "phone_local": "700000001" }
+}
+```
+
+Exactly those fields: no `worker_id`, no account identifier, no consent flag, no PIN, no score and no
+rank. `trade` is the first occupation the worker's own words reach, or `null`.
+
+**One 404 for every miss.** An unknown id, a malformed id, a worker who has not consented, a worker
+with no name, and a value that will not decrypt all answer the same 404 `not_found`, with the same
+body (`"This worker's profile is not available."`), so a client cannot tell a withdrawn worker from
+one who never existed.
+
+**Rate limited**, per signed-in account (so signing in again does not reset it): 30 views per 60
+seconds, counting misses as well as hits. Over the limit: **429 `rate_limited`** with a `Retry-After`
+header in seconds. The limit is in memory and per process (`docs/limitations.md` item 38).
+
+Every response carries `Cache-Control: no-store`.
 
 ## `POST /jobs`
 
@@ -438,7 +498,10 @@ matching never reads it, so the API does not invite a client to set it.
         "workers": 36,
         "sample": [
           { "describes_as": "fundi wa umeme", "location": "Nairobi - Kasarani",
-            "availability": "Part-time", "rate_expectation": 1800.0 }
+            "availability": "Part-time", "rate_expectation": 1800.0,
+            "public_id": "3e2bc19b-aaf5-4365-9737-147958c886ae", "name": "Amina Wanjiru" },
+          { "describes_as": "fundi wa umeme", "location": "Thika",
+            "availability": "Full-time", "rate_expectation": 2200.0 }
         ] }
     ]
   },
@@ -457,9 +520,14 @@ matching never reads it, so the API does not invite a client to set it.
   It is `[]` when the posting reaches no occupation.
 - **`worker_pool[].sample`** is at most 5 of those workers, as a client may see them: their own
   words and the practical facts, trimmed to 120 characters at a word boundary. It carries **no
-  identifier, no score and no ranking**, because a client posting a job has not been matched to
-  anyone and must not be shown a league table of workers. `describes_as` is the worker's listed
-  skills, or their biography when they listed none.
+  score and no ranking**, because a client posting a job has not been matched to anyone and must
+  not be shown a league table of workers. `describes_as` is the worker's listed skills, or their
+  biography when they listed none. The five are the first by `worker_id`, which is random, so the
+  sample is arbitrary and the same each time; who has consented never changes which workers are in
+  it, or the count.
+  **A worker who has a name and has consented also carries `public_id` and `name`** (both or
+  neither), so the client can open `GET /workers/{public_id}`. Everyone else is anonymous and has
+  no identifier at all. `public_id` says nothing about fit.
 - **`candidate_jobs`** is the pool size after this posting was added.
 
 ## `GET /jobs`
@@ -500,8 +568,21 @@ Every error has the same shape, and no error ever includes a stack trace:
 | 403 | `forbidden` | Signed in as the other role, or a worker asking for matches before creating a profile | — |
 | 409 | `already_exists` | That phone number already has an account, or that account already has a profile | `phone` |
 | 423 | `locked` | Five wrong PINs; the account is locked for 15 minutes | — |
+| 429 | `rate_limited` | A client viewed worker profiles too quickly; `Retry-After` is set | — |
 | 404 | `not_found` | `worker_id` is not a stored worker, `posting_id` is not a stored posting, or the URL is unknown | `worker_id` or `posting_id` |
 | 501 | `not_supported` | `POST /workers` or `POST /jobs` while the server reads the frozen CSVs (`KAZIFORCE_PROFILE_SOURCE=csv`) | — |
 | 405 | `method_not_allowed` | E.g. `GET /recommend` | — |
 | 503 | `not_ready` | The engine is still loading; a `Retry-After: 5` header is set | — |
 | 500 | `internal_error` | Anything unexpected; the details go to the server log only | — |
+
+## Headers and CORS
+
+Every response carries `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`,
+`Referrer-Policy: no-referrer`, `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'`
+and `Cache-Control: no-store`. `Strict-Transport-Security` is added **only in production**
+(`KAZIFORCE_ENV` not `development` or `test`, and not unset), and the session cookie is `Secure` there.
+
+CORS allows the origins in `KAZIFORCE_CORS_ORIGIN` (comma-separated) and no others, with
+credentials. In development it defaults to the two `http://…:3000` loopback addresses. In production
+it is required (the app refuses to start without it) and `*` is refused. See
+`docs/privacy-and-keys.md` for the rest of the HTTPS preparation.
