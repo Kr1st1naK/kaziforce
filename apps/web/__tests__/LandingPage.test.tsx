@@ -1,6 +1,6 @@
 /**
- * The landing page says what the system does, with one worked example, and offers the two
- * ways in. It claims nothing it cannot show: no figures, no images.
+ * The landing page says what the system does, which trades it understands and how it works, and offers the
+ * ways in. It claims nothing the system cannot back, shows no worker, and has no search.
  */
 
 import { render, screen, within } from "@testing-library/react";
@@ -10,7 +10,6 @@ import Page from "@/app/page";
 const engine = { ready: true, candidateJobs: 280, unreachable: false, recheck: vi.fn() };
 const redirect = vi.fn();
 
-vi.mock("next/font/google", () => ({ Nunito_Sans: () => ({ variable: "heading" }) }));
 vi.mock("@/components/EngineStatus", () => ({ useEngineStatus: () => engine }));
 vi.mock("@/components/SessionProvider", () => ({
   useRedirectIfSignedIn: () => redirect(),
@@ -24,60 +23,115 @@ beforeEach(() => {
 });
 
 describe("the landing page", () => {
-  it("has one heading and one sentence saying what the system does", () => {
+  it("has one heading, and says in one sentence what the system does", () => {
     render(<Page />);
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Work that fits your hands.");
     expect(screen.getByText(/understands how tradespeople describe their work/)).toBeInTheDocument();
   });
 
-  it("shows the path from what a worker writes to the trade to the jobs", () => {
+  it("leads to create-account with the right role from each hero button", () => {
     render(<Page />);
-    const path = screen.getByRole("list", { name: "An example" });
-    const steps = within(path).getAllByRole("listitem");
-    expect(steps).toHaveLength(3);
-    expect(steps[0]).toHaveTextContent("fundi wa umeme");
-    expect(steps[1]).toHaveTextContent("Electrician");
-    expect(steps[2]).toHaveTextContent("Jobs that need those skills");
+    expect(screen.getByRole("link", { name: /I'm looking for work/ })).toHaveAttribute("href", "/create-account?role=worker");
+    expect(screen.getByRole("link", { name: /I need a fundi/ })).toHaveAttribute("href", "/create-account?role=client");
   });
 
-  it("leads to create-account with the right role from each entry point", () => {
+  it("repeats the two ways in further down, to the same places", () => {
     render(<Page />);
-    expect(screen.getByRole("link", { name: "I'm looking for work" })).toHaveAttribute(
-      "href",
-      "/create-account?role=worker",
-    );
-    expect(screen.getByRole("link", { name: "I need a fundi" })).toHaveAttribute(
-      "href",
-      "/create-account?role=client",
-    );
+    expect(screen.getByRole("link", { name: "Create a worker account" })).toHaveAttribute("href", "/create-account?role=worker");
+    expect(screen.getByRole("link", { name: "Create a client account" })).toHaveAttribute("href", "/create-account?role=client");
   });
 
-  it("keeps a way back to sign-in for returning users", () => {
+  it("has a way to sign in at the top and at the foot, both to /sign-in", () => {
     render(<Page />);
     expect(screen.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/sign-in");
+    expect(screen.getByRole("link", { name: "Sign in to your account" })).toHaveAttribute("href", "/sign-in");
   });
 
-  it("describes how it works in three steps", () => {
+  it("scrolls to the two entry cards from Get started, and to the steps from How it works", () => {
     render(<Page />);
-    const row = within(screen.getByRole("region", { name: "How it works" })).getAllByRole("listitem");
-    expect(row.map((item) => item.textContent?.replace(/^\d/, ""))).toEqual([
-      "Describe your work in your own words",
-      "We work out your trade",
-      "See matching jobs with the reasons for each",
-    ]);
+    expect(screen.getByRole("link", { name: "Get started" })).toHaveAttribute("href", "#start");
+    expect(screen.getByRole("link", { name: "How it works" })).toHaveAttribute("href", "#how-it-works");
+    expect(document.getElementById("start")).not.toBeNull();
+    expect(document.getElementById("how-it-works")).not.toBeNull();
   });
+});
 
-  it("says it is a student project and not a live service", () => {
+describe("the trades", () => {
+  it("lists the eleven trades the system understands, each with the term it knows", () => {
     render(<Page />);
-    expect(screen.getByRole("contentinfo")).toHaveTextContent(
-      "final-year project at Strathmore University. It is not a live service.",
-    );
+    const trades = within(screen.getByRole("list", { name: /Trades and the terms we know/ })).getAllByRole("listitem");
+    expect(trades).toHaveLength(11);
+    expect(trades[0]).toHaveTextContent("fundi wa umeme");
+    expect(trades[0]).toHaveTextContent("electrician");
+    expect(trades.map((t) => t.textContent).join(" ")).toMatch(/fundi bomba.*plumber/);
   });
 
-  it("has no images and no figures", () => {
+  it("offers nothing to click or search: the list is text", () => {
+    render(<Page />);
+    const list = screen.getByRole("list", { name: /Trades and the terms we know/ });
+    expect(within(list).queryAllByRole("link")).toHaveLength(0);
+    expect(within(list).queryAllByRole("button")).toHaveLength(0);
+    expect(screen.queryByRole("searchbox")).toBeNull();
+    expect(screen.queryByRole("textbox")).toBeNull();
+  });
+});
+
+describe("how it works", () => {
+  it("has three steps", () => {
+    render(<Page />);
+    const steps = within(screen.getByRole("region", { name: /How KaziForce works/ })).getAllByRole("heading", { level: 3 });
+    expect(steps.map((h) => h.textContent)).toEqual(["Say what you do", "We work out your trade", "See jobs, and why"]);
+  });
+
+  it("labels its worker example as an example, so it cannot read as a testimonial", () => {
+    render(<Page />);
+    expect(screen.getAllByText("Example").length).toBeGreaterThanOrEqual(2);
+  });
+});
+
+describe("what the page does not claim", () => {
+  const text = () => render(<Page />).container.textContent ?? "";
+
+  it("has no counts, rates or percentages", () => {
+    expect(text()).not.toMatch(/\d+\s*\+|\bKES\b|\d+\s*%|typical|over \d|\d{2,} (workers|fundis|wiremen|jobs|users)/i);
+  });
+
+  it("has no verified, trusted or free promises", () => {
+    expect(text()).not.toMatch(/verified|trust|\bfree\b|commission|middlem|guarantee|best|top-rated|quality/i);
+  });
+
+  it("names no feature the system lacks", () => {
+    expect(text()).not.toMatch(/\bSMS\b|one-time|WhatsApp|quote|estimate|search|speak|project rate|password/i);
+  });
+
+  it("does not rank anything", () => {
+    expect(text()).not.toMatch(/score|ranked|best fit|top match|recommended|leaderboard/i);
+  });
+
+  it("shows no worker's name, number or profile", () => {
+    const { container } = render(<Page />);
+    expect(container.textContent).not.toMatch(/Amina|Joseph|Grace|Wanjiru|Otieno|Achieng/);
+    expect(container.textContent).not.toMatch(/\+?254|\b07\d|\b7\d{2} ?\d{3} ?\d{3}/);
+    expect(container.querySelector('a[href^="tel:"], a[href*="/client/workers"]')).toBeNull();
+  });
+
+  it("has no images and loads no icon font: its icons are inline and hidden from assistive technology", () => {
     const { container } = render(<Page />);
     expect(container.querySelector("img, picture, video")).toBeNull();
-    expect(container.textContent).not.toMatch(/\d+\s*(%|workers|jobs|users)/);
+    for (const svg of container.querySelectorAll("svg")) expect(svg).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("says the workers a client sees are a sample, not a ranking", () => {
+    render(<Page />);
+    expect(screen.getByText(/a sample of the trade, not a ranking/)).toBeInTheDocument();
+  });
+});
+
+describe("the page's behaviour", () => {
+  it("has a footer with the name and the year, and nothing else", () => {
+    render(<Page />);
+    expect(screen.getByRole("contentinfo")).toHaveTextContent(/^KaziForce © 2026$/);
   });
 
   it("sends a signed-in visitor on to their own home", () => {
@@ -94,5 +148,14 @@ describe("the landing page", () => {
   it("shows no notice once the service is ready", () => {
     render(<Page />);
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  });
+
+  it("puts the startup notice after the top bar and before the content", () => {
+    engine.ready = false;
+    const { container } = render(<Page />);
+    const order = [container.querySelector("header"), screen.getByRole("status"), container.querySelector("main")];
+    for (let i = 0; i < order.length - 1; i++) {
+      expect(order[i]!.compareDocumentPosition(order[i + 1]!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    }
   });
 });
