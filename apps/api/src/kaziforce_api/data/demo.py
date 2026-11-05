@@ -17,7 +17,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from kaziforce_api.auth import AuthError
+from kaziforce_api.auth import AuthError, normalise_phone
 from kaziforce_api.data.accounts import AccountStore, Contact
 from kaziforce_api.data.models import WorkerProfile
 from kaziforce_api.data.seed import SkillDescriber
@@ -57,13 +57,24 @@ DEMO_WORKERS = (
 
 
 def seed_demo_workers(accounts: AccountStore, store: PostgresProfileStore, describer: SkillDescriber) -> list[str]:
-    """Create the demo workers that do not exist yet. Returns the phone numbers it created."""
+    """Create the demo workers that do not exist yet, and make sure all of them are consenting.
+
+    Returns the phone numbers it created. A demo worker who already exists is left as they are
+    except that consent is switched back on, so a test that withdrew it cannot leave the demo
+    without its named cards. (If someone has changed a demo account's PIN, it is left alone.)
+    """
     created = []
     for demo in DEMO_WORKERS:
+        contact = Contact(demo.first_name, demo.last_name, True)
+        phone = normalise_phone(demo.phone)  # the form the API stores and looks up: 254700000001
         try:
-            account = accounts.create(demo.phone, DEMO_PIN, "worker", Contact(demo.first_name, demo.last_name, True))
+            account = accounts.create(phone, DEMO_PIN, "worker", contact)
         except AuthError:
-            continue  # already there: running this twice is harmless
+            try:
+                accounts.update_contact(accounts.authenticate(phone, DEMO_PIN).account_id, contact)
+            except AuthError:
+                pass
+            continue
         stored = store.save_worker(
             WorkerProfile(demo.worker_id, demo.biography, demo.skills, demo.location, demo.availability, demo.rate),
             describer.describe(demo.skills))

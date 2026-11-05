@@ -504,6 +504,16 @@ def test_the_demo_workers_are_seeded_once_and_appear_named_in_their_trade(app, s
     assert len(seed_demo_workers(accounts, store, SkillDescriber())) == len(DEMO_WORKERS)
     assert seed_demo_workers(accounts, store, SkillDescriber()) == []  # idempotent
 
+    # a worker who withdrew is brought back, so a test that withdrew cannot leave the demo bare
+    amina = app.test_client()
+    assert amina.post("/auth/sessions", json={"phone": "700000001", "pin": "4821"}).status_code == 200
+    own = amina.get("/workers/me").get_json()["worker"]
+    own_fields = {k: own[k] for k in ("biography", "skills", "location", "availability", "rate_expectation")}
+    withdrawn = amina.put("/workers/me", json={**own_fields, "contact_consent": False})
+    assert withdrawn.get_json()["contact"]["consent"] is False
+    assert seed_demo_workers(accounts, store, SkillDescriber()) == []
+    assert amina.get("/workers/me").get_json()["contact"]["consent"] is True
+
     viewer, _ = client_account(app)
     plumbing = {**JOB, "title": "Fix bathroom leakage", "description": "Need a fundi bomba. Bathroom leaking.",
                 "required_skills": ["replace faucets", "plumbing tools"]}

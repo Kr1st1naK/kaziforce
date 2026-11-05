@@ -221,8 +221,11 @@ def test_the_trade_list_shows_no_identifiers_scores_or_ranking(client):
     interpretation = client.post("/jobs", json=JOB).get_json()["interpretation"]
     (pool,) = [p for p in interpretation["worker_pool"] if p["occupation"]["label"] == "electrician"]
     assert pool["workers"] > 0 and 1 <= len(pool["sample"]) <= 5
+    anonymous = {"describes_as", "location", "availability", "rate_expectation"}
     for worker in pool["sample"]:
-        assert set(worker) == {"describes_as", "location", "availability", "rate_expectation"}
+        # A worker who has a name and has agreed to be shown also carries a public_id and a name, together
+        # and nothing else (the workers signed up earlier in this module do, and may land in the five).
+        assert set(worker) in (anonymous, anonymous | {"public_id", "name"})
     text = str(interpretation)
     assert "worker_id" not in text and "composite" not in text and "rank" not in text
 
