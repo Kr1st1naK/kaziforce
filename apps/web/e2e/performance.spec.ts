@@ -52,7 +52,10 @@ test("the matches screen is on the worker's screen within NFR-01's budget", asyn
   const phone = `7${String(Date.now()).slice(-6)}${Math.floor(Math.random() * 90) + 10}`;
   await page.goto("/create-account");
   await page.getByRole("radio", { name: "I'm a worker" }).click();
-  await view(page).getByLabel("Phone number").fill(phone);
+  await view(page).getByLabel(/^First name/).fill("Test");
+  await view(page).getByLabel(/^Last name/).fill("Worker");
+  await view(page).getByRole("checkbox", { name: /can see my name and phone number/ }).check();
+  await view(page).getByLabel("Phone number", { exact: true }).fill(phone);
   await fillPin(page, /Create a 4-digit PIN/, PIN);
   await fillPin(page, /Confirm PIN/, PIN);
   await page.getByRole("button", { name: "Create account" }).click();

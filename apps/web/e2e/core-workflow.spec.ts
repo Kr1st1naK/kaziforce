@@ -43,7 +43,13 @@ async function createAccount(page: Page, role: "worker" | "client"): Promise<str
   await page.goto("/create-account");
   await expect(page.getByRole("heading", { name: "Create an account" })).toBeVisible();
   await page.getByRole("radio", { name: role === "worker" ? "I'm a worker" : "I'm a client" }).click();
-  await view(page).getByLabel("Phone number").fill(number);
+  if (role === "worker") {
+    // A worker gives a name and agrees to be shown; a client is asked for neither.
+    await view(page).getByLabel(/^First name/).fill("Test");
+    await view(page).getByLabel(/^Last name/).fill("Worker");
+    await view(page).getByRole("checkbox", { name: /can see my name and phone number/ }).check();
+  }
+  await view(page).getByLabel("Phone number", { exact: true }).fill(number);
   await fillPin(page, /Create a 4-digit PIN/, PIN);
   await fillPin(page, /Confirm PIN/, PIN);
   await page.getByRole("button", { name: "Create account" }).click();
@@ -61,8 +67,8 @@ test("a worker signs up, describes their work, and reads an explained match", as
 
   await expect(page).toHaveURL(/\/worker\/profile$/);
   await expect(page.getByRole("heading", { name: "Create your worker profile" })).toBeVisible();
-  // No name or contact field is asked for (DR-07).
-  await expect(page.getByLabel(/full name/i)).toHaveCount(0);
+  // The profile holds no name or contact field (DR-07): the name was given at sign-up, on the account.
+  await expect(view(page).getByLabel(/name/i)).toHaveCount(0);
 
   await page.getByLabel(/What work do you do\?/).fill("fundi wa umeme, wiring, solar installation");
   await page.getByLabel(/About you/).fill("Nina uzoefu wa miaka mitano. Domestic and commercial installations.");
@@ -183,7 +189,7 @@ test("signing in returns a worker to their matches", async ({ page }) => {
   await page.getByRole("button", { name: /Sign out/ }).click();
   await expect(page).toHaveURL(/\/sign-in$/);
 
-  await view(page).getByLabel("Phone number").fill(number);
+  await view(page).getByLabel("Phone number", { exact: true }).fill(number);
   await fillPin(page, /4-digit PIN/, PIN);
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page).toHaveURL(/\/worker\/matches$/);
@@ -193,7 +199,7 @@ test("the wrong PIN is refused, and the form says so", async ({ page }) => {
   const number = await createAccount(page, "client");
   await page.getByRole("button", { name: /Sign out/ }).click();
 
-  await view(page).getByLabel("Phone number").fill(number);
+  await view(page).getByLabel("Phone number", { exact: true }).fill(number);
   await fillPin(page, /4-digit PIN/, "0000");
   await page.getByRole("button", { name: "Continue" }).click();
   // Scoped: Next's route announcer is also role="alert".
@@ -212,6 +218,17 @@ test("no PIN is left behind in the page after signing up", async ({ page }) => {
     .locator('input[type="password"], input[type="tel"]')
     .evaluateAll((inputs) => inputs.map((input) => (input as HTMLInputElement).value).filter(Boolean));
   expect(retained).toEqual([]);
+
+  // The name and the agreement the form held are cleared too: they are personal data in a hidden route.
+  const names = await page
+    .locator('input[type="text"], input[type="checkbox"]')
+    .evaluateAll((inputs) =>
+      inputs
+        .filter((input) => !(input as HTMLElement).checkVisibility())
+        .map((input) => (input as HTMLInputElement).value || (input as HTMLInputElement).checked)
+        .filter((value) => value === true || (typeof value === "string" && value !== "" && value !== "on")),
+    );
+  expect(names).toEqual([]);
 });
 
 test("a signed-out visitor is sent to sign in", async ({ page }) => {

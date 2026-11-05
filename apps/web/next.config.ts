@@ -14,6 +14,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Only an e2e run against its own server sets this: Next allows one dev server per build directory.
+  ...(process.env.NEXT_DIST_DIR ? { distDir: process.env.NEXT_DIST_DIR } : {}),
   // The dev-tools badge would otherwise sit in the corner of every thesis figure.
   devIndicators: false,
   cacheComponents: true,
