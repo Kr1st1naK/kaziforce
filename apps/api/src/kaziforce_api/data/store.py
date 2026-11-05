@@ -180,9 +180,13 @@ class PostgresProfileStore(ProfileStore):
         try:
             with conn, conn.cursor() as cur:
                 skill_id = self._skill_ids(cur, skills)
-                cur.execute("INSERT INTO worker_profile (biography, location, availability, rate_expectation) "
-                            "VALUES (%s, %s, %s, %s) RETURNING worker_id::text",
-                            (profile.biography, profile.location, profile.availability, profile.rate_expectation))
+                # A new profile arrives with worker_id "" and is given one by the database. Only
+                # scripts/seed_demo_workers.py passes its own, to place its demo workers.
+                cur.execute("INSERT INTO worker_profile (worker_id, biography, location, availability, rate_expectation) "
+                            "VALUES (COALESCE(NULLIF(%s, '')::uuid, gen_random_uuid()), %s, %s, %s, %s) "
+                            "RETURNING worker_id::text",
+                            (profile.worker_id, profile.biography, profile.location, profile.availability,
+                             profile.rate_expectation))
                 worker_id = cur.fetchone()[0]
                 execute_values(cur, "INSERT INTO worker_skill (fk_worker_id, fk_skill_id, position) VALUES %s",
                                [(worker_id, skill_id[s], i) for i, s in enumerate(profile.skills)])

@@ -8,8 +8,9 @@ recommendation engine (IR-02).
     DELETE /auth/sessions     sign out
     GET    /auth/session      who is signed in, and what they own
     POST   /recommend         ranked jobs for the signed-in worker, a worker_id, or a typed-in profile
-    GET    /workers/me        the signed-in worker's profile
-    PUT    /workers/me        replace the signed-in worker's profile
+    GET    /workers/me        the signed-in worker's profile, with their own name and consent
+    PUT    /workers/me        replace the signed-in worker's profile (and, if sent, name and consent)
+    GET    /workers/<public_id>  a consenting worker's profile and phone number, for a signed-in client
     POST   /workers           store a worker profile; a signed-in worker account claims it
     POST   /jobs              store a posting, add it to the candidate pool, return how it was understood
     GET    /jobs              the signed-in client's postings
@@ -17,7 +18,7 @@ recommendation engine (IR-02).
 
 Contract: docs/api.md. Errors are always {"error": {"code", "message", "field"?}}
 with status 400 invalid_request, 401 unauthenticated, 403 forbidden,
-404 not_found, 405 method_not_allowed, 409 already_exists, 423 locked,
+404 not_found, 405 method_not_allowed, 409 already_exists, 423 locked, 429 rate_limited,
 501 not_supported (the store cannot accept new profiles), 503 not_ready
 (engine still loading) or 500 internal_error; no stack trace is ever returned.
 
@@ -33,15 +34,18 @@ from __future__ import annotations
 import logging
 import math
 import os
+import re
 
 from flask import Flask, jsonify, request
 from werkzeug.exceptions import HTTPException
 
 from kaziforce_api.auth import AuthError, check_pin, check_role, local_phone, normalise_phone
-from kaziforce_api.data.accounts import AccountStore
+from kaziforce_api.crypto import ConfigError, is_production
+from kaziforce_api.data.accounts import AccountStore, Contact
 from kaziforce_api.data.models import JobPosting, WorkerProfile
 from kaziforce_api.data.store import ReadOnlyStore
 from kaziforce_api.pipeline import CONFIGURATIONS
+from kaziforce_api.ratelimit import SlidingWindowLimiter
 from kaziforce_api.service import MAX_K, NotReady, RecommendationService
 
 AVAILABILITY = ("Full-time", "Part-time", "Weekends")
@@ -54,6 +58,14 @@ MAX_TEXT, MAX_SKILLS, MAX_SKILL_TEXT, MAX_TITLE = 4000, 50, 200, 255
 DEFAULT_CORS_ORIGINS = "http://localhost:3000,http://127.0.0.1:3000"
 SESSION_COOKIE = "kaziforce_session"
 CREDENTIAL_FIELDS = {"phone", "pin", "role"}
+# A worker gives these at sign-up; a client gives none of them.
+CONTACT_FIELDS = {"first_name", "last_name", "contact_consent"}
+MAX_NAME = 60
+# Letters (any script), then single spaces, hyphens, apostrophes or full stops between parts.
+NAME_PATTERN = re.compile(r"^[^\W\d_]+(?:[ '’.\-][^\W\d_]+)*\.?$")
+# Contact details are released slowly: this many profile views per account per window.
+CONTACT_VIEWS_PER_WINDOW, CONTACT_WINDOW_SECONDS = 30, 60
+UNAVAILABLE = "This worker's profile is not available."
 
 
 class Unauthenticated(Exception):
@@ -144,10 +156,38 @@ def parse_worker(body: dict) -> WorkerProfile:
                          _amount(body.get("rate_expectation"), "worker.rate_expectation"))
 
 
+def _person_name(value, field: str) -> str:
+    """A first or last name: trimmed, single-spaced, letters with the usual joiners, at most MAX_NAME long."""
+    text = " ".join(_required_text(value, field, MAX_NAME).split())
+    if not NAME_PATTERN.match(text):
+        raise InvalidRequest(f"{field} may contain only letters, spaces, hyphens and apostrophes", field)
+    return text
+
+
+def _consent(value, field: str = "contact_consent") -> bool:
+    if not isinstance(value, bool):
+        raise InvalidRequest(f"{field} must be true or false", field)
+    return value
+
+
+def parse_signup_contact(body: dict, role: str) -> Contact | None:
+    """A new worker's name and consent. A worker must give both and agree; a client gives none."""
+    if role != "worker":
+        for field in sorted(CONTACT_FIELDS):
+            if body.get(field) is not None:
+                raise InvalidRequest(f"{field} is only for worker accounts", field)
+        return None
+    first, last = _person_name(body.get("first_name"), "first_name"), _person_name(body.get("last_name"), "last_name")
+    if body.get("contact_consent") is not True:
+        raise InvalidRequest("contact_consent: you need to agree that clients can see your name and phone number",
+                             "contact_consent")
+    return Contact(first, last, True)
+
+
 def parse_credentials(body, require_role: bool) -> tuple[str, str, str | None]:
     """(phone, PIN, role) from a sign-in or create-account body. The PIN is never logged."""
     body = _object(body, "body")
-    _no_unknown_fields(body, CREDENTIAL_FIELDS)
+    _no_unknown_fields(body, CREDENTIAL_FIELDS | (CONTACT_FIELDS if require_role else set()))
     phone = normalise_phone(_required_text(body.get("phone"), "phone", 20))
     pin = check_pin(body.get("pin"))
     role = check_role(body.get("role")) if require_role else None
@@ -186,8 +226,33 @@ def parse_request(body) -> tuple[str | None, WorkerProfile | None, int, str]:
     return (worker_id.strip() if has_id else None), worker, k, configuration
 
 
+def split_contact(body):
+    """A PUT /workers/me body as (profile fields, name-and-consent fields)."""
+    if not isinstance(body, dict):
+        return body, {}
+    return ({k: v for k, v in body.items() if k not in CONTACT_FIELDS},
+            {k: v for k, v in body.items() if k in CONTACT_FIELDS})
+
+
+def parse_contact_update(sent: dict, current: dict) -> Contact:
+    """The name and consent after an edit: what was sent, over what was there.
+
+    Consent can only be on while there is a first and last name to show, and a name is
+    stored whole, so one half cannot be set without the other.
+    """
+    first = _person_name(sent["first_name"], "first_name") if "first_name" in sent else current["first_name"]
+    last = _person_name(sent["last_name"], "last_name") if "last_name" in sent else current["last_name"]
+    consent = _consent(sent["contact_consent"]) if "contact_consent" in sent else current["consent"]
+    if bool(first) != bool(last):
+        missing = "last_name" if first else "first_name"
+        raise InvalidRequest(f"{missing} is required", missing)
+    if consent and not first:
+        raise InvalidRequest("contact_consent: add your first and last name before sharing them", "contact_consent")
+    return Contact(first, last, consent)
+
+
 def create_app(service: RecommendationService | None = None, start: bool = True,
-               accounts: AccountStore | None = None) -> Flask:
+               accounts: AccountStore | None = None, contact_limiter: SlidingWindowLimiter | None = None) -> Flask:
     app = Flask(__name__)
     app.json.sort_keys = False
     if service is None:
@@ -195,12 +260,19 @@ def create_app(service: RecommendationService | None = None, start: bool = True,
         if start:
             service.start(background=True)
     accounts = accounts if accounts is not None else AccountStore()
+    service.contact_lookup = accounts.consented_cards
+    contact_limiter = contact_limiter or SlidingWindowLimiter(CONTACT_VIEWS_PER_WINDOW, CONTACT_WINDOW_SECONDS)
     app.extensions["kaziforce"] = service
     app.extensions["kaziforce_accounts"] = accounts
-    cors_origins = {
-        origin.strip() for origin in os.getenv("KAZIFORCE_CORS_ORIGIN", DEFAULT_CORS_ORIGINS).split(",")
-        if origin.strip()
-    }
+
+    production = is_production()
+    configured_origins = os.getenv("KAZIFORCE_CORS_ORIGIN", "").strip()
+    if production and not configured_origins:
+        raise ConfigError("KAZIFORCE_CORS_ORIGIN must be set outside development, to the web app's origin "
+                          "(for example https://app.example.org)")
+    cors_origins = {origin.strip() for origin in (configured_origins or DEFAULT_CORS_ORIGINS).split(",") if origin.strip()}
+    if "*" in cors_origins:
+        raise ConfigError("KAZIFORCE_CORS_ORIGIN cannot be *: the API sends cookies, so it names its origins")
 
     @app.after_request
     def cors(response):
@@ -213,6 +285,20 @@ def create_app(service: RecommendationService | None = None, start: bool = True,
             response.headers["Vary"] = "Origin"
         return response
 
+    @app.after_request
+    def security_headers(response):
+        # This is a JSON API, so it needs no content of its own to be framed, sniffed or cached.
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "no-referrer"
+        response.headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'"
+        response.headers.setdefault("Cache-Control", "no-store")  # nothing here should sit in a shared cache
+        if production:
+            # Only over HTTPS, and only when told this is production: on plain HTTP it does nothing,
+            # and set on a development host it would pin a browser to HTTPS for localhost.
+            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        return response
+
     def current_account():
         return accounts.session_account(request.cookies.get(SESSION_COOKIE))
 
@@ -223,6 +309,11 @@ def create_app(service: RecommendationService | None = None, start: bool = True,
         if role is not None and account.role != role:
             raise Forbidden(f"This is a {account.role} account; that page is for {role}s.")
         return account
+
+    def with_contact(profile: dict, account) -> dict:
+        """A worker's own profile with their own name, consent and number: decrypted for them alone."""
+        own = accounts.own_contact(account.account_id)
+        return {**profile, "contact": {**own, "phone": local_phone(account.phone)}}
 
     def session_payload(account) -> dict:
         """Who is signed in, and what they own, so the interface can route and draw its nav."""
@@ -239,15 +330,16 @@ def create_app(service: RecommendationService | None = None, start: bool = True,
         response = jsonify(session_payload(account))
         token = accounts.start_session(account.account_id)
         response.set_cookie(SESSION_COOKIE, token, httponly=True, samesite="Lax",
-                            secure=request.is_secure, max_age=7 * 24 * 3600, path="/")
+                            secure=production or request.is_secure, max_age=7 * 24 * 3600, path="/")
         return response, status
 
     @app.route("/auth/accounts", methods=["POST", "OPTIONS"])
     def create_account_route():
         if request.method == "OPTIONS":
             return "", 204
-        phone, pin, role = parse_credentials(request.get_json(silent=True), require_role=True)
-        return signed_in(accounts.create(phone, pin, role), 201)
+        body = request.get_json(silent=True)
+        phone, pin, role = parse_credentials(body, require_role=True)
+        return signed_in(accounts.create(phone, pin, role, parse_signup_contact(body, role)), 201)
 
     @app.route("/auth/sessions", methods=["POST", "DELETE", "OPTIONS"])
     def sessions_route():
@@ -314,10 +406,37 @@ def create_app(service: RecommendationService | None = None, start: bool = True,
         if worker_id is None:
             return error(404, "not_found", "This account has no profile yet.")
         if request.method == "GET":
-            return jsonify(service.worker_profile(service.worker(worker_id)))
+            return jsonify(with_contact(service.worker_profile(service.worker(worker_id)), account))
         # An edit replaces the profile whole: the form always submits every field, so a
-        # partial body would silently clear whatever it left out.
-        return jsonify(service.update_worker(worker_id, parse_worker(request.get_json(silent=True))))
+        # partial body would silently clear whatever it left out. The name and consent are the
+        # exception: left out, they stay as they are, because they belong to the account.
+        profile_body, contact_body = split_contact(request.get_json(silent=True))
+        profile = parse_worker(profile_body)
+        contact = parse_contact_update(contact_body, accounts.own_contact(account.account_id)) if contact_body else None
+        updated = service.update_worker(worker_id, profile)
+        if contact is not None:
+            accounts.update_contact(account.account_id, contact)
+        return jsonify(with_contact(updated, account))
+
+    @app.route("/workers/<public_id>", methods=["GET", "OPTIONS"])
+    def worker_for_client(public_id: str):
+        if request.method == "OPTIONS":
+            return "", 204
+        account = require("client")
+        # Counted before the lookup, and for misses as much as hits, so guessing is as slow as browsing.
+        wait = contact_limiter.retry_after(account.account_id)
+        if wait is not None:
+            response = error(429, "rate_limited", "You are viewing profiles too quickly. Wait a minute and try again.")
+            response[0].headers["Retry-After"] = str(wait)
+            return response
+        contact = accounts.consented_contact(public_id)
+        if contact is None:
+            return error(404, "not_found", UNAVAILABLE)
+        try:
+            worker = service.worker(contact["worker_id"])
+        except KeyError:
+            return error(404, "not_found", UNAVAILABLE)
+        return jsonify(service.client_view_of_worker(worker, public_id, contact))
 
     @app.route("/jobs", methods=["GET", "POST", "OPTIONS"])
     def jobs_route():

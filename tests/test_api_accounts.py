@@ -17,6 +17,7 @@ PIN = "4821"
 PROFILE = {"biography": "Mimi ni fundi wa umeme, nina uzoefu wa miaka mitano. Niko Nyeri.",
            "skills": ["fundi wa umeme"], "location": "Nyeri", "availability": "Part-time",
            "rate_expectation": 2000}
+WORKER_NAME = {"first_name": "Test", "last_name": "Worker", "contact_consent": True}  # a worker gives these at sign-up
 JOB = {"title": "Rewire a small shop", "description": "We need an electrician in Nyeri to rewire a small shop.",
        "required_skills": ["install electricity sockets"], "location": "Nyeri", "budget": 2600}
 
@@ -47,7 +48,8 @@ def phone() -> str:
 
 def register(client, role: str, pin: str = PIN) -> str:
     number = phone()
-    created = client.post("/auth/accounts", json={"phone": number, "pin": pin, "role": role})
+    created = client.post("/auth/accounts", json={"phone": number, "pin": pin, "role": role,
+                                                  **(WORKER_NAME if role == "worker" else {})})
     assert created.status_code == 201, created.get_json()
     return number
 
@@ -56,7 +58,7 @@ def register(client, role: str, pin: str = PIN) -> str:
 
 def test_creating_an_account_signs_you_in_and_says_what_you_own(client):
     number = phone()
-    created = client.post("/auth/accounts", json={"phone": number, "pin": PIN, "role": "worker"})
+    created = client.post("/auth/accounts", json={"phone": number, "pin": PIN, "role": "worker", **WORKER_NAME})
     assert created.status_code == 201
     assert created.get_json() == {"account": {"account_id": pytest.approx(created.get_json()["account"]["account_id"]),
                                               "phone": number, "role": "worker"},
@@ -76,8 +78,8 @@ def test_the_pin_never_comes_back_in_any_response(client):
 
 @pytest.mark.parametrize("typed", ["0712345679", "+254 712 345 679", "254712345679"])
 def test_one_number_written_three_ways_is_one_account(client, typed):
-    client.post("/auth/accounts", json={"phone": "712345679", "pin": PIN, "role": "worker"})
-    again = client.post("/auth/accounts", json={"phone": typed, "pin": PIN, "role": "worker"})
+    client.post("/auth/accounts", json={"phone": "712345679", "pin": PIN, "role": "worker", **WORKER_NAME})
+    again = client.post("/auth/accounts", json={"phone": typed, "pin": PIN, "role": "worker", **WORKER_NAME})
     assert again.status_code == 409 and again.get_json()["error"]["code"] == "already_exists"
 
 
