@@ -14,6 +14,8 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+import psycopg2.errors
+
 from kaziforce_api.data.db import get_connection
 
 MIGRATIONS_DIR = Path(__file__).resolve().parent / "migrations"
@@ -65,5 +67,9 @@ if __name__ == "__main__":
         for path in migration_files():
             print(f"[{'x' if path.stem in done else ' '}] {path.stem}")
     else:
-        applied = migrate()
+        try:
+            applied = migrate()
+        except psycopg2.errors.RaiseException as exc:
+            # A migration's own guard refusing to run (0005 until the backfill has been done).
+            raise SystemExit(f"Stopped: {exc.diag.message_primary}") from None
         print("Applied: " + ", ".join(applied) if applied else "Database is up to date.")

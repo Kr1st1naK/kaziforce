@@ -10,6 +10,7 @@
  */
 
 import { expect, test, type Page } from "@playwright/test";
+import { seedDemoWorkers } from "./demo";
 
 const OUT = (browser: string, name: string) => `../../docs/evidence/screens/${browser}/${name}.png`;
 const PIN = "4821";
@@ -49,12 +50,19 @@ async function completeAccountForm(page: Page, role: "worker" | "client") {
   await page.goto("/create-account");
   await expect(page.getByRole("heading", { name: "Create an account" })).toBeVisible();
   await page.getByRole("radio", { name: role === "worker" ? "I'm a worker" : "I'm a client" }).click();
-  await view(page).getByLabel("Phone number").fill(phone());
+  if (role === "worker") {
+    await view(page).getByLabel(/^First name/).fill("Zawadi");
+    await view(page).getByLabel(/^Last name/).fill("Mutua");
+    await view(page).getByRole("checkbox", { name: /can see my name and phone number/ }).check();
+  }
+  await view(page).getByLabel("Phone number", { exact: true }).fill(phone());
   await fillPin(page, /Create a 4-digit PIN/, PIN);
   await fillPin(page, /Confirm PIN/, PIN);
 }
 
 test.beforeAll(async ({ request }) => {
+  // The confirmation screen (08) and the worker's page (10) are photographed with the demo plumbers on them.
+  seedDemoWorkers();
   const api = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:5000";
   const health = await request.get(`${api}/health`);
   expect(health.ok(), "the API must be running").toBeTruthy();
@@ -140,4 +148,14 @@ test("capture the eight screens", async ({ page, browserName }) => {
   await expect(page).toHaveURL(/\/client\/postings$/);
   await expect(view(page).getByRole("link", { name: /Fix bathroom leakage/ })).toBeVisible();
   await shot("09-client_postings_list");
+
+  // 10 a worker's page, as the client reaches it from the confirmation screen. Photographed
+  // last so the earlier numbering is unchanged; opens the first demo plumber.
+  await view(page).getByRole("link", { name: /Fix bathroom leakage/ }).click();
+  await expect(view(page).getByRole("heading", { name: "How we understood your posting" })).toBeVisible();
+  await view(page).getByRole("link", { name: "Amina Wanjiru" }).click();
+  await expect(page).toHaveURL(/\/client\/workers\//);
+  await expect(view(page).getByRole("heading", { name: "Amina Wanjiru" })).toBeVisible();
+  await expect(view(page).getByRole("link", { name: /Call Amina Wanjiru/ })).toBeVisible();
+  await shot("10-worker_profile_for_client");
 });

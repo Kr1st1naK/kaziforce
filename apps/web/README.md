@@ -10,14 +10,16 @@ Built to the approved designs in `docs/UI views/`.
 
 | Route | Screen | Design |
 |---|---|---|
-| `/` | Sign in with a phone number and 4-digit PIN | `sign_in.png` |
-| `/create-account` | Create an account, as a worker or a client | `create_account.png` |
+| `/` | The landing page: what the system does, and the two ways in | — |
+| `/sign-in` | Sign in with a phone number and 4-digit PIN | `sign_in.png` |
+| `/create-account` | Create an account, as a worker (with a name and an agreement) or a client | `create_account.png` |
 | `/worker/profile` | Describe your work (FR-01) | `create_worker_profile_view.png` |
 | `/worker/matches` | Ranked jobs with match score and band (FR-08), or nothing above the threshold | `job_matches_for_worker_view.png`, `no_matches.png` |
 | `/worker/matches/[postingId]` | Why this job suits you, in plain words, with the technical detail behind a disclosure (FR-09, FR-10) | `worker_explanation_view.png` |
 | `/client/post` | Post a job (FR-02) | `job_posting_creation.png` |
 | `/client/postings/[postingId]` | How the posting was understood, and the trade list | `job_posted_confirmation.png` |
 | `/client/postings` | A client's own postings | — (composed from the confirmation row style) |
+| `/client/workers/[workerId]` | A consenting worker's name, trade, facts, own words and a tap-to-call number | — |
 
 A worker's own identifier is no longer in the URL: the session says who they
 are, and the interface asks for "my" profile and matches. A posting identifier

@@ -117,3 +117,22 @@
   font-size: 14px;
   margin-top: var(--space-sm);
 }
+
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+
+.check input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0;
+  accent-color: var(--primary);
+}
+
+.check label {
+  font-size: 16px;
+  line-height: 24px;
+}

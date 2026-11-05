@@ -142,12 +142,22 @@ psql kaziforce -c "REVOKE CREATE ON SCHEMA public FROM PUBLIC; GRANT USAGE, CREA
 ```
 Then set `DATABASE_URL=postgresql://kaziforce_app:<password>@localhost:5432/kaziforce` in `.env`.
 
+**Keys.** Phone numbers and workers' names are encrypted in the application, so the API needs two
+secrets in `.env`. Generate them and paste the two lines it prints:
+```bash
+python -m kaziforce_api.crypto
+```
+Outside development (`KAZIFORCE_ENV` other than `development` or `test`) the API will not start without
+them, or without `KAZIFORCE_CORS_ORIGIN`. A database that already holds accounts needs a one-off
+encrypting migration first: see the runbook in `docs/privacy-and-keys.md`.
+
 Test the connection, create the schema, and load the dataset:
 ```bash
 python -m kaziforce_api.data.db
 python -m kaziforce_api.data.migrate          # safe to re-run; --status lists applied migrations
 python scripts/seed_database.py              # development-split workers + all 280 postings; idempotent
 python scripts/seed_database.py --reset      # clear profiles and postings stored through the API, then re-seed
+python scripts/seed_demo_workers.py          # optional: three named, consenting demo plumbers
 ```
 
 With `DATABASE_URL` set, `pytest` also runs the PostgreSQL round-trip tests

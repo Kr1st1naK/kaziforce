@@ -13,7 +13,9 @@
 
 import { defineConfig, devices } from "@playwright/test";
 
-const WEB_PORT = 3000;
+// E2E_WEB_PORT, with NEXT_PUBLIC_API_BASE and NEXT_DIST_DIR (next.config.ts), lets a run use its own web
+// server and API, for example against a copy of the database, without touching the ones already running.
+const WEB_PORT = Number(process.env.E2E_WEB_PORT ?? 3000);
 // 127.0.0.1, not localhost: the API runs on 127.0.0.1:5000 and the session cookie is
 // SameSite=Lax, so the browser only sends it when both are the same host.
 const WEB_HOST = "127.0.0.1";

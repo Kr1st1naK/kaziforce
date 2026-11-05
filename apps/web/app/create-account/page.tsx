@@ -14,8 +14,10 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { PIN_LENGTH, PinField, PhoneField, RoleToggle } from "@/components/AuthFields";
+import { Checkbox, TextInput } from "@/components/FormFields";
 import { ApiErrorMessage, homeFor, useRedirectIfSignedIn, useSession } from "@/components/SessionProvider";
 import { ApiError, api } from "@/lib/api";
+import { MAX_NAME, nameError, tidyName } from "@/lib/names";
 import { phoneError } from "@/lib/phone";
 import { ROLES, type Role } from "@/lib/types";
 import styles from "../auth.module.css";
@@ -42,6 +44,10 @@ function CreateAccount() {
   const { setSession } = useSession();
   const params = useSearchParams();
   const [role, setRole] = useState<Role>(() => startingRole(params.get("role")));
+  // A worker gives a name and agrees to be shown; a client gives neither, and the fields are not drawn.
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [consent, setConsent] = useState(false);
   const [phone, setPhone] = useState("");
   const [pin, setPin] = useState("");
   const [confirmation, setConfirmation] = useState("");
@@ -55,6 +61,13 @@ function CreateAccount() {
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     const found: Record<string, string> = {};
+    if (role === "worker") {
+      const badFirst = nameError(firstName, "first name");
+      const badLast = nameError(lastName, "last name");
+      if (badFirst) found.first_name = badFirst;
+      if (badLast) found.last_name = badLast;
+      if (!consent) found.contact_consent = "Agree to continue, or choose I'm a client.";
+    }
     const badPhone = phoneError(phone);
     if (badPhone) found.phone = badPhone;
     if (pin.length !== PIN_LENGTH) found.pin = `Choose a ${PIN_LENGTH}-digit PIN.`;
@@ -64,9 +77,16 @@ function CreateAccount() {
 
     setBusy(true);
     try {
-      const session = await api.createAccount({ phone, pin, role });
-      // See the note in app/page.tsx: this route stays mounted but hidden, so
-      // the PIN is cleared from state before navigating away.
+      const session = await api.createAccount(
+        role === "worker"
+          ? { phone, pin, role, first_name: tidyName(firstName), last_name: tidyName(lastName), contact_consent: true }
+          : { phone, pin, role },
+      );
+      // See the note in app/sign-in/page.tsx: this route stays mounted but hidden, so
+      // the PIN, and the name and number with it, are cleared from state before navigating away.
+      setFirstName("");
+      setLastName("");
+      setConsent(false);
       setPhone("");
       setPin("");
       setConfirmation("");
@@ -97,6 +117,29 @@ function CreateAccount() {
             </div>
           )}
 
+          {role === "worker" && (
+            <>
+              <TextInput
+                label="First name"
+                required
+                value={firstName}
+                onChange={setFirstName}
+                error={errors.first_name}
+                maxLength={MAX_NAME}
+                disabled={busy}
+              />
+              <TextInput
+                label="Last name"
+                required
+                value={lastName}
+                onChange={setLastName}
+                error={errors.last_name}
+                maxLength={MAX_NAME}
+                disabled={busy}
+              />
+            </>
+          )}
+
           <PhoneField
             value={phone}
             onChange={setPhone}
@@ -121,6 +164,17 @@ function CreateAccount() {
             disabled={busy}
             showToggle
           />
+
+          {role === "worker" && (
+            <Checkbox
+              label="Clients who post a job in my trade can see my name and phone number."
+              checked={consent}
+              onChange={setConsent}
+              error={errors.contact_consent}
+              hint="You can turn this off later on your profile."
+              disabled={busy}
+            />
+          )}
 
           <button className={`button ${styles.submit}`} type="submit" disabled={busy}>
             {busy ? "Creating your account…" : "Create account"}

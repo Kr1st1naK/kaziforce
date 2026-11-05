@@ -3,13 +3,26 @@ AccountStore: accounts, sessions, and the ownership links to profiles and postin
 
 Every method takes or returns plain values; the PIN never leaves auth.py and
 the raw session token is returned once, at creation, and never stored.
+
+The phone number is stored encrypted (`phone_enc`) and found by a keyed hash (`phone_hash`);
+see crypto.py. Nothing here decrypts it except `session_account`, which hands a person their
+own number back.
+
+Names are decrypted in exactly three places, each named below: `own_contact` (a worker reading
+their own profile), `consented_cards` (the first and last name on a client's worker card) and
+`consented_contact` (the profile a client opens). All three skip any worker who has not
+consented, and none of them logs a value.
 """
 
 from __future__ import annotations
 
+import logging
 import uuid
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
+from dataclasses import dataclass
 from datetime import datetime, timezone
+
+import psycopg2.errors
 
 from kaziforce_api.auth import (
     Account,
@@ -20,6 +33,9 @@ from kaziforce_api.auth import (
     new_session_token,
     pin_matches,
 )
+from kaziforce_api.crypto import FIRST_NAME, LAST_NAME, CryptoError, FieldCrypto, load_from_env
+
+log = logging.getLogger(__name__)
 
 
 def _is_uuid(value: str) -> bool:
@@ -30,29 +46,52 @@ def _is_uuid(value: str) -> bool:
     return True
 
 
+@dataclass(frozen=True)
+class Contact:
+    """A worker's name and whether clients may see it, with their phone number."""
+
+    first_name: str | None
+    last_name: str | None
+    consent: bool
+
+
 class AccountStore:
-    def __init__(self, connect: Callable | None = None):
+    def __init__(self, connect: Callable | None = None, crypto: FieldCrypto | None = None):
         if connect is None:
             from kaziforce_api.data.db import get_connection as connect
         self._connect = connect
+        # Read at construction, so an app without its keys fails to start, not on the first sign-in.
+        self.crypto = crypto if crypto is not None else load_from_env()
 
     # Accounts
 
-    def create(self, phone: str, pin: str, role: str) -> Account:
-        """Create an account. Raises AuthError if the phone number is already registered."""
+    def create(self, phone: str, pin: str, role: str, contact: Contact | None = None) -> Account:
+        """Create an account. Raises AuthError if the phone number is already registered.
+
+        `contact` is a worker's name and their consent to show it, given at sign-up.
+        """
         pin_hash, salt, iterations = hash_pin(pin)
+        phone_hash, phone_enc = self.crypto.phone_hash(phone), self.crypto.encrypt_phone(phone)
+        first_enc, last_enc, consent = (
+            (self.crypto.encrypt_name(contact.first_name, FIRST_NAME), self.crypto.encrypt_name(contact.last_name, LAST_NAME),
+             contact.consent) if contact else (None, None, False))
+        taken = AuthError("That phone number already has an account.", "already_exists", "phone")
         conn = self._connect()
         try:
             with conn, conn.cursor() as cur:
-                cur.execute("SELECT 1 FROM account WHERE phone = %s", (phone,))
+                cur.execute("SELECT 1 FROM account WHERE phone_hash = %s", (phone_hash,))
                 if cur.fetchone():
-                    raise AuthError("That phone number already has an account.", "already_exists", "phone")
+                    raise taken
                 cur.execute(
-                    "INSERT INTO account (phone, role, pin_hash, pin_salt, pin_iterations) "
-                    "VALUES (%s, %s, %s, %s, %s) RETURNING account_id::text",
-                    (phone, role, pin_hash, salt, iterations),
+                    "INSERT INTO account (phone_hash, phone_enc, role, pin_hash, pin_salt, pin_iterations, "
+                    "first_name_enc, last_name_enc, contact_consent, consent_changed_at) "
+                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, CASE WHEN %s THEN now() END) "
+                    "RETURNING account_id::text",
+                    (phone_hash, phone_enc, role, pin_hash, salt, iterations, first_enc, last_enc, consent, consent),
                 )
                 return Account(cur.fetchone()[0], phone, role)
+        except psycopg2.errors.UniqueViolation:
+            raise taken from None  # two sign-ups for one number at once
         finally:
             conn.close()
 
@@ -67,8 +106,8 @@ class AccountStore:
             with conn.cursor() as cur:
                 cur.execute(
                     "SELECT account_id::text, role, pin_hash, pin_salt, pin_iterations, failed_attempts, locked_until "
-                    "FROM account WHERE phone = %s FOR UPDATE",
-                    (phone,),
+                    "FROM account WHERE phone_hash = %s FOR UPDATE",
+                    (self.crypto.phone_hash(phone),),
                 )
                 row = cur.fetchone()
                 if row is None:
@@ -114,13 +153,21 @@ class AccountStore:
         try:
             with conn, conn.cursor() as cur:
                 cur.execute(
-                    "SELECT a.account_id::text, a.phone, a.role FROM session s "
+                    "SELECT a.account_id::text, a.phone_enc, a.role FROM session s "
                     "JOIN account a ON a.account_id = s.fk_account_id "
                     "WHERE s.token_hash = %s AND s.expires_at > now()",
                     (hash_token(token),),
                 )
                 row = cur.fetchone()
-                return Account(*row) if row else None
+                if row is None:
+                    return None
+                account_id, phone_enc, role = row
+                try:
+                    return Account(account_id, self.crypto.decrypt_phone(phone_enc), role)
+                except CryptoError:
+                    # A key that does not match the data: no one can be shown their number, so no one is signed in.
+                    log.error("an account's phone could not be decrypted: is the field key the one the data was written with?")
+                    return None
         finally:
             conn.close()
 
@@ -187,3 +234,98 @@ class AccountStore:
                 return cur.fetchone() is not None
         finally:
             conn.close()
+
+    # Names and consent
+
+    def own_contact(self, account_id: str) -> dict:
+        """A worker's own name and consent, for their own profile. Names are None until they add them."""
+        conn = self._connect()
+        try:
+            with conn, conn.cursor() as cur:
+                cur.execute("SELECT first_name_enc, last_name_enc, contact_consent FROM account WHERE account_id = %s",
+                            (account_id,))
+                row = cur.fetchone()
+        finally:
+            conn.close()
+        first_enc, last_enc, consent = row if row else (None, None, False)
+        try:
+            return {"first_name": self.crypto.decrypt_name(first_enc, FIRST_NAME) if first_enc else None,
+                    "last_name": self.crypto.decrypt_name(last_enc, LAST_NAME) if last_enc else None,
+                    "consent": bool(consent)}
+        except CryptoError:
+            log.error("an account's name could not be decrypted: is the field key the one the data was written with?")
+            return {"first_name": None, "last_name": None, "consent": False}
+
+    def update_contact(self, account_id: str, contact: Contact) -> None:
+        """Replace a worker's name and consent. Consent turning off takes effect on the next request."""
+        conn = self._connect()
+        try:
+            with conn, conn.cursor() as cur:
+                cur.execute(
+                    "UPDATE account SET first_name_enc = %s, last_name_enc = %s, contact_consent = %s, "
+                    "consent_changed_at = CASE WHEN contact_consent IS DISTINCT FROM %s THEN now() "
+                    "ELSE consent_changed_at END WHERE account_id = %s",
+                    (self.crypto.encrypt_name(contact.first_name, FIRST_NAME) if contact.first_name else None,
+                     self.crypto.encrypt_name(contact.last_name, LAST_NAME) if contact.last_name else None,
+                     contact.consent, contact.consent, account_id))
+        finally:
+            conn.close()
+
+    def consented_cards(self, worker_ids: Sequence[str]) -> dict[str, dict]:
+        """For the workers among these who have a name and consent: their public id and full name.
+
+        Keyed by the internal worker_id, which the caller already holds and never sends on.
+        """
+        ids = [w for w in worker_ids if _is_uuid(w)]
+        if not ids:
+            return {}
+        conn = self._connect()
+        try:
+            with conn, conn.cursor() as cur:
+                cur.execute(
+                    "SELECT w.worker_id::text, w.public_id::text, a.first_name_enc, a.last_name_enc "
+                    "FROM worker_profile w JOIN account a ON a.account_id = w.fk_account_id "
+                    "WHERE w.worker_id = ANY(%s::uuid[]) AND a.role = 'worker' AND a.contact_consent "
+                    "AND a.first_name_enc IS NOT NULL AND a.last_name_enc IS NOT NULL", (ids,))
+                rows = cur.fetchall()
+        finally:
+            conn.close()
+        cards = {}
+        for worker_id, public_id, first_enc, last_enc in rows:
+            try:
+                name = f"{self.crypto.decrypt_name(first_enc, FIRST_NAME)} {self.crypto.decrypt_name(last_enc, LAST_NAME)}"
+            except CryptoError:
+                log.error("a worker's name could not be decrypted and was left off their card")
+                continue
+            cards[worker_id] = {"public_id": public_id, "name": name}
+        return cards
+
+    def consented_contact(self, public_id: str) -> dict | None:
+        """The name, phone number and internal worker_id behind a public id, only if the worker consented.
+
+        None for an unknown id, a worker who has not consented, one without a name, or a value that
+        will not decrypt: the caller cannot tell these apart, and neither can the person asking.
+        """
+        if not _is_uuid(public_id):
+            return None
+        conn = self._connect()
+        try:
+            with conn, conn.cursor() as cur:
+                cur.execute(
+                    "SELECT w.worker_id::text, a.first_name_enc, a.last_name_enc, a.phone_enc "
+                    "FROM worker_profile w JOIN account a ON a.account_id = w.fk_account_id "
+                    "WHERE w.public_id = %s AND a.role = 'worker' AND a.contact_consent "
+                    "AND a.first_name_enc IS NOT NULL AND a.last_name_enc IS NOT NULL", (public_id,))
+                row = cur.fetchone()
+        finally:
+            conn.close()
+        if row is None:
+            return None
+        worker_id, first_enc, last_enc, phone_enc = row
+        try:
+            return {"worker_id": worker_id, "first_name": self.crypto.decrypt_name(first_enc, FIRST_NAME),
+                    "last_name": self.crypto.decrypt_name(last_enc, LAST_NAME),
+                    "phone": self.crypto.decrypt_phone(phone_enc)}
+        except CryptoError:
+            log.error("a worker's contact details could not be decrypted and were not shown")
+            return None

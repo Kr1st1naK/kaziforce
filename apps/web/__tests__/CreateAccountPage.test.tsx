@@ -6,7 +6,7 @@
  * keeps both fields and says as soon as they differ.
  */
 
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import Page from "@/app/create-account/page";
@@ -31,6 +31,15 @@ vi.mock("@/components/SessionProvider", async (importOriginal) => ({
 }));
 
 const phoneField = () => screen.getByLabelText("Phone number");
+const firstName = () => screen.getByLabelText(/^First name/);
+const lastName = () => screen.getByLabelText(/^Last name/);
+const consentBox = () => screen.getByRole("checkbox", { name: /can see my name and phone number/ });
+
+async function fillWorkerDetails(first = "Amina", last = "Wanjiru") {
+  await userEvent.type(firstName(), first);
+  await userEvent.type(lastName(), last);
+  await userEvent.click(consentBox());
+}
 
 async function typePin(label: RegExp | string, digits: string) {
   const boxes = screen.getAllByLabelText(new RegExp(`^${label}, digit`));
@@ -96,12 +105,125 @@ describe("the phone number", () => {
     createAccount.mockResolvedValue({ account: { account_id: "a-1", phone: "712345678", role: "worker" }, worker_profile_id: null, postings: 0 });
 
     render(<Page />);
+    await fillWorkerDetails();
     await userEvent.type(phoneField(), "712345678");
     await typePin("Create a 4-digit PIN", "4821");
     await typePin("Confirm PIN", "4821");
     await userEvent.click(screen.getByRole("button", { name: "Create account" }));
 
-    expect(createAccount).toHaveBeenCalledWith({ phone: "712345678", pin: "4821", role: "worker" });
+    expect(createAccount).toHaveBeenCalledWith({
+      phone: "712345678",
+      pin: "4821",
+      role: "worker",
+      first_name: "Amina",
+      last_name: "Wanjiru",
+      contact_consent: true,
+    });
+  });
+});
+
+async function submitWorker() {
+  await userEvent.type(phoneField(), "712345678");
+  await typePin("Create a 4-digit PIN", "4821");
+  await typePin("Confirm PIN", "4821");
+  await userEvent.click(screen.getByRole("button", { name: "Create account" }));
+}
+
+describe("a worker's name and agreement", () => {
+  it("asks for a first name, a last name and an agreement, all marked required", () => {
+    render(<Page />);
+    expect(firstName()).toBeVisible();
+    expect(lastName()).toBeVisible();
+    expect(consentBox()).not.toBeChecked();
+    expect(screen.getAllByText("(required)")).toHaveLength(2); // the two names; the agreement is required by its own sentence
+  });
+
+  it("shows the agreement in words a worker can read before they tick it", () => {
+    render(<Page />);
+    expect(screen.getByText("Clients who post a job in my trade can see my name and phone number.")).toBeVisible();
+    expect(screen.getByText("You can turn this off later on your profile.")).toBeVisible();
+  });
+
+  it("refuses to submit without a name or the agreement, and says what is missing", async () => {
+    render(<Page />);
+    await submitWorker();
+    expect(await screen.findByText("Enter your first name.")).toBeVisible();
+    expect(screen.getByText("Enter your last name.")).toBeVisible();
+    expect(screen.getByText(/Agree to continue/)).toBeVisible();
+    expect(createAccount).not.toHaveBeenCalled();
+  });
+
+  it("refuses a name that is only spaces", async () => {
+    render(<Page />);
+    await userEvent.type(firstName(), "   ");
+    await userEvent.type(lastName(), "Wanjiru");
+    await userEvent.click(consentBox());
+    await submitWorker();
+    expect(await screen.findByText("Enter your first name.")).toBeVisible();
+    expect(createAccount).not.toHaveBeenCalled();
+  });
+
+  it("refuses digits and symbols in a name", async () => {
+    render(<Page />);
+    await fillWorkerDetails("Amina2", "Wanjiru");
+    await submitWorker();
+    expect(await screen.findByText("Use letters, spaces, hyphens and apostrophes only.")).toBeVisible();
+    expect(createAccount).not.toHaveBeenCalled();
+  });
+
+  it("stops a name at 60 characters", () => {
+    render(<Page />);
+    expect(firstName()).toHaveAttribute("maxlength", "60");
+    expect(lastName()).toHaveAttribute("maxlength", "60");
+  });
+
+  it("accepts a hyphenated name, an apostrophe and accents, and sends them trimmed", async () => {
+    createAccount.mockResolvedValue({ account: { account_id: "a-1", phone: "712345678", role: "worker" }, worker_profile_id: null, postings: 0 });
+    render(<Page />);
+    await fillWorkerDetails("  Mary-Anne ", "O'Neil  Zoë");
+    await submitWorker();
+    expect(createAccount).toHaveBeenCalledWith(
+      expect.objectContaining({ first_name: "Mary-Anne", last_name: "O'Neil Zoë", contact_consent: true }),
+    );
+  });
+
+  it("shows the server's complaint on the field it names", async () => {
+    const { ApiError } = await import("@/lib/api");
+    createAccount.mockRejectedValue(new ApiError(400, "invalid_request", "first_name is required", "first_name"));
+    render(<Page />);
+    await fillWorkerDetails();
+    await submitWorker();
+    expect(await screen.findByText("first_name is required")).toBeVisible();
+  });
+
+  it("clears the name and the agreement from the page once the account is made", async () => {
+    createAccount.mockResolvedValue({ account: { account_id: "a-1", phone: "712345678", role: "worker" }, worker_profile_id: null, postings: 0 });
+    render(<Page />);
+    await fillWorkerDetails();
+    await submitWorker();
+    await waitFor(() => expect(createAccount).toHaveBeenCalled());
+    await waitFor(() => expect(firstName()).toHaveValue(""));
+    expect(lastName()).toHaveValue("");
+    expect(consentBox()).not.toBeChecked();
+  });
+});
+
+describe("a client signing up", () => {
+  it("is not asked for a name or an agreement", async () => {
+    render(<Page />);
+    await userEvent.click(screen.getByRole("radio", { name: "I'm a client" }));
+    expect(screen.queryByLabelText(/^First name/)).toBeNull();
+    expect(screen.queryByLabelText(/^Last name/)).toBeNull();
+    expect(screen.queryByRole("checkbox")).toBeNull();
+  });
+
+  it("sends only the number, the PIN and the role, even after typing a worker's name first", async () => {
+    createAccount.mockResolvedValue({ account: { account_id: "a-1", phone: "712345678", role: "client" }, worker_profile_id: null, postings: 0 });
+    render(<Page />);
+    await fillWorkerDetails();
+    await userEvent.click(screen.getByRole("radio", { name: "I'm a client" }));
+    await submitWorker();
+    expect(createAccount).toHaveBeenCalledWith({ phone: "712345678", pin: "4821", role: "client" });
   });
 });
 

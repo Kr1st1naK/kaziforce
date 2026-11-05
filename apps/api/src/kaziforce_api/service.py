@@ -78,6 +78,9 @@ class RecommendationService:
         self._jobs: dict[str, JobPosting] = {}
         self._semantic: SemanticScorer | None = None
         self._describer: SkillDescriber | None = None
+        # Set by create_app: given internal worker_ids, returns {worker_id: {"public_id", "name"}} for the
+        # workers who have a name and have consented. Left None, every card in a trade list is anonymous.
+        self.contact_lookup: Callable[[Sequence[str]], dict[str, dict]] | None = None
         self._lock = threading.Lock()  # held while the candidate pool is rebuilt
 
     # Startup
@@ -250,8 +253,13 @@ class RecommendationService:
 
         Counted from the profiles themselves, never from the dataset's occupational area labels.
         Each entry carries a short sample for display: how the worker describes their own work,
-        where they are, when they work and their rate. No identifier, no score and no ranking,
-        so a client cannot enumerate or rank workers from it.
+        where they are, when they work and their rate. No score and no ranking. The sample is the
+        same arbitrary subset it always was: who is named, or has consented, changes what a card
+        shows and never which workers are in the sample or how many there are.
+
+        A worker who has a name and has consented also carries a `public_id` and a `name`, so a
+        client can open their profile. No one else has an identifier, so a client cannot
+        enumerate workers from this list.
         """
         if not enrichment.occupations:
             return []
@@ -260,16 +268,49 @@ class RecommendationService:
         pool = []
         for occupation in enrichment.occupations:
             matching = [w for w, occupations in reached if occupation in occupations]
+            sample = matching[:TRADE_SAMPLE_SIZE]
+            cards = self._cards([w.worker_id for w in sample])
             pool.append({"occupation": self._node_ref(occupation), "workers": len(matching),
-                         "sample": [self._worker_sample(w) for w in matching[:TRADE_SAMPLE_SIZE]]})
+                         "sample": [self._worker_sample(w, cards.get(w.worker_id)) for w in sample]})
         return pool
 
+    def _cards(self, worker_ids: Sequence[str]) -> dict[str, dict]:
+        if self.contact_lookup is None:
+            return {}
+        try:
+            return self.contact_lookup(worker_ids)
+        except Exception:
+            # A failed lookup must not take the confirmation screen with it: the cards go anonymous.
+            log.exception("could not look up which workers in a trade list have consented")
+            return {}
+
     @staticmethod
-    def _worker_sample(worker: WorkerProfile) -> dict:
-        """A worker as a client may see them: their own words, and the practical facts. No identifier."""
+    def _worker_sample(worker: WorkerProfile, card: dict | None = None) -> dict:
+        """A worker as a client may see them: their own words, and the practical facts.
+
+        `card` is the public id and name of a worker who has consented; anyone else is anonymous.
+        """
         describes_as = ", ".join(worker.skills) if worker.skills else worker.biography
-        return {"describes_as": shorten(describes_as), "location": worker.location,
-                "availability": worker.availability, "rate_expectation": worker.rate_expectation}
+        sample = {"describes_as": shorten(describes_as), "location": worker.location,
+                  "availability": worker.availability, "rate_expectation": worker.rate_expectation}
+        if card is not None:
+            sample["public_id"], sample["name"] = card["public_id"], card["name"]
+        return sample
+
+    def client_view_of_worker(self, worker: WorkerProfile, public_id: str, contact: dict) -> dict:
+        """A consenting worker as a client sees them on their own page: name, trade, facts, words, phone.
+
+        Built from the stored profile and the contact the account store released, and nothing else:
+        no worker_id, no account id, no consent flag, no score.
+        """
+        self._require_ready()
+        occupations = self.recommenders["full"].enrich(worker).enrichment.occupations
+        phone = contact["phone"]
+        return {"public_id": public_id, "first_name": contact["first_name"], "last_name": contact["last_name"],
+                "trade": self._node_ref(occupations[0])["label"] if occupations else None,
+                "skills": list(worker.skills), "biography": worker.biography, "location": worker.location,
+                "availability": worker.availability, "rate_expectation": worker.rate_expectation,
+                "contact": {"phone_e164": f"+{phone}", "phone_local": phone[3:] if phone.startswith("254") else phone}}
 
     # Serialisation
 
