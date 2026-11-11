@@ -240,17 +240,28 @@ class PostgresProfileStore(ProfileStore):
 
         `replace` drops this worker's previous ranking under the same configuration first, so the
         table holds the current ranking rather than one row per time anybody looked. The API uses
-        it; a batch run that wants a history does not.
+        it. Without `replace`, rows for postings already recorded are updated in place and others
+        are added: the table holds one row per (worker, posting, configuration), enforced by
+        migration 0006, so it cannot keep a history.
+
+        Writes for one (worker, configuration) are serialised with a transaction-scoped advisory
+        lock. Without it, two requests arriving together could each delete the old ranking before
+        either inserted its own, and both rankings would survive (system test record, S-1).
         """
         rows = [(worker_id, m.posting_id, m.rule, m.semantic, m.composite, m.rank, configuration) for m in scores]
         conn = self._connect()
         try:
             with conn, conn.cursor() as cur:
+                cur.execute("SELECT pg_advisory_xact_lock(hashtextextended(%s, 0))", (f"match_score:{worker_id}:{configuration}",))
                 if replace:
                     cur.execute("DELETE FROM match_score WHERE fk_worker_id = %s AND configuration = %s",
                                 (worker_id, configuration))
                 cur.executemany("INSERT INTO match_score (fk_worker_id, fk_posting_id, rule_score, semantic_score, "
-                                "composite_score, rank, configuration) VALUES (%s, %s, %s, %s, %s, %s, %s)", rows)
+                                "composite_score, rank, configuration) VALUES (%s, %s, %s, %s, %s, %s, %s) "
+                                "ON CONFLICT (fk_worker_id, fk_posting_id, configuration) DO UPDATE SET "
+                                "rule_score = EXCLUDED.rule_score, semantic_score = EXCLUDED.semantic_score, "
+                                "composite_score = EXCLUDED.composite_score, rank = EXCLUDED.rank, created_at = now()",
+                                rows)
         finally:
             conn.close()
         return len(rows)

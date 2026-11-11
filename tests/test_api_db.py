@@ -145,6 +145,40 @@ def test_a_ranking_is_recorded_and_replaced_rather_than_accumulated(client, pg_c
     assert by_configuration == [("full", 5), ("rule_only", 3)]
 
 
+def test_two_concurrent_requests_for_matches_leave_one_ranking(client, pg_connect):
+    """S-1: the matches screen can send two /recommend calls at once (React runs effects twice in
+    development; a worker may also have two tabs open). Exactly one ranking must remain."""
+    import threading
+
+    worker_id = client.post("/workers", json=WORKER).get_json()["worker_id"]
+    app = client.application
+    for round_ in range(5):
+        barrier = threading.Barrier(2)
+        statuses = []
+
+        def ask(k):
+            with app.test_client() as own:
+                barrier.wait()
+                statuses.append(own.post("/recommend", json={"worker_id": worker_id, "k": k}).status_code)
+
+        threads = [threading.Thread(target=ask, args=(k,)) for k in (10, 10)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+        assert statuses == [200, 200]
+
+        conn = pg_connect()
+        with conn.cursor() as cur:
+            cur.execute("SELECT rank, fk_posting_id::text FROM match_score WHERE fk_worker_id = %s "
+                        "AND configuration = 'full'", (worker_id,))
+            rows = cur.fetchall()
+        conn.close()
+        assert len(rows) == 10, f"round {round_}: {len(rows)} rows"
+        assert sorted(r for r, _ in rows) == list(range(1, 11))
+        assert len({p for _, p in rows}) == 10
+
+
 def test_a_typed_in_profile_records_nothing(client, pg_connect):
     """There is no worker row to attach a ranking to, and inventing one would be a lie."""
     conn = pg_connect()

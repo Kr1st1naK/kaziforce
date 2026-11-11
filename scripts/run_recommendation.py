@@ -8,7 +8,8 @@ components, the rule breakdown and the matched skills with how the worker came
 to have each one.
 
 Profiles are read from PostgreSQL (the application store, seeded by
-scripts/seed_database.py), and the ranking is written to match_score. Use
+scripts/seed_database.py), and the ranking is written to match_score, replacing this
+worker's previous ranking for the same configuration. Use
 --source csv to read the frozen CSVs instead (no database; nothing is saved).
 
 Startup (graph, job enrichment, model, job embeddings) is timed separately from
@@ -101,7 +102,7 @@ def main() -> None:
             print("    matched: " + "; ".join(f"{s.skill_label} [{provenance(s, kg.label)}]" for s in m.matched_skills))
 
     if args.source == "db" and not args.no_save:
-        saved = store.save_match_scores(worker.worker_id, args.config, results)
+        saved = store.save_match_scores(worker.worker_id, args.config, results, replace=True)
         print(f"\nSaved {saved} match_score rows (configuration {args.config}).")
     print(f"\nTiming: startup {t_startup - t0:.2f} s (of which graph, data and job enrichment {t_build - t0:.2f} s); "
           f"query {1000 * (t_query - t_startup):.0f} ms")
