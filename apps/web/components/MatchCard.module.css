@@ -106,6 +106,21 @@ span.below_threshold {
   font-size: 14px;
 }
 
+.moreLink {
+  /* A 44 px tap target without making the chip row taller: the padding is paid back by the negative margin. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-block: -7px;
+  padding: 0 8px;
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+.moreLink:hover {
+  color: var(--primary);
+}
+
 .why {
   flex: none;
   border-color: var(--primary-fixed, #ffdbd0);

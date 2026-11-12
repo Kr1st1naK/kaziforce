@@ -45,19 +45,28 @@ function apiBase(): string {
 
 export const API_BASE = apiBase();
 export const RETRY_BUDGET_MS = 90_000;
+export const NETWORK_MESSAGE = "We couldn't reach the service. Check your connection and try again.";
 const DEFAULT_RETRY_AFTER_MS = 5_000;
 
 export class ApiError extends Error {
   readonly status: number;
   readonly code: ApiErrorCode;
   readonly field?: string;
+  /** For developers: what was attempted, when the message shown to the person is plain. */
+  readonly detail?: string;
 
-  constructor(status: number, code: ApiErrorCode, message: string, field?: string) {
-    super(message);
+  constructor(status: number, code: ApiErrorCode, message: string, field?: string, detail?: string, cause?: unknown) {
+    super(message, cause === undefined ? undefined : { cause });
+    this.detail = detail;
     this.name = "ApiError";
     this.status = status;
     this.code = code;
     this.field = field;
+  }
+
+  /** True when the request got no response at all. */
+  get isNetworkFailure(): boolean {
+    return this.code === "network_error";
   }
 
   /** True while the engine is still loading, so the caller can keep waiting. */
@@ -109,8 +118,14 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
         headers: body === undefined ? undefined : { "Content-Type": "application/json" },
         body: body === undefined ? undefined : JSON.stringify(body),
       });
-    } catch {
-      throw new ApiError(0, "network_error", `Cannot reach the API at ${API_BASE}. Is it running?`);
+    } catch (cause) {
+      // No response at all: a dropped connection, a tunnel that restarted, or an API that is down. The person
+      // gets plain words and a way to retry (components/FormAlert.tsx); the detail stays here for whoever debugs.
+      // This is NOT retried here. A POST whose request reached the server but whose reply was lost would be sent
+      // twice, and the second would come back as a duplicate (a 409 for a phone number already registered), so
+      // the retry is left to the person, who presses "Try again". Only a 503 "engine not ready" is retried below.
+      console.warn(`KaziForce: no response from ${method} ${API_BASE}${path}`, cause);
+      throw new ApiError(0, "network_error", NETWORK_MESSAGE, undefined, `no response from ${method} ${API_BASE}${path}`, cause);
     }
 
     if (response.ok) {

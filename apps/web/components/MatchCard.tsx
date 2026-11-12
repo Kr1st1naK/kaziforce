@@ -30,7 +30,11 @@ export function MatchScoreBadge({ score, band }: { score: number; band: Band }) 
   );
 }
 
-export function SkillChips({ skills, shown = CHIPS_SHOWN }: { skills: string[]; shown?: number }) {
+/**
+ * The first few matched skills as chips. When more matched than are shown, "+N more" is a link to
+ * `moreHref` (the match's "Why this job?" page, which lists every one), not plain text that only looks tappable.
+ */
+export function SkillChips({ skills, shown = CHIPS_SHOWN, moreHref }: { skills: string[]; shown?: number; moreHref?: string }) {
   const visible = skills.slice(0, shown);
   const hidden = skills.length - visible.length;
   return (
@@ -40,7 +44,14 @@ export function SkillChips({ skills, shown = CHIPS_SHOWN }: { skills: string[]; 
           {skill}
         </span>
       ))}
-      {hidden > 0 && <span className={styles.more}>+{hidden} more</span>}
+      {hidden > 0 &&
+        (moreHref ? (
+          <Link className={`${styles.more} ${styles.moreLink}`} href={moreHref} aria-label={`+${hidden} more matched skills`}>
+            +{hidden} more
+          </Link>
+        ) : (
+          <span className={styles.more}>+{hidden} more</span>
+        ))}
     </div>
   );
 }
@@ -61,7 +72,7 @@ export function MatchCard({ result, href }: { result: MatchResult; href: string 
         <MatchScoreBadge score={result.match_score} band={result.band} />
       </div>
       <div className={styles.bottom}>
-        <SkillChips skills={result.matched_skills.map((skill) => skill.skill_label)} />
+        <SkillChips skills={result.matched_skills.map((skill) => skill.skill_label)} moreHref={href} />
         <Link className={`button button-secondary ${styles.why}`} href={href}>
           Why this job?
         </Link>

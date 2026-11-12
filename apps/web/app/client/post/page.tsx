@@ -17,7 +17,8 @@ import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { AmountInput, Select, TextArea, TextInput } from "@/components/FormFields";
-import { ApiErrorMessage, useGuard, useSession } from "@/components/SessionProvider";
+import { ApiErrorMessage, isNetworkFailure, useGuard, useSession } from "@/components/SessionProvider";
+import { FormAlert } from "@/components/FormAlert";
 import { ApiError, api } from "@/lib/api";
 import { SUGGESTED_LOCATIONS } from "@/lib/locations";
 import { AVAILABILITY, type Availability } from "@/lib/types";
@@ -38,6 +39,7 @@ export default function Page() {
   const [availability, setAvailability] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  const [retryable, setRetryable] = useState(false); // the last submit got no response: offer "Try again"
   const [confirming, setConfirming] = useState(false);
 
   const clear = () => {
@@ -50,8 +52,8 @@ export default function Page() {
     setErrors({});
   };
 
-  const submit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const submit = async (event?: React.FormEvent) => {
+    event?.preventDefault();
     const found: Record<string, string> = {};
     if (!title.trim()) found.title = "Give the job a short title.";
     if (!skills.trim()) found.required_skills = "List what the work involves.";
@@ -62,6 +64,7 @@ export default function Page() {
     if (Object.keys(found).length > 0) return;
 
     setBusy(true);
+    setRetryable(false);
     try {
       const created = await api.createJob({
         title: title.trim(),
@@ -79,6 +82,7 @@ export default function Page() {
       router.push(`/client/postings/${created.posting_id}`);
     } catch (error) {
       setBusy(false);
+      setRetryable(isNetworkFailure(error));
       setErrors(
         error instanceof ApiError && error.field
           ? { [error.field]: error.message }
@@ -96,9 +100,7 @@ export default function Page() {
 
       <div className="card">
         {errors.form && (
-          <div className={`alert ${styles.alert}`} role="alert">
-            {errors.form}
-          </div>
+          <FormAlert className={styles.alert} message={errors.form} onRetry={retryable ? () => void submit() : undefined} busy={busy} />
         )}
 
         <form onSubmit={submit} noValidate>
