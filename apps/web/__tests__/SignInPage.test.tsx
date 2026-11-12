@@ -12,6 +12,7 @@ import userEvent from "@testing-library/user-event";
 import { Activity } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import Page from "@/app/sign-in/page";
+import { ApiError, NETWORK_MESSAGE } from "@/lib/api";
 
 const replace = vi.fn();
 vi.mock("next/navigation", () => ({
@@ -93,5 +94,32 @@ describe("the submit button", () => {
 
     expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled();
     expect(screen.queryByText("Signing in…")).not.toBeInTheDocument();
+  });
+});
+
+describe("when the service cannot be reached", () => {
+  it("says so plainly, and Try again sends the same details once more", async () => {
+    signIn.mockRejectedValueOnce(new ApiError(0, "network_error", NETWORK_MESSAGE)).mockResolvedValueOnce(SESSION);
+    render(<Page />);
+
+    await submitValidForm();
+    expect(await screen.findByRole("alert")).toHaveTextContent("We couldn't reach the service. Check your connection and try again.");
+    expect(screen.getByRole("alert")).not.toHaveTextContent(/API|running/);
+
+    await userEvent.click(screen.getByRole("button", { name: "Try again" }));
+
+    await waitFor(() => expect(replace).toHaveBeenCalledWith("/worker/matches"));
+    expect(signIn).toHaveBeenCalledTimes(2);
+    expect(signIn).toHaveBeenLastCalledWith({ phone: "700000101", pin: "4821" });
+  });
+
+  it("offers no Try again for an error the server answered, such as a wrong PIN", async () => {
+    signIn.mockRejectedValue(new ApiError(401, "invalid_credentials" as never, "That phone number and PIN do not match."));
+    render(<Page />);
+
+    await submitValidForm();
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("do not match");
+    expect(screen.queryByRole("button", { name: "Try again" })).not.toBeInTheDocument();
   });
 });

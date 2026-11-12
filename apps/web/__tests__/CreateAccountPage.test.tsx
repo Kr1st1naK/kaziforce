@@ -11,6 +11,7 @@ import userEvent from "@testing-library/user-event";
 import { Activity } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import Page from "@/app/create-account/page";
+import { ApiError, NETWORK_MESSAGE } from "@/lib/api";
 
 let query = "";
 vi.mock("next/navigation", () => ({
@@ -307,5 +308,26 @@ describe("the submit button", () => {
 
     expect(screen.getByRole("button", { name: "Create account" })).toBeEnabled();
     expect(screen.queryByText("Creating your account…")).not.toBeInTheDocument();
+  });
+});
+
+describe("when the service cannot be reached", () => {
+  it("offers Try again, which sends the same details once more", async () => {
+    createAccount
+      .mockRejectedValueOnce(new ApiError(0, "network_error", NETWORK_MESSAGE))
+      .mockResolvedValueOnce({ account: { account_id: "a-1", phone: "700000101", role: "worker" }, worker_profile_id: null, postings: 0 });
+    render(<Page />);
+    await fillWorkerDetails();
+    await userEvent.type(phoneField(), "700000101");
+    await typePin("Create a 4-digit PIN", "4821");
+    await typePin("Confirm PIN", "4821");
+    await userEvent.click(screen.getByRole("button", { name: "Create account" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("We couldn't reach the service");
+    await userEvent.click(screen.getByRole("button", { name: "Try again" }));
+
+    await waitFor(() => expect(createAccount).toHaveBeenCalledTimes(2));
+    expect(createAccount.mock.calls[1][0]).toEqual(createAccount.mock.calls[0][0]);
+    await waitFor(() => expect(screen.queryByRole("button", { name: "Try again" })).not.toBeInTheDocument());
   });
 });

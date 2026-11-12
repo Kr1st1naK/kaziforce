@@ -74,6 +74,20 @@ describe("api", () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("Failed to fetch")));
     const error = (await api.job("abc").catch((caught: ApiError) => caught)) as ApiError;
     expect(error.code).toBe("network_error");
-    expect(error.message).toContain("Cannot reach the API");
+    expect(error.isNetworkFailure).toBe(true);
+    // Plain words for the person; no address, no "Is it running?"
+    expect(error.message).toBe("We couldn't reach the service. Check your connection and try again.");
+    expect(error.message).not.toMatch(/API|running|\/api/);
+    // The developer's detail is kept, on the error and in the console.
+    expect(error.detail).toContain("GET");
+    expect(error.cause).toBeInstanceOf(TypeError);
+  });
+
+  it("does not retry a POST that got no response: the reply may have been lost, and a second send is a duplicate", async () => {
+    const fetchMock = vi.fn().mockRejectedValue(new TypeError("Failed to fetch"));
+    vi.stubGlobal("fetch", fetchMock);
+    const error = (await api.signIn({ phone: "700000101", pin: "4821" }).catch((caught: ApiError) => caught)) as ApiError;
+    expect(error.code).toBe("network_error");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });

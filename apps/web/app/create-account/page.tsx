@@ -15,7 +15,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { PIN_LENGTH, PinField, PhoneField, RoleToggle } from "@/components/AuthFields";
 import { Checkbox, TextInput } from "@/components/FormFields";
-import { ApiErrorMessage, homeFor, useRedirectIfSignedIn, useSession } from "@/components/SessionProvider";
+import { ApiErrorMessage, isNetworkFailure, homeFor, useRedirectIfSignedIn, useSession } from "@/components/SessionProvider";
+import { FormAlert } from "@/components/FormAlert";
 import { ApiError, api } from "@/lib/api";
 import { useIdleWhenHidden } from "@/lib/useIdleWhenHidden";
 import { MAX_NAME, nameError, tidyName } from "@/lib/names";
@@ -54,6 +55,7 @@ function CreateAccount() {
   const [confirmation, setConfirmation] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  const [retryable, setRetryable] = useState(false); // the last submit got no response: offer "Try again"
   // See app/sign-in/page.tsx: the page stays mounted, hidden, so busy must be cleared when it is left.
   useIdleWhenHidden(() => setBusy(false));
 
@@ -61,8 +63,8 @@ function CreateAccount() {
   // the digits are hidden, so the sooner it is said the less there is to retype.
   const mismatch = confirmation.length === PIN_LENGTH && confirmation !== pin;
 
-  const submit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const submit = async (event?: React.FormEvent) => {
+    event?.preventDefault();
     const found: Record<string, string> = {};
     if (role === "worker") {
       const badFirst = nameError(firstName, "first name");
@@ -79,6 +81,7 @@ function CreateAccount() {
     if (Object.keys(found).length > 0) return;
 
     setBusy(true);
+    setRetryable(false);
     try {
       const session = await api.createAccount(
         role === "worker"
@@ -97,6 +100,7 @@ function CreateAccount() {
       router.replace(homeFor(session));
     } catch (error) {
       setBusy(false);
+      setRetryable(isNetworkFailure(error));
       setErrors(
         error instanceof ApiError && error.field
           ? { [error.field]: error.message }
@@ -118,9 +122,7 @@ function CreateAccount() {
           <RoleToggle role={role} onChange={setRole} disabled={busy} />
 
           {errors.form && (
-            <div className={`alert ${styles.alert}`} role="alert">
-              {errors.form}
-            </div>
+            <FormAlert className={styles.alert} message={errors.form} onRetry={retryable ? () => void submit() : undefined} busy={busy} />
           )}
 
           {role === "worker" && (
