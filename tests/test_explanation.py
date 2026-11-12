@@ -84,8 +84,94 @@ def test_a_criterion_match_alone_does_not_cover_it(generator):
     assert explanation.covered_inclusive          # it is still a reason, and reported as one
     assert not explanation.covered_graph
     assert explanation.text == ("You're both in Nyeri.",
-                                "Your rate of KES 2,500 a day fits their budget.",
+                                "Your rate of KES 2,500 a day is within their budget of KES 3,000.",
                                 "You can work full-time, and that suits this job.")
+
+
+# Criterion sentences say what is true at every score (system test record, S-7 and S-8).
+# A criterion that scored above zero still yields exactly one reason, whatever its wording,
+# so the coverage figures cannot move; only the sentence changes.
+
+def _criterion_text(generator, worker_kw, job_kw, components):
+    e = generator.explain(worker(**worker_kw), job(**job_kw), match(matched_skills=[], components={
+        "skill_overlap": 0.0, "location": None, "budget_fit": None, "availability": None, **components}))
+    return [r.text for r in e.reasons], e
+
+
+def test_location_exact_match_says_both_in_the_place(generator):
+    texts, _ = _criterion_text(generator, {"location": "Nairobi - Kasarani"}, {"location": "Nairobi - Kasarani"},
+                               {"location": 1.0})
+    assert texts == ["You're both in Nairobi - Kasarani."]
+
+
+def test_location_same_town_different_area_names_both_places_t04(generator):
+    """T-04's pair: worker in Embakasi, job in Rongai. The score is 0.5 (same town)."""
+    texts, e = _criterion_text(generator, {"location": "Nairobi - Embakasi"}, {"location": "Nairobi - Rongai"},
+                               {"location": 0.5})
+    assert texts == ["This job is in Nairobi - Rongai: the same town as you, but a different area "
+                     "(you're in Nairobi - Embakasi)."]
+    assert not any("both in" in t for t in texts)
+    assert e.covered_inclusive and len(e.reasons) == 1
+
+
+def test_location_in_a_different_town_gives_no_reason(generator):
+    """Scored 0: assessed and not matched. It is not a reason, and not reported as unassessed."""
+    texts, e = _criterion_text(generator, {"location": "Nyeri"}, {"location": "Meru"}, {"location": 0.0})
+    assert texts == []
+    assert not any("where" in t for t in e.not_assessed)
+
+
+def test_rate_within_budget_names_the_budget(generator):
+    texts, _ = _criterion_text(generator, {"rate_expectation": 2500.0}, {"budget": 2500.0}, {"budget_fit": 1.0})
+    assert texts == ["Your rate of KES 2,500 a day is within their budget of KES 2,500."]
+
+
+def test_rate_above_budget_names_the_gap(generator):
+    """S-8: KES 3,000 against a budget of KES 1,800 scores 0.33 and must not be called a fit."""
+    texts, e = _criterion_text(generator, {"rate_expectation": 3000.0}, {"budget": 1800.0},
+                               {"budget_fit": 1 - (3000 - 1800) / 1800})
+    assert texts == ["Your rate of KES 3,000 a day is KES 1,200 above their budget of KES 1,800."]
+    assert not any("fits" in t or "within" in t for t in texts)
+    assert e.covered_inclusive and len(e.reasons) == 1
+
+
+def test_the_recorded_evidence_case_rate_2000_budget_1400(generator):
+    """The pair in docs/evidence/explanation_payload.md before it was regenerated."""
+    texts, _ = _criterion_text(generator, {"rate_expectation": 2000.0}, {"budget": 1400.0},
+                               {"budget_fit": 1 - 600 / 1400})
+    assert texts == ["Your rate of KES 2,000 a day is KES 600 above their budget of KES 1,400."]
+
+
+def test_rate_twice_the_budget_scores_zero_and_gives_no_reason(generator):
+    texts, _ = _criterion_text(generator, {"rate_expectation": 4000.0}, {"budget": 2000.0}, {"budget_fit": 0.0})
+    assert texts == []
+
+
+def test_availability_same_pattern(generator):
+    texts, _ = _criterion_text(generator, {"availability": "Part-time"}, {"availability": "Part-time"},
+                               {"availability": 1.0})
+    assert texts == ["You can work part-time, and that suits this job."]
+
+
+def test_availability_full_time_worker_and_a_weekend_job_says_why_it_suits(generator):
+    """A full-time worker scores 1 for any job (scoring policy §1); the sentence names the job's pattern."""
+    texts, _ = _criterion_text(generator, {"availability": "Full-time"}, {"availability": "Weekends"},
+                               {"availability": 1.0})
+    assert texts == ["You can work full-time, so a weekend job suits you."]
+
+
+def test_availability_full_time_worker_and_a_part_time_job(generator):
+    texts, _ = _criterion_text(generator, {"availability": "Full-time"}, {"availability": "Part-time"},
+                               {"availability": 1.0})
+    assert texts == ["You can work full-time, so a part-time job suits you."]
+
+
+def test_every_partial_criterion_still_yields_exactly_one_reason(generator):
+    """The invariant that keeps both coverage figures fixed: one reason per criterion scored above zero."""
+    for components in ({"location": 0.5}, {"budget_fit": 0.2}, {"location": 0.5, "budget_fit": 0.9}):
+        _, e = _criterion_text(generator, {"location": "Nairobi - Embakasi", "rate_expectation": 3000.0},
+                               {"location": "Nairobi - Rongai", "budget": 2800.0}, components)
+        assert len(e.reasons) == len(components)
 
 
 def test_a_semantic_score_alone_never_counts(generator):
