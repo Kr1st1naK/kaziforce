@@ -17,6 +17,7 @@ import { PIN_LENGTH, PinField, PhoneField, RoleToggle } from "@/components/AuthF
 import { Checkbox, TextInput } from "@/components/FormFields";
 import { ApiErrorMessage, homeFor, useRedirectIfSignedIn, useSession } from "@/components/SessionProvider";
 import { ApiError, api } from "@/lib/api";
+import { useIdleWhenHidden } from "@/lib/useIdleWhenHidden";
 import { MAX_NAME, nameError, tidyName } from "@/lib/names";
 import { phoneError } from "@/lib/phone";
 import { ROLES, type Role } from "@/lib/types";
@@ -53,6 +54,8 @@ function CreateAccount() {
   const [confirmation, setConfirmation] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  // See app/sign-in/page.tsx: the page stays mounted, hidden, so busy must be cleared when it is left.
+  useIdleWhenHidden(() => setBusy(false));
 
   // Reported as soon as the second PIN is complete, rather than waiting for submit:
   // the digits are hidden, so the sooner it is said the less there is to retype.
@@ -105,6 +108,9 @@ function CreateAccount() {
   return (
     <main className={styles.centre}>
       <div className={`card ${styles.card}`}>
+        <Link href="/" className={styles.back}>
+          <span aria-hidden="true">←</span> Back to the home page
+        </Link>
         <h1 className={styles.heading}>Create an account</h1>
         <p className={`subtitle ${styles.subtitle}`}>Job matching for Kenyan trades.</p>
 

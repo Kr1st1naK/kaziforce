@@ -8,6 +8,7 @@ import { useState } from "react";
 import { PinField, PhoneField, RoleToggle } from "@/components/AuthFields";
 import { ApiErrorMessage, homeFor, useRedirectIfSignedIn, useSession } from "@/components/SessionProvider";
 import { ApiError, api } from "@/lib/api";
+import { useIdleWhenHidden } from "@/lib/useIdleWhenHidden";
 import type { Role } from "@/lib/types";
 import styles from "../auth.module.css";
 
@@ -20,6 +21,8 @@ export default function Page() {
   const [pin, setPin] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  // On success the page stays busy while it navigates away; it must not still be busy when it is shown again.
+  useIdleWhenHidden(() => setBusy(false));
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -55,6 +58,9 @@ export default function Page() {
   return (
     <main className={styles.centre}>
       <div className={`card ${styles.card}`}>
+        <Link href="/" className={styles.back}>
+          <span aria-hidden="true">←</span> Back to the home page
+        </Link>
         <form onSubmit={submit} noValidate>
           <RoleToggle role={role} onChange={setRole} bordered={false} disabled={busy} />
 

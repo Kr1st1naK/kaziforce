@@ -33,3 +33,10 @@
 .alert {
   margin-bottom: var(--space-lg);
 }
+
+.back {
+  display: inline-block;
+  margin-bottom: var(--space-md);
+  padding: 10px 0;
+  font-size: 15px;
+}

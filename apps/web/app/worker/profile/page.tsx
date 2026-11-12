@@ -23,6 +23,7 @@ import { AmountInput, Checkbox, Select, TextArea, TextInput } from "@/components
 import { formatKes } from "@/components/MatchCard";
 import { ApiErrorMessage, useGuard, useSession } from "@/components/SessionProvider";
 import { ApiError, api } from "@/lib/api";
+import { useIdleWhenHidden } from "@/lib/useIdleWhenHidden";
 import { SUGGESTED_LOCATIONS } from "@/lib/locations";
 import { MAX_NAME, nameError, tidyName } from "@/lib/names";
 import { formatPhone } from "@/lib/phone";
@@ -159,6 +160,9 @@ export default function Page() {
   const [fields, setFields] = useState<Fields>(EMPTY);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  // Creating a profile leaves this page for the matches and stays mounted, hidden; clear busy so that it
+  // does not say "Saving…" with nothing submitted when the worker comes back.
+  useIdleWhenHidden(() => setBusy(false));
   const [confirming, setConfirming] = useState(false);
 
   const set = <K extends keyof Fields>(key: K) => (value: Fields[K]) => setFields((current) => ({ ...current, [key]: value }));
