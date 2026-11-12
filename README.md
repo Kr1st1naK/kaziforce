@@ -119,7 +119,7 @@ described in `data/raw/*/README.md`.
 
 PostgreSQL is the application store: the command-line demo and the REST API read
 worker profiles and job postings from it, and the demo writes each ranking to
-`match_score`. The schema (proposal Figure 4.6, extended in migration 0002) is
+`match_score`. The schema (proposal Figure 4.6, extended in migrations 0002 to 0006) is
 defined as versioned SQL migrations in `apps/api/src/kaziforce_api/data/migrations/`.
 The evaluation deliberately reads the frozen CSVs instead, so its results stay
 traceable through the dataset checksums and run in CI without a database.
@@ -140,6 +140,17 @@ psql -d postgres -c "CREATE ROLE kaziforce_app LOGIN PASSWORD '<password>';"
 createdb -O kaziforce_app kaziforce
 psql kaziforce -c "REVOKE CREATE ON SCHEMA public FROM PUBLIC; GRANT USAGE, CREATE ON SCHEMA public TO kaziforce_app;"
 ```
+**The database must use UTF-8.** The migrations and the data contain non-ASCII text
+(Kiswahili terms, dashes), and a database in the `SQL_ASCII` encoding makes the first
+migration fail with `UnicodeEncodeError: 'ascii' codec can't encode character`. Most
+installers create UTF-8 clusters, but a cluster made with a bare `initdb` under the `C`
+locale is `SQL_ASCII`. Check with `psql kaziforce -c "SHOW server_encoding;"`; if it is not
+`UTF8`, create the database explicitly:
+```bash
+createdb -O kaziforce_app -E UTF8 -T template0 kaziforce
+```
+(or initialise a new cluster with `initdb -E UTF8 --locale=en_US.UTF-8`).
+
 Then set `DATABASE_URL=postgresql://kaziforce_app:<password>@localhost:5432/kaziforce` in `.env`.
 
 **Keys.** Phone numbers and workers' names are encrypted in the application, so the API needs two

@@ -40,11 +40,11 @@ INFERRED = ("informal_term", "occupation_label")
 # Criteria that become a sentence of their own. skill_overlap is deliberately absent: it is
 # the same evidence as the skill reasons, stated as a number instead of concretely, and
 # counting it as well would count one fact twice.
-CRITERION_PHRASE = {
-    "location": "You're both in {value}.",
-    "budget_fit": "Your rate of KES {rate} a day fits their budget.",
-    "availability": "You can work {availability}, and that suits this job.",
-}
+#
+# Each criterion gives a reason whenever it scored above zero, and the sentence must say what
+# is actually true at that score, not only at a full match (system test record, S-7 and S-8):
+# a same-town location scores 0.5, and a rate above the budget keeps a partial budget score.
+CRITERIA = ("location", "budget_fit", "availability")
 
 NOT_ASSESSED_PHRASE = {
     ("location", True): "You haven't said where you work, so we couldn't check that.",
@@ -56,6 +56,12 @@ NOT_ASSESSED_PHRASE = {
     ("skill_overlap", True): "You haven't listed any skills, so we couldn't compare them.",
     ("skill_overlap", False): "This job doesn't list the skills it needs, so we couldn't compare them.",
 }
+
+
+def _pattern(availability: str) -> str:
+    """A job's working pattern as a noun phrase: 'Weekends' -> 'a weekend job', 'Part-time' -> 'a part-time job'."""
+    value = availability.lower()
+    return "a weekend job" if value == "weekends" else f"a {value} job"
 
 
 def trade_phrase(occupation: str) -> str:
@@ -73,7 +79,7 @@ class ExplanationGenerator(Explainer):
         self.graph = graph
 
     def explain(self, worker: WorkerProfile, job: JobPosting, match: MatchScore) -> Explanation:
-        reasons = [*self._skill_reasons(match), *self._criterion_reasons(worker, match)]
+        reasons = [*self._skill_reasons(match), *self._criterion_reasons(worker, job, match)]
         return Explanation(
             worker_id=match.worker_id, posting_id=match.posting_id, rank=match.rank,
             reasons=tuple(reasons), not_assessed=self._not_assessed(worker, job, match),
@@ -136,23 +142,42 @@ class ExplanationGenerator(Explainer):
 
     # Criteria
 
-    @staticmethod
-    def _criterion_reasons(worker: WorkerProfile, match: MatchScore) -> list[Reason]:
+    @classmethod
+    def _criterion_reasons(cls, worker: WorkerProfile, job: JobPosting, match: MatchScore) -> list[Reason]:
         """One sentence per criterion that was assessed and scored above zero.
 
         A criterion scored 0 is assessed and did not match; it is not a reason, and it is
-        not reported as unassessed either.
+        not reported as unassessed either. Above zero, the sentence states the actual relation
+        between the two sides, including a partial one.
         """
         reasons = []
-        for criterion, template in CRITERION_PHRASE.items():
+        for criterion in CRITERIA:
             score = match.components.get(criterion)
             if score is None or score <= 0:
                 continue
-            text = template.format(value=worker.location, rate=f"{worker.rate_expectation:,.0f}"
-                                   if worker.rate_expectation is not None else "",
-                                   availability=(worker.availability or "").lower())
+            text = cls._criterion_sentence(criterion, score, worker, job)
             reasons.append(Reason(kind=CRITERION, text=text, criterion=criterion, score=score))
         return reasons
+
+    @staticmethod
+    def _criterion_sentence(criterion: str, score: float, worker: WorkerProfile, job: JobPosting) -> str:
+        if criterion == "location":
+            if score >= 1.0:
+                return f"You're both in {job.location}."
+            # 0.5: the same town, a different area (docs/scoring-policy.md §1).
+            return (f"This job is in {job.location}: the same town as you, but a different area "
+                    f"(you're in {worker.location}).")
+        if criterion == "budget_fit":
+            rate, budget = worker.rate_expectation, job.budget
+            if rate <= budget:
+                return f"Your rate of KES {rate:,.0f} a day is within their budget of KES {budget:,.0f}."
+            return (f"Your rate of KES {rate:,.0f} a day is KES {rate - budget:,.0f} above their budget "
+                    f"of KES {budget:,.0f}.")
+        # availability scores 1 or 0: the same pattern, or a full-time worker, who can take any job.
+        mine, theirs = (worker.availability or "").strip(), (job.availability or "").strip()
+        if mine.casefold() == theirs.casefold():
+            return f"You can work {mine.lower()}, and that suits this job."
+        return f"You can work {mine.lower()}, so {_pattern(theirs)} suits you."
 
     @staticmethod
     def _not_assessed(worker: WorkerProfile, job: JobPosting, match: MatchScore) -> tuple[str, ...]:

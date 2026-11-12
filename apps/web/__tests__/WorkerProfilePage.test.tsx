@@ -8,6 +8,7 @@
 
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { Activity } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import Page from "@/app/worker/profile/page";
 import type { OwnContact, Session, Worker } from "@/lib/types";
@@ -266,5 +267,41 @@ describe("a worker's name and who can see it", () => {
     render(<Page />);
     expect(screen.queryByLabelText(/^First name/)).toBeNull();
     expect(screen.queryByRole("checkbox")).toBeNull();
+  });
+});
+
+describe("the submit button after a profile is created", () => {
+  it("is ready again when the worker comes back to the page, and does not say Saving…", async () => {
+    session = signedIn(null);
+    createWorker.mockResolvedValue({});
+    const { rerender } = render(
+      <Activity mode="visible">
+        <Page />
+      </Activity>,
+    );
+
+    await userEvent.type(screen.getByLabelText(/What work do you do\?/), "electrician");
+    await userEvent.type(screen.getByLabelText(/About you/), "Electrical work in houses for three years.");
+    await userEvent.selectOptions(screen.getByLabelText(/Where do you work\?/), "Nairobi - Kasarani");
+    await userEvent.selectOptions(screen.getByLabelText(/When can you work\?/), "Full-time");
+    await userEvent.type(screen.getByLabelText(/Your daily rate/), "2500");
+    await userEvent.click(screen.getByRole("button", { name: "Create profile" }));
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/worker/matches"));
+
+    // Next keeps the page mounted, hidden, once it has navigated away, and shows it again on the next visit.
+    rerender(
+      <Activity mode="hidden">
+        <Page />
+      </Activity>,
+    );
+    rerender(
+      <Activity mode="visible">
+        <Page />
+      </Activity>,
+    );
+
+    expect(screen.queryByText("Finding your matches…")).not.toBeInTheDocument();
+    expect(screen.queryByText("Saving…")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Create profile" })).toBeEnabled();
   });
 });

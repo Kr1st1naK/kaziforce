@@ -98,8 +98,8 @@ posting now belong to someone.
    Moderate), *Electrical fault-finding in an office* (63, Weak).
 4. **Why this job?** opens the explanation in plain words first: "This job needs
    someone to test electrical equipment. That's part of electrical work.",
-   "You're both in Nairobi - Kasarani.", "Your rate of KES 2,500 a day fits their
-   budget."; then "You described yourself as a *fundi wa umeme*. We matched that
+   "You're both in Nairobi - Kasarani.", "Your rate of KES 2,500 a day is within
+   their budget of KES 3,600."; then "You described yourself as a *fundi wa umeme*. We matched that
    to the trade *electrician*."
    That is the whole screen. There is no technical detail to open: a worker is
    shown the sentences, never the component scores or the raw graph path. Those

@@ -8,6 +8,7 @@
 
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { Activity } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import Page from "@/app/create-account/page";
 
@@ -261,5 +262,50 @@ describe("the PIN and its confirmation", () => {
     expect(screen.getAllByLabelText(/^Create a 4-digit PIN, digit/)[0]).toHaveAttribute("type", "password");
     await userEvent.click(show);
     expect(screen.getAllByLabelText(/^Create a 4-digit PIN, digit/)[0]).toHaveAttribute("type", "text");
+  });
+});
+
+describe("the way back", () => {
+  it("links to the landing page", () => {
+    render(<Page />);
+
+    expect(screen.getByRole("link", { name: /Back to the home page/ })).toHaveAttribute("href", "/");
+  });
+});
+
+describe("the submit button", () => {
+  it("is ready again when the page is shown again after an account was created", async () => {
+    createAccount.mockResolvedValue({
+      account: { account_id: "a-1", phone: "700000101", role: "worker" },
+      worker_profile_id: null,
+      postings: 0,
+    });
+    const { rerender } = render(
+      <Activity mode="visible">
+        <Page />
+      </Activity>,
+    );
+
+    await fillWorkerDetails();
+    await userEvent.type(phoneField(), "700000101");
+    await typePin("Create a 4-digit PIN", "4821");
+    await typePin("Confirm PIN", "4821");
+    await userEvent.click(screen.getByRole("button", { name: "Create account" }));
+    await waitFor(() => expect(createAccount).toHaveBeenCalled());
+
+    // Next keeps the page mounted, hidden, once it has navigated away, and shows it again on the next visit.
+    rerender(
+      <Activity mode="hidden">
+        <Page />
+      </Activity>,
+    );
+    rerender(
+      <Activity mode="visible">
+        <Page />
+      </Activity>,
+    );
+
+    expect(screen.getByRole("button", { name: "Create account" })).toBeEnabled();
+    expect(screen.queryByText("Creating your account…")).not.toBeInTheDocument();
   });
 });

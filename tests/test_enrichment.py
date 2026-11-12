@@ -94,6 +94,53 @@ def test_unmapped_entries_are_retained_as_text(enricher):
     assert e.occupations == ()
 
 
+# Occupation labels in the "What work do you do?" entries (system test record, S-2)
+
+VEHICLE_TECHNICIAN_LABEL = "vehicle technician"
+
+
+def _occupation_labels(kg, e):
+    return [kg.label(o) for o in e.occupations]
+
+
+def test_t01_worker_reaches_electrician_through_the_occupation_label(kg, enricher):
+    """T-01's inputs, verbatim. The biography also says "electrician", so this held before S-2 too."""
+    e = enricher.enrich(
+        "Experienced electrician with eight years in residential and commercial installations across Nairobi.",
+        ["electrician", "electrical installation", "wiring", "test electrical equipment"])
+    assert _occupation_labels(kg, e) == ["electrician"]
+    assert "electrician" not in e.unmapped
+    assert any(ev.source == OCCUPATION_LABEL for ev in e.evidence)
+
+
+def test_t04_worker_reaches_vehicle_technician_from_the_listed_entry_alone(kg, enricher):
+    """T-04's inputs, verbatim. The biography says "mechanic", not the ESCO label, so before S-2
+    the worker reached no occupation at all and was shown "No strong matches yet"."""
+    e = enricher.enrich(
+        "Motor vehicle mechanic with twelve years on saloon cars and light commercial vehicles.",
+        ["vehicle technician", "engine diagnostics", "brake repair"])
+    assert _occupation_labels(kg, e) == [VEHICLE_TECHNICIAN_LABEL]
+    assert e.unmapped == ("engine diagnostics", "brake repair")
+    inferred = [ev for ev in e.evidence if ev.source == OCCUPATION_LABEL]
+    assert inferred and all(ev.graph_path for ev in inferred)
+
+
+def test_a_listed_entry_containing_an_occupation_label_is_not_reported_unmapped(kg, enricher):
+    e = enricher.enrich("I fix things.", ["experienced plumber"])
+    assert _occupation_labels(kg, e) == ["plumber"]
+    assert e.unmapped == ()
+
+
+def test_listed_occupation_label_and_biography_label_reach_the_occupation_once(kg, enricher):
+    e = enricher.enrich("I am an electrician.", ["electrician"])
+    assert _occupation_labels(kg, e) == ["electrician"]
+
+
+def test_an_entry_that_names_no_occupation_is_still_unmapped(enricher):
+    e = enricher.enrich("Welder with six years making gates.", ["welder", "arc welding", "metal fabrication"])
+    assert e.occupations == () and e.unmapped == ("welder", "arc welding", "metal fabrication")
+
+
 def test_optional_skills_only_when_asked(kg):
     e = ProfileEnricher(kg, include_optional=True).enrich("fundi wa umeme", [])
     assert e.inferred_skills == set(kg.skills_of(ELECTRICIAN, essential_only=False))

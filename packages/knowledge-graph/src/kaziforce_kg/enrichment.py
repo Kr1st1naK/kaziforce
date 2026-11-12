@@ -78,7 +78,10 @@ class ProfileEnricher(Enricher):
     1. Listed skills equal to an ESCO skill label -> that skill (listed).
     2. Informal terms in the text or the listed skills -> MAPS_TO occupation -> its essential
        skills (informal_term), with the full path.
-    3. ESCO occupation labels in the text -> the occupation's essential skills (occupation_label).
+    3. ESCO occupation labels in the listed skills or the text -> the occupation's essential
+       skills (occupation_label). The listed skills are read too: a worker who writes
+       "vehicle technician" under "What work do you do?" but "mechanic" in their biography
+       must still reach the occupation (system test record, S-2).
     4. Any other listed entry stays as literal text (text) and is reported as unmapped.
     A skill reached more than once keeps its first evidence, in the order above.
     """
@@ -92,6 +95,7 @@ class ProfileEnricher(Enricher):
         unmapped: list[str] = []
         terms: list[str] = []
 
+        labelled: list[str] = []
         for entry in skills:
             skill = self.kg.skill_by_label(entry)
             if skill:
@@ -99,7 +103,9 @@ class ProfileEnricher(Enricher):
             else:
                 found = self.kg.find_terms(entry)
                 terms += [t for t in found if t not in terms]
-                if not found:
+                named = self.kg.find_occupations(entry)
+                labelled += [o for o in named if o not in labelled]
+                if not found and not named:
                     unmapped.append(entry)
         terms += [t for t in self.kg.find_terms(text) if t not in terms]
 
@@ -109,7 +115,7 @@ class ProfileEnricher(Enricher):
             if occupation not in occupations:
                 occupations.append(occupation)
             self._infer(evidence, occupation, INFORMAL_TERM, ((term, MAPS_TO, occupation),))
-        for occupation in self.kg.find_occupations(text):
+        for occupation in labelled + [o for o in self.kg.find_occupations(text) if o not in labelled]:
             if occupation not in occupations:
                 occupations.append(occupation)
             self._infer(evidence, occupation, OCCUPATION_LABEL, ())

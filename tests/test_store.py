@@ -84,6 +84,71 @@ def test_match_scores_are_written_with_nulls_and_unbounded_keyword_scores(seeded
     assert float(rows[1][2]) == 0.8
 
 
+def _ranking(store_rows):
+    """Rows as (rank, posting) pairs; a single clean ranking has ranks 1..n and n distinct postings."""
+    ranks = sorted(r for r, _ in store_rows)
+    postings = {p for _, p in store_rows}
+    return ranks, postings
+
+
+def test_concurrent_replacements_leave_exactly_one_ranking(seeded, pg_connect):
+    """S-1 (system test record): two requests replacing the same worker's ranking at once.
+
+    Each call deletes the worker's ranking and inserts its own. Without serialisation, both
+    deletes can run before either insert commits, and both rankings survive side by side.
+    """
+    import threading
+
+    _, workers, jobs, _, store = seeded
+    w = workers[1]
+    for round_ in range(5):
+        sizes = [5, 8, 5, 8]
+        barrier = threading.Barrier(len(sizes))
+        errors = []
+
+        def save(k):
+            scores = [MatchScore(w.worker_id, jobs[i].posting_id, composite=1 - i / 100, rule=0.5, semantic=0.5,
+                                 rank=i + 1) for i in range(k)]
+            try:
+                barrier.wait()
+                store.save_match_scores(w.worker_id, "full", scores, replace=True)
+            except Exception as e:  # surfaced below, so a failing thread fails the test
+                errors.append(e)
+
+        threads = [threading.Thread(target=save, args=(k,)) for k in sizes]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+        assert not errors, errors
+
+        conn = pg_connect()
+        with conn.cursor() as cur:
+            cur.execute("SELECT rank, fk_posting_id::text FROM match_score "
+                        "WHERE fk_worker_id = %s AND configuration = 'full'", (w.worker_id,))
+            rows = cur.fetchall()
+        conn.close()
+        ranks, postings = _ranking(rows)
+        assert len(rows) in (5, 8), f"round {round_}: {len(rows)} rows"
+        assert ranks == list(range(1, len(rows) + 1)), f"round {round_}: ranks {ranks}"
+        assert len(postings) == len(rows)
+
+
+def test_the_database_refuses_a_second_row_for_the_same_pair(seeded, pg_connect):
+    """Migration 0006: one row per (worker, posting, configuration), whatever writes it."""
+    import psycopg2
+
+    _, workers, jobs, _, _ = seeded
+    w, j = workers[2], jobs[0]
+    conn = pg_connect()
+    with pytest.raises(psycopg2.errors.UniqueViolation):
+        with conn, conn.cursor() as cur:
+            for _ in range(2):
+                cur.execute("INSERT INTO match_score (fk_worker_id, fk_posting_id, composite_score, rank, configuration) "
+                            "VALUES (%s, %s, 0.5, 1, 'full')", (w.worker_id, j.posting_id))
+    conn.close()
+
+
 def test_unknown_or_malformed_worker_id_is_a_key_error(seeded):
     store = seeded[-1]
     for worker_id in (str(uuid.uuid4()), "not-a-uuid"):

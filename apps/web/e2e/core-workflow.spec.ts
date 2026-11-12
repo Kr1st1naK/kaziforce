@@ -236,3 +236,52 @@ test("a signed-out visitor is sent to sign in", async ({ page }) => {
   await expect(page).toHaveURL(/\/sign-in$/);
   await expect(page.getByRole("button", { name: "Continue" })).toBeVisible();
 });
+
+test("sign-in and create-account each have a way back to the landing page", async ({ page }) => {
+  for (const path of ["/sign-in", "/create-account"]) {
+    await page.goto(path);
+    await view(page).getByRole("link", { name: /Back to the home page/ }).click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  }
+});
+
+test("no button says Signing in…, Creating your account… or Saving… when nothing was submitted", async ({ page }) => {
+  // Next keeps a route it left mounted but hidden. A busy flag set by a successful submit used to survive that,
+  // so the page came back saying "Signing in…" with its fields disabled (first usability sessions).
+  const number = await createAccount(page, "worker");
+  await page.getByLabel(/What work do you do\?/).fill("fundi wa umeme");
+  await page.getByLabel(/About you/).fill("Five years of electrical work.");
+  await page.getByLabel(/Where do you work\?/).selectOption("Nyeri");
+  await page.getByRole("button", { name: "Create profile" }).click();
+  await expect(page).toHaveURL(/\/worker\/matches$/);
+
+  // Back to the profile page the worker created the profile on, and into editing it.
+  await page.locator("header:visible").getByRole("link", { name: /profile/i }).first().click();
+  await expect(page).toHaveURL(/\/worker\/profile$/);
+  await view(page).getByRole("button", { name: /Edit profile/ }).click();
+  await expect(view(page).getByRole("button", { name: "Save changes" })).toBeEnabled();
+  await expect(view(page).getByText("Saving…")).toHaveCount(0);
+  await view(page).getByRole("button", { name: "Save changes" }).click();
+  await expect(view(page).getByRole("button", { name: /Edit profile/ })).toBeVisible();
+
+  // Sign out to the page create-account left behind, then through sign-in and out again.
+  await page.getByRole("button", { name: /Sign out/ }).click();
+  await expect(page).toHaveURL(/\/sign-in$/);
+  await expect(view(page).getByRole("button", { name: "Continue" })).toBeEnabled();
+  await view(page).getByRole("link", { name: /New here/ }).click();
+  await expect(view(page).getByRole("button", { name: "Create account" })).toBeEnabled();
+  await expect(view(page).getByText("Creating your account…")).toHaveCount(0);
+
+  // By the page's own link, not a fresh load: the point is the sign-in route Next kept.
+  await view(page).getByRole("link", { name: /Already have an account/ }).click();
+  await expect(page).toHaveURL(/\/sign-in$/);
+  await view(page).getByLabel("Phone number", { exact: true }).fill(number);
+  await fillPin(page, /4-digit PIN/, PIN);
+  await view(page).getByRole("button", { name: "Continue" }).click();
+  await expect(page).toHaveURL(/\/worker\/matches$/);
+  await page.getByRole("button", { name: /Sign out/ }).click();
+  await expect(page).toHaveURL(/\/sign-in$/);
+  await expect(view(page).getByRole("button", { name: "Continue" })).toBeEnabled();
+  await expect(view(page).getByText("Signing in…")).toHaveCount(0);
+});

@@ -32,9 +32,13 @@ able to run on it. Allowing it is a deliberate, recorded code change, not a flag
 | `results/dev/20261025-225302_1ae4e60` | development |
 | `results/dev/20261026-231918_46116e0` | development |
 | `results/dev/20261026-232037_46116e0` | development |
+| `results/dev/20261029-225742_33df7f5` | development |
+| `results/dev/20261112-012400_f5587b0` | development |
+| `results/dev/20261112-012811_cf644c3` | development |
+| `results/dev/20261112-082720_64381de` | development |
 | `results/scratch/20261017-132231_7aef3e0` | development |
 
-No run on any other split exists.
+No run on any other split exists (list updated 2026-11-12).
 
 ### Every call site that selects a split
 
@@ -47,7 +51,35 @@ Only three places name the test split, and none of them scores anything:
 | `scripts/seed_database.py` | `--split` is declared `choices=["development"]`, so the test split cannot be loaded into the application database at all. |
 
 No scorer, recommender, evaluator or report has ever read a test-split worker's biography,
-skills, location, rate or availability.
+skills, location, rate or availability. **One structural check, recorded below, has read the
+listed-skill text of the test-split workers, outside any scorer.**
+
+### The structural check of 2026-11-12
+
+**Why it was made.** The system test record found that a worker who writes an occupation's
+name under "What work do you do?" (for example "vehicle technician") reached no occupation,
+because occupation labels were looked for only in the biography (S-2, fixed in `cf644c3`).
+That fix changes enrichment, so the question before the test run was whether it could change
+the test-split result.
+
+**What was read.** A one-off script, run once and not committed, loaded the three splits'
+worker profiles through `DataLoader`. **For the 216 test-split workers it read the `skills`
+field (the listed work entries) and the biography only**, and asked the knowledge graph
+whether any listed entry contains an ESCO occupation label that is not an exact ESCO skill
+label (`KnowledgeGraph.find_occupations`, `skill_by_label`). It output two counts per split.
+
+**Result.** Test split: **0 of 216** workers have such an entry (the same as development, 0
+of 216, and validation, 0 of 96). So S-2 cannot change any test-split figure.
+
+**What was not read or done.** No relevance label, ground-truth file, group, variant or area
+was loaded. No enrichment was stored, no score or ranking was computed, no metric was
+produced, and no evaluation was run. `EVALUATION_SPLITS` was not changed. Nothing about the
+test split's outcome can be inferred from two counts of zero.
+
+**Why it is recorded.** It is the only read of test-split profile content outside the guard's
+own tests, and §1 should say so rather than claim none happened. The same kind of read in
+test *controls* was removed on 2026-10-16 (`aa2771a`). This one is a single, recorded
+check, not a control that runs with the suite.
 
 ## 2. Frozen before the run
 

@@ -195,7 +195,7 @@ Three reason types are recognised:
 |---|---|---|
 | **Graph-traced skill** | A `MatchedSkill` with `source` in {`informal_term`, `occupation_label`} and a non-empty `graph_path` | "This job needs someone to install electricity sockets. That's part of electrical work." |
 | **Literal skill** | A `MatchedSkill` with `source` in {`listed`, `text`} | "You said you do breaker box repair, and this job mentions it." |
-| **Assessed criterion** | A `components` entry that is not `None` and is > 0 | "You're both in Nyeri." |
+| **Assessed criterion** | A `components` entry that is not `None` and is > 0 | "You're both in Nyeri." (at a partial score the sentence says so: "This job is in Nairobi - Rongai: the same town as you, but a different area") |
 
 ### The headline rule: strict
 
@@ -256,4 +256,11 @@ ranking, so computing coverage cannot change any other metric.
 
 ## Deviations
 
-None.
+Changes made after results existed. Neither changes a rule in this policy; both change code that
+the evaluated configurations run, so the development split was re-run after each and the
+results compared with the run before. The test split had not been run when either was made.
+
+| Date | Change | Why | Effect on results |
+|---|---|---|---|
+| 2026-11-12 | **Enrichment reads occupation labels in the listed work entries, not only in the free text** (`cf644c3`). An entry such as "vehicle technician" now reaches its occupation, and is no longer kept as unmapped text | System test T-04 (S-2): a worker who named the occupation under "What work do you do?" but used another word in the biography reached no occupation and was shown "No strong matches yet" | **None.** Development re-run: `results/dev/20261112-012400_f5587b0` (before) and `results/dev/20261112-012811_cf644c3` (after) are identical in every metric and every per-query row. No profile in the dataset lists an occupation's name as a work entry (0 of 216 development, 96 validation and 216 test workers; 0 of 280 postings; see `docs/test-split-preflight.md` §1) |
+| 2026-11-12 | **Explanation sentences state the actual relation at partial criterion scores** (`64381de`). Location at 0.5 says "the same town as you, but a different area" instead of "You're both in …"; a rate above the budget names the gap instead of "fits their budget"; availability names the job's pattern when a full-time worker matches a different one. A reason is still given for exactly the criteria scored above zero (§7) | System test record S-7 and S-8: both sentences were false at partial scores. In the development top-10 of `full`, 536 of 2,160 explanations (24.8%) contained at least one such sentence (239 same-town location, 340 rate-above-budget) | **None.** Wording only: no score, ranking, or coverage figure (strict or inclusive) can change, because the reasons counted are unchanged. Development re-run: `results/dev/20261112-012811_cf644c3` (before) and `results/dev/20261112-082720_64381de` (after) are identical in every metric and every per-query row |
