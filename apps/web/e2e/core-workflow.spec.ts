@@ -141,8 +141,8 @@ test("a client signs up, posts a job, and sees how it was understood", async ({ 
   // two skills are real ESCO labels, so this posting does reach a trade. Note the
   // title is not read by matching: the description and required skills are.
   await page.getByLabel("Job title").fill("Fix bathroom leakage");
-  await page.getByLabel(/What skills does this job need\?/).fill("replace faucets, plumbing tools");
-  await page.getByLabel("Description").fill("Need a fundi bomba. Bathroom leaking at the joints, materials are on site.");
+  await page.getByLabel("Add skills if you know them").fill("replace faucets, plumbing tools");
+  await page.getByLabel("What do you need done?").fill("Need a fundi bomba. Bathroom leaking at the joints, materials are on site.");
   await page.getByLabel(/Budget per day/).fill("2200");
   await page.getByLabel(/Where is the job\?/).selectOption("Nairobi - Kawangware");
   await page.getByRole("button", { name: /Post job/ }).click();
@@ -165,8 +165,8 @@ test("a client signs up, posts a job, and sees how it was understood", async ({ 
 test("a client's postings are listed, and only their own", async ({ page }) => {
   await createAccount(page, "client");
   await page.getByLabel("Job title").fill("Rewire a small shop");
-  await page.getByLabel(/What skills does this job need\?/).fill("install electricity sockets");
-  await page.getByLabel("Description").fill("Small shop in Nyeri needs a fundi wa umeme for rewiring.");
+  await page.getByLabel("Add skills if you know them").fill("install electricity sockets");
+  await page.getByLabel("What do you need done?").fill("Small shop in Nyeri needs a fundi wa umeme for rewiring.");
   await page.getByLabel(/Budget per day/).fill("2600");
   await page.getByLabel(/Where is the job\?/).selectOption("Nyeri");
   await page.getByRole("button", { name: /Post job/ }).click();
@@ -328,8 +328,8 @@ test("when the connection drops while posting a job, Try again posts it once", a
   await createAccount(page, "client");
   await expect(page).toHaveURL(/\/client\/post$/);
   await page.getByLabel("Job title").fill("Fix bathroom leakage");
-  await page.getByLabel(/What skills does this job need\?/).fill("replace faucets, plumbing tools");
-  await page.getByLabel("Description").fill("Need a fundi bomba. Bathroom leaking at the joints, materials are on site.");
+  await page.getByLabel("Add skills if you know them").fill("replace faucets, plumbing tools");
+  await page.getByLabel("What do you need done?").fill("Need a fundi bomba. Bathroom leaking at the joints, materials are on site.");
   await page.getByLabel(/Budget per day/).fill("2200");
   await page.getByLabel(/Where is the job\?/).selectOption("Nairobi - Kawangware");
 
@@ -369,4 +369,39 @@ test("tapping \"+N more\" on a match opens that match's explanation", async ({ p
   await expect(page).toHaveURL(/\/worker\/matches\/[0-9a-f-]+$/);
   await expect(page.getByRole("heading", { name: "What lined up" })).toBeVisible();
   await expect(view(page)).toContainText(title);
+});
+
+test("a client who lists no skills posts a job and is told how it was read", async ({ page }) => {
+  // Usability finding U-7: most clients know only that they need a plumber or an electrician.
+  await createAccount(page, "client");
+  await expect(page).toHaveURL(/\/client\/post$/);
+
+  await view(page).getByLabel("What do you need done?").fill("I need a plumber to fix a leaking tap");
+  await view(page).getByLabel("Job title").fill("Fix a leaking tap");
+  await view(page).getByLabel(/Budget per day/).fill("2200");
+  await view(page).getByLabel(/Where is the job\?/).selectOption("Nairobi - Kawangware");
+  await expect(view(page).getByLabel(/Add skills if you know them/)).toHaveValue("");
+  await view(page).getByRole("button", { name: /Post job/ }).click();
+
+  await expect(page).toHaveURL(/\/client\/postings\/[0-9a-f-]+$/);
+  await expect(page.getByRole("heading", { name: "Your job has been posted." })).toBeVisible();
+  await expect(view(page).getByText(/We matched this to the trade:/)).toContainText("plumber");
+  await expect(view(page).getByText(/You didn't list any skills, so we couldn't compare skills/)).toBeVisible();
+  await expect(view(page)).not.toContainText("We match on the skills you listed above");
+  await expect(page.getByRole("heading", { name: "Workers in this trade" })).toBeVisible();
+});
+
+test("a client whose words reach no trade, with no skills, is told so plainly", async ({ page }) => {
+  // P2's own words in the first sessions: "looking for a mechanic for a car".
+  await createAccount(page, "client");
+  await view(page).getByLabel("What do you need done?").fill("looking for a mechanic for a car");
+  await view(page).getByLabel("Job title").fill("Mechanic for a car");
+  await view(page).getByLabel(/Budget per day/).fill("3000");
+  await view(page).getByLabel(/Where is the job\?/).selectOption("Nairobi - Kawangware");
+  await view(page).getByRole("button", { name: /Post job/ }).click();
+
+  await expect(page.getByRole("heading", { name: "Your job has been posted." })).toBeVisible();
+  await expect(view(page).getByText(/We couldn't match this to a trade we know/)).toBeVisible();
+  await expect(view(page).getByText(/You didn't list any skills, so we couldn't compare skills/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Workers in this trade" })).toHaveCount(0);
 });

@@ -129,7 +129,15 @@ function Posting({ params }: { params: Promise<{ postingId: string }> }) {
               {trade ? <> and they describe the work {trade.label}s do</> : null}.
             </>
           )}{" "}
-          We match on the skills you listed above, and nothing else.
+          {interpretation.stated_skills.length > 0 ? (
+            <>We match on the skills you listed above, and nothing else.</>
+          ) : (
+            <>
+              You didn&apos;t list any skills, so we couldn&apos;t compare skills. We read the trade from your
+              description, and workers are matched on the wording of your posting, the place, the budget and the
+              timing.
+            </>
+          )}
           {interpretation.unmapped.length > 0 && (
             <>
               {" "}

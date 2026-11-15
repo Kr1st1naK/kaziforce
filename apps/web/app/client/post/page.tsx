@@ -56,8 +56,7 @@ export default function Page() {
     event?.preventDefault();
     const found: Record<string, string> = {};
     if (!title.trim()) found.title = "Give the job a short title.";
-    if (!skills.trim()) found.required_skills = "List what the work involves.";
-    if (!description.trim()) found.description = "Describe the work that needs doing.";
+    if (!description.trim()) found.description = "Say what you need done.";
     if (budget === "") found.budget = "Give a budget per day.";
     if (!location) found.location = "Choose where the job is.";
     setErrors(found);
@@ -96,7 +95,7 @@ export default function Page() {
   return (
     <AppShell>
       <h1>Post a job</h1>
-      <p className={`subtitle ${styles.subtitle}`}>Describe the work you need done.</p>
+      <p className={`subtitle ${styles.subtitle}`}>Say what you need, the way you would to a neighbour.</p>
 
       <div className="card">
         {errors.form && (
@@ -104,6 +103,18 @@ export default function Page() {
         )}
 
         <form onSubmit={submit} noValidate>
+          <TextArea
+            label="What do you need done?"
+            required
+            value={description}
+            onChange={setDescription}
+            error={errors.description}
+            rows={4}
+            maxLength={4000}
+            placeholder="e.g. I need a plumber to fix a leaking tap"
+            hint="Write it in your own words, in English or Kiswahili. For example: “I need a plumber to fix a leaking tap”, “Electrician needed, a socket keeps sparking” or “fundi bomba wa kurekebisha bomba”."
+          />
+
           <TextInput
             label="Job title"
             required
@@ -111,34 +122,18 @@ export default function Page() {
             onChange={setTitle}
             error={errors.title}
             maxLength={255}
-            placeholder="e.g. Electrician needed for 3-bedroom house wiring"
+            placeholder="e.g. Fix a leaking tap"
+            hint="A few words. Workers see this title."
           />
 
           <TextArea
-            label="What skills does this job need?"
-            required
+            label="Add skills if you know them"
             value={skills}
             onChange={setSkills}
             error={errors.required_skills}
             rows={3}
-            placeholder="e.g. Conduit bending, three-phase distribution board installation, earthing, trunking"
-            hint="List what the work involves. Local terms are understood."
-            hintIcon={
-              <span aria-hidden="true" className={styles.hintIcon}>
-                文
-              </span>
-            }
-          />
-
-          <TextArea
-            label="Description"
-            required
-            value={description}
-            onChange={setDescription}
-            error={errors.description}
-            rows={4}
-            maxLength={4000}
-            placeholder="Provide context on site readiness, materials on-site, access hours, and specific structural requirements..."
+            placeholder="e.g. replace faucets, plumbing tools"
+            hint="Optional. If you leave this empty, we read the trade from what you wrote above."
           />
 
           <AmountInput

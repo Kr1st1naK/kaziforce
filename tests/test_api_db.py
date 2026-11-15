@@ -195,3 +195,34 @@ def test_a_typed_in_profile_records_nothing(client, pg_connect):
         after = cur.fetchone()[0]
     conn.close()
     assert after == before
+
+
+# A client who does not know the skills a job needs (usability finding U-7): the skills are optional.
+
+@pytest.mark.parametrize("text, trade", [
+    ("I need a plumber to fix a leaking tap", "plumber"),
+    ("Electrician needed, a socket keeps sparking", "electrician"),
+    ("fundi bomba wa kurekebisha bomba", "plumber"),
+])
+def test_a_posting_with_no_skills_is_stored_and_its_trade_is_read_from_the_description(client, text, trade):
+    for body in ({"title": "Fix it", "description": text, "budget": 2500, "location": "Nyeri"},
+                 {"title": "Fix it", "description": text, "required_skills": [], "budget": 2500, "location": "Nyeri"}):
+        created = client.post("/jobs", json=body)
+        assert created.status_code == 201
+        d = created.get_json()
+        assert d["job"]["required_skills"] == []
+        assert [o["label"] for o in d["interpretation"]["occupations"]] == [trade]
+        assert d["interpretation"]["stated_skills"] == [] and d["interpretation"]["unmapped"] == []
+        (pool,) = d["interpretation"]["worker_pool"]
+        assert pool["occupation"]["label"] == trade and pool["workers"] > 0
+        assert client.get(f"/jobs/{d['posting_id']}").get_json()["job"]["required_skills"] == []
+
+
+def test_a_posting_with_no_skills_can_be_ranked_without_error_and_has_no_skill_criterion(client):
+    posting_id = client.post("/jobs", json={"title": "Fix it", "description": "Electrician needed, a socket keeps sparking",
+                                            "budget": 2500, "location": "Nyeri"}).get_json()["posting_id"]
+    worker_id = client.post("/workers", json=WORKER).get_json()["worker_id"]
+    results = client.post("/recommend", json={"worker_id": worker_id, "k": 50}).get_json()["results"]
+    (result,) = [r for r in results if r["posting_id"] == posting_id]
+    assert result["rule_components"]["skill_overlap"] is None  # not assessed, not zero
+    assert 0 <= result["match_score"] <= 100

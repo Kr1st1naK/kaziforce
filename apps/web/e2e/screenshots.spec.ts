@@ -140,9 +140,9 @@ test("capture the eight screens", async ({ page, browserName }) => {
   await page.getByRole("button", { name: "Create account" }).click();
   await expect(page).toHaveURL(/\/client\/post$/);
   await view(page).getByLabel("Job title").fill("Fix bathroom leakage");
-  await view(page).getByLabel(/What skills does this job need\?/).fill("replace faucets, plumbing tools");
+  await view(page).getByLabel("Add skills if you know them").fill("replace faucets, plumbing tools");
   await view(page)
-    .getByLabel("Description")
+    .getByLabel("What do you need done?")
     .fill("Need a fundi bomba. Bathroom leaking at the joints, materials are on site.");
   await view(page).getByLabel(/Budget per day/).fill("2200");
   await view(page).getByLabel(/Where is the job\?/).selectOption("Nairobi - Kawangware");

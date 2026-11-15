@@ -248,3 +248,13 @@ def test_unknown_or_malformed_posting_is_404(client):
     for posting_id in ("not-a-uuid", "11111111-1111-4111-8111-111111111111"):
         r = client.get(f"/jobs/{posting_id}")
         assert r.status_code == 404 and r.get_json()["error"]["field"] == "posting_id"
+
+
+def test_a_job_may_be_posted_with_no_skills():
+    """The interface no longer requires skills (usability finding U-7); the API never did."""
+    from kaziforce_api.app import parse_job
+
+    for body in ({"title": "Fix a tap", "description": "I need a plumber to fix a leaking tap"},
+                 {"title": "Fix a tap", "description": "I need a plumber to fix a leaking tap", "required_skills": []},
+                 {"title": "Fix a tap", "description": "I need a plumber", "required_skills": ["  ", ""]}):
+        assert parse_job(body).required_skills == ()
