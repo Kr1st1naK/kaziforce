@@ -36,9 +36,10 @@ able to run on it. Allowing it is a deliberate, recorded code change, not a flag
 | `results/dev/20261112-012400_f5587b0` | development |
 | `results/dev/20261112-012811_cf644c3` | development |
 | `results/dev/20261112-082720_64381de` | development |
+| `results/dev/20261116-002209_5c915fc` | development (the freeze commit's own run, 2026-11-16) |
 | `results/scratch/20261017-132231_7aef3e0` | development |
 
-No run on any other split exists (list updated 2026-11-12).
+No run on any other split exists (list updated 2026-11-16, before the freeze).
 
 ### Every call site that selects a split
 
@@ -172,7 +173,7 @@ Send a test run somewhere of its own:
 Then:
 
 ```bash
-python -m pytest -q                     # 381 tests; the guard test now expects test to be allowed
+python -m pytest -q                     # 529 tests with a scratch database; the guard test now expects test to be allowed
 git add -A && git commit -m "evaluation: allow the test split for the final run"
 ```
 
@@ -213,3 +214,19 @@ because of what it showed.
    Chapter 5.
 4. If a target is missed, it is reported as missed. Any later change to the system
    produces a **new development-split result**, never a revised test result.
+
+## 7. Freeze record (filled 2026-11-16)
+
+Everything in §5 step 2 was done **before** this record, on branch `freeze/test-split`, and the test split has **not** been run.
+
+| Item | Value |
+|---|---|
+| **Code commit** (the guard change, and what every check below ran on) | `5c915fc` ("evaluation: allow the test split for the final run") |
+| What the guard commit changed | `EVALUATION_SPLITS = ("development", "test")`; `scripts/evaluate.py` gains `--split` (default `development`, choices `development` and `test`), passes it to the `Evaluator`, **records it in `run.json`** (the script hardcoded `"split": "development"` there, which the draft in §5 step 2 did not mention and which a test run would otherwise have carried), prints it, and writes a test run to `results/test/`. 30 lines changed in three files |
+| The guard test | `test_only_the_development_split_may_be_evaluated` became `test_only_the_development_and_test_splits_may_be_evaluated`: it now asserts `EVALUATION_SPLITS == ("development", "test")` and parametrises over `validation` and `train` (`test` was dropped from the list, as §5 says). A new test holds that the default split is still `development`, in the evaluator and in the script |
+| Checks on `5c915fc` (2026-11-16, clean tree) | ruff clean; pytest with a scratch database **529 passed**; without a database **402 passed, 127 skipped**; the two slow tests **2 passed**; tsc and eslint clean; vitest **167 passed**; e2e **70 passed (35 per engine)** |
+| Development run on `5c915fc` | `results/dev/20261116-002209_5c915fc`: identical in every metric (both CSVs, every cell outside the timing columns) to `results/dev/20261112-082720_64381de` |
+| What is frozen | The commit tagged `freeze-test-split` (the docs commit, which differs from `5c915fc` only in `docs/` and `results/`; the proof is in `handoff/27-freeze-report.md`) |
+| Command to run | `python scripts/evaluate.py --split test` from a clean tree on that tag (no `--allow-dirty`); then §5 step 4 |
+| Test split run? | **No.** |
+

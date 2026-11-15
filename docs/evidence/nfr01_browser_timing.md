@@ -13,11 +13,11 @@ after 3 discarded warm-up loads. The worker is the same throughout
 
 | Browser | end-to-end median | p95 | max | engine median | p95 | max | browser overhead (median) |
 |---|---|---|---|---|---|---|---|
-| chromium | 471 | 638 | 638 | 14.8 | 15.9 | 15.9 | 456 |
-| webkit | 598 | 697 | 697 | 14.1 | 15.3 | 15.3 | 584 |
+| chromium | 377 | 542 | 542 | 11 | 22.9 | 22.9 | 366 |
+| webkit | 337.5 | 375 | 375 | 8.45 | 11.3 | 11.3 | 329 |
 
 All figures in milliseconds. **Budget: 5,000 ms. The slowest single sample in either engine
-is 697 ms**, so NFR-01 is met with a wide margin.
+is 542 ms**, so NFR-01 is met with a wide margin. Measured on 2026-11-16 at commit `5c915fc` (the run in `docs/evidence/e2e_browsers.txt`); the raw samples are in `nfr01_browser_timing/`.
 
 ## Why both numbers are reported
 
@@ -26,7 +26,7 @@ postings, rank them. The end-to-end figure adds everything the requirement inclu
 one leaves out — the HTTP round trip, the session check the page makes first, React rendering,
 and paint.
 
-The gap is the point. End-to-end is roughly **thirty times** the engine time, so quoting the
+The gap is the point. End-to-end is roughly **thirty to forty times** the engine time, so quoting the
 engine figure alone against a requirement worded "end to end" would understate the real
 latency by an order of magnitude, even though both are far inside the budget.
 

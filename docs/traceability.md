@@ -9,14 +9,15 @@ say so, and name the gap.
 or **Not implemented**.
 
 Paths are relative to the repository root. Python test counts are from the run
-recorded in `docs/test-results.xml`: **520 tests, all passing** (2026-11-12, commit
-`3dd58f0`, **with a database available**, so the 123 database-backed tests ran). Without a
-database, as in CI, the same suite gives 397 passed and 123 skipped. The interface adds
-**167 component tests** (vitest, all passing, 2026-11-12, after the usability fixes in `4e9f635`). The end-to-end suite defines
+recorded in `docs/test-results.xml`: **529 tests, all passing** (2026-11-16, commit
+`5c915fc`, **with a database available**, so the 127 database-backed tests ran). Without a
+database, as in CI, the same suite gives 402 passed and 127 skipped. Two further tests load the
+real language model and are run separately (`pytest -m slow`): both pass. The interface adds
+**167 component tests** (vitest, all passing, 2026-11-16). The end-to-end suite defines
 **35 tests per engine** (Chromium and WebKit), one of which is the NFR-01 browser timing. Its last
-recorded run (`docs/evidence/e2e_browsers.txt`, 2026-11-12, commit `b44c924`, an isolated scratch stack)
-**passed all 48** (24 per engine, 0 failed, 0 flaky); the run before it (2026-10-29) predates the landing page and
-the contact feature, when the suite held 10 per engine. Tests added since (to 35 per engine, counted in the run of 2026-11-16: 18 core-workflow, 9 landing, 6 worker-contact, 1 timing, 1 screenshots) passed in both engines, 70 of 70, on an isolated stack; that run is not in the transcript above, which is the 48 of `b44c924`. The earlier counts of 24 and 26 per engine do not reconcile with this count by file, and 35 is the one to cite. System tests T-01 to T-08 are in
+recorded run (`docs/evidence/e2e_browsers.txt`, 2026-11-16, commit `5c915fc`, an isolated scratch stack)
+**passed all 70** (35 per engine: 18 core-workflow, 9 landing, 6 worker-contact, 1 timing, 1 screenshots;
+0 failed, 0 flaky). System tests T-01 to T-08 are in
 `docs/test-record.md`.
 
 ## Functional requirements
