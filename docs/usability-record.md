@@ -1,10 +1,14 @@
 # Usability record: first sessions
 
-This is a transcription of `docs/context/Testing.md`, as written. Nothing is corrected, tidied or interpreted. Where a fact was not written down it says **not recorded**; nothing has been filled in from memory or inference.
+This is a transcription of `docs/context/Testing.md`, as written, plus facts the author has since confirmed (marked "stated by the author" or "as reported by the author"). Nothing is corrected, tidied or interpreted. Where a fact was not written down it says **not recorded**; nothing has been filled in from memory or inference.
 
 **What this is.** Three participant sessions (P1, P2, P3) and one check by the author. The cases give identity-card details (a made-up name, number and PIN). Case 4 is **not** a participant session (see below).
 
-**Fields that were not recorded for any case:** step times, hesitations, hints given, the commit under test, and whether the session was live or recorded. They appear as "not recorded" in each case. `Testing.md` does not say whether the time written beside each case is minutes; the unit is **not recorded**.
+**Format of all sessions (stated by the author):** **unmoderated.** Participants worked alone and screen-recorded themselves; none was live. **Moderator hints: none possible (unmoderated); to confirm from recordings.**
+
+**Time (stated by the author):** a time written as "6:44" means **6 minutes 44 seconds**. Every time below is minutes:seconds.
+
+**Fields that were not recorded for any case:** step times, hesitations and the commit under test. They appear as "not recorded" in each case. What participants were told about being recorded is **not recorded**. The recordings are to be deleted after analysis; **deletion date: not yet** (not deleted).
 
 | Code | Case in `Testing.md` | Role | Kind of session |
 |---|---|---|---|
@@ -13,7 +17,7 @@ This is a transcription of `docs/context/Testing.md`, as written. Nothing is cor
 | P3 | Case 3 | worker | participant |
 | Author check | Case 4 | worker | **the author's own test, with details that differ from the cards; not a participant session** |
 
-> **Note on the times.** Case 1 (P1) and Case 3 (P3) **both record "6:44"**. They are copied here exactly as written (P1's is written "6: 44", with a space). Neither has been changed. Whether the two sessions really took the same time, or one was copied from the other, is not known.
+> **Note on the times.** Case 1 (P1) and Case 3 (P3) **both record "6:44"**. They are copied here exactly as written (P1's is written "6: 44", with a space). Neither has been changed. Both are 6 minutes 44 seconds as written. **Confirmed as written by the author; check against the recordings.**
 
 ---
 
@@ -25,12 +29,12 @@ This is a transcription of `docs/context/Testing.md`, as written. Nothing is cor
 | Credentials on the card | First name: Juma · Last name: Testa · Phone: +254 700 000 101 · Pin: 4821 |
 | Device | laptop |
 | Browser | Safari |
-| Time | 6: 44 (verbatim; see the note on times above) |
+| Time | 6: 44 as written (6 minutes 44 seconds; see the note on times above) |
 | Step times | not recorded |
 | Hesitations | not recorded |
-| Hints given | not recorded |
+| Moderator hints | none possible (unmoderated); to confirm from recordings |
 | Commit under test | not recorded |
-| Live or recorded | not recorded |
+| Format | unmoderated; worked alone; screen-recorded by the participant; not live |
 
 **Profile built (verbatim):**
 
@@ -51,7 +55,7 @@ Your daily rate
 KES 3,000 / day
 ```
 
-**Tips.** These are tips *I got from the testers about their experience*, not instructions the participant was given:
+**Tips.** These are the participant's own remarks about their experience (tips the author got from the tester). They are **not moderator hints**; the session was unmoderated.
 
 > Tips: a worker might want to click the title of the job for more information.
 
@@ -80,12 +84,12 @@ KES 3,000 / day
 | Credentials on the card | Phone: +254 700 000 201 · Pin: 4821 |
 | Device | laptop |
 | Browser | Safari |
-| Time | 4:10 |
+| Time | 4:10 (4 minutes 10 seconds) |
 | Step times | not recorded |
 | Hesitations | not recorded |
-| Hints given | not recorded |
+| Moderator hints | none possible (unmoderated); to confirm from recordings |
 | Commit under test | not recorded |
-| Live or recorded | not recorded |
+| Format | unmoderated; worked alone; screen-recorded by the participant; not live |
 
 **Job built (verbatim):**
 
@@ -121,12 +125,12 @@ We read the words of your posting. We match on the skills you listed above, and 
 | Credentials on the card | First name: Wanjiru · Last name: Testa · Phone: +254 700 000 102 · Pin: 4821 |
 | Device | laptop |
 | Browser | Dia (a Chromium-based browser) |
-| Time | 6:44 (verbatim; see the note on times above) |
+| Time | 6:44 as written (6 minutes 44 seconds; see the note on times above) |
 | Step times | not recorded |
 | Hesitations | not recorded |
-| Hints given | not recorded |
+| Moderator hints | none possible (unmoderated); to confirm from recordings |
 | Commit under test | not recorded |
-| Live or recorded | not recorded |
+| Format | unmoderated; worked alone; screen-recorded by the participant; not live |
 
 **Profile built (verbatim):**
 
@@ -178,12 +182,12 @@ This is the author's own test of the app. **Its details differ from the identity
 | Credentials as written | First name: Kristina · Last name: Testa · Phone: +254 700 012 300 · Pin: 4545 |
 | Device | phone |
 | Browser | Safari |
-| Time | 5:10 |
+| Time | 5:10 (5 minutes 10 seconds) |
 | Step times | not recorded |
 | Hesitations | not recorded |
-| Hints given | not recorded |
+| Moderator hints | none possible (unmoderated); to confirm from recordings |
 | Commit under test | not recorded |
-| Live or recorded | not recorded |
+| Format | the author's own check, done alone, so unmoderated; whether it was screen-recorded: not recorded |
 
 **Profile built (verbatim):**
 
@@ -210,13 +214,53 @@ KES 2,000 / day
 
 ## Findings
 
-Six findings came out of the sessions. "Seen by" gives only what `Testing.md` supports. Where the record does not say who met a thing, it says **not recorded**.
+Six findings came out of the sessions. "Seen by" gives what `Testing.md` supports and what the author has since stated. Where neither says who met a thing, it says **not recorded**.
 
 | # | Finding | Seen by | Kind | Status |
 |---|---|---|---|---|
-| U-1 | No way back from the sign-in and create-account pages to the landing page | P1 (the note "add back navigation to the landing page" is written at the end of Case 1; whose note it is, the participant's or the author's, is not recorded) | navigation gap in the interface | **Fixed**: a "Back to the home page" link on both pages |
-| U-2 | A button reading "Signing in…" / "Creating your account…" / "Saving…" with nothing submitted, fields disabled (sign-in, create account, edit profile) | not recorded in `Testing.md` | defect in the interface | **Fixed**: cause found and reproduced; see `docs/test-record.md` |
-| U-3 | The message "Cannot reach API at /api. Is it running?" for one tester | not recorded in `Testing.md` | connectivity; cause not established | **Open**: the logs show tunnel reconnections during the sessions, which cannot be tied to a participant; whether the message should offer a retry is for the author to decide |
-| U-4 | "See more keywords that matched" did not work | P3 (Dia, laptop) | unclear affordance, not a broken control: the only such text is "+N more" on a match card, which is plain text and does nothing in any browser | **Open**: left for the author to decide (make it a link to "Why this job?", or expand in place) |
+| U-1 | No way back from the sign-in and create-account pages to the landing page | P1 (the note "add back navigation to the landing page" is written at the end of Case 1) and the author | navigation gap in the interface | **Fixed in `4e9f635`**: a "Back to the home page" link on both pages |
+| U-2 | A button reading "Signing in…" / "Creating your account…" / "Saving…" with nothing submitted, fields disabled (sign-in, create account, edit profile) | the author, on a phone (Safari) | defect in the interface | **Fixed in `4e9f635`**: cause found and reproduced; see `docs/test-record.md` |
+| U-3 | The message "Cannot reach API at /api. Is it running?" for one tester | reported to the author by a tester while creating a job posting; **likely P2; to confirm** | connectivity message and recovery. The original cause was the **tunnel dropping** (see `tunnel.log`), which is **outside the app** | **Fixed in `660a184`, for the wording and the recovery only**: the message now reads "We couldn't reach the service. Check your connection and try again.", and the forms that submit show a "Try again" button. The dropped connection itself is not something the app can prevent. Nothing is retried automatically |
+| U-4 | "See more keywords that matched" did not work | P3 (Dia, laptop) | unclear affordance, not a broken control: the only such text was "+N more" on a match card, plain text that did nothing in any browser | **Fixed in `660a184`**: "+N more" is now a link to that match's "Why this job?" page, keyboard reachable, 44 px tall |
 | U-5 | The match score does not follow pay: P3's strongest match (job 1) paid much less than the daily rate; P3 would pick the two highest-paying jobs | P3 | a question about what the score means, not an interface defect | **Open, not changed**: the score is the matching and scoring path, which this phase does not touch |
 | U-6 | "looking for a mechanic for a car" is not matched to a trade ("We couldn't match this to a trade we know") | P2 | vocabulary coverage in the knowledge graph | **Open, not changed**: enrichment is not touched in this phase; P2 recorded no difficulty ("Was there anything you didn't understand? No") |
+
+---
+
+## Observations from the server log, as reported by the author
+
+These are the author's statements. `api.log` records **when** a request was made, not **who** made it, so the log alone does not identify anyone.
+
+| What the log shows | Time (EAT) | As reported by the author | Cause |
+|---|---|---|---|
+| Two sign-in attempts refused (HTTP 401) | 21:40 | made by P1 | **to check from the recording** |
+| One account creation refused as a duplicate phone number (HTTP 409) | 22:28 | made by P1 | **to check from the recording** |
+
+No cause is stated here for either.
+
+---
+
+## To fill from the recordings
+
+Left empty on purpose. Nothing below has been filled in from memory or inference.
+
+### P1
+- Step times: 
+- Hesitations: 
+- Errors (including the two wrong-PIN sign-ins and the duplicate-phone attempt above): 
+
+### P2
+- Step times: 
+- Hesitations: 
+- Errors (including the "Cannot reach the API" message, if it was P2): 
+
+### P3
+- Step times: 
+- Hesitations: 
+- Errors: 
+
+---
+
+## Recordings
+
+What participants were told about being recorded: **not recorded**. The recordings are to be **deleted after analysis**; deletion date: **not yet** (they have not been deleted).

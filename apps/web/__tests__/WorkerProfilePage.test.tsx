@@ -12,6 +12,7 @@ import { Activity } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import Page from "@/app/worker/profile/page";
 import type { OwnContact, Session, Worker } from "@/lib/types";
+import { ApiError, NETWORK_MESSAGE } from "@/lib/api";
 
 const push = vi.fn();
 vi.mock("next/navigation", () => ({
@@ -303,5 +304,26 @@ describe("the submit button after a profile is created", () => {
     expect(screen.queryByText("Finding your matches…")).not.toBeInTheDocument();
     expect(screen.queryByText("Saving…")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Create profile" })).toBeEnabled();
+  });
+});
+
+describe("when the service cannot be reached", () => {
+  it("offers Try again, which sends the same profile once more", async () => {
+    session = signedIn(null);
+    createWorker.mockRejectedValueOnce(new ApiError(0, "network_error", NETWORK_MESSAGE)).mockResolvedValueOnce({});
+    render(<Page />);
+    await userEvent.type(screen.getByLabelText(/What work do you do\?/), "electrician");
+    await userEvent.type(screen.getByLabelText(/About you/), "Electrical work in houses for three years.");
+    await userEvent.selectOptions(screen.getByLabelText(/Where do you work\?/), "Nairobi - Kasarani");
+    await userEvent.selectOptions(screen.getByLabelText(/When can you work\?/), "Full-time");
+    await userEvent.type(screen.getByLabelText(/Your daily rate/), "2500");
+    await userEvent.click(screen.getByRole("button", { name: "Create profile" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("We couldn't reach the service");
+    await userEvent.click(screen.getByRole("button", { name: "Try again" }));
+
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/worker/matches"));
+    expect(createWorker).toHaveBeenCalledTimes(2);
+    expect(createWorker.mock.calls[1][0]).toEqual(createWorker.mock.calls[0][0]);
   });
 });

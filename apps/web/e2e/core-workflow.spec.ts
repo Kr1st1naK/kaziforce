@@ -285,3 +285,88 @@ test("no button says Signing in…, Creating your account… or Saving… when n
   await expect(view(page).getByRole("button", { name: "Continue" })).toBeEnabled();
   await expect(view(page).getByText("Signing in…")).toHaveCount(0);
 });
+
+/** Drops the first request that matches, as a dead connection would: the browser gets no response at all. */
+async function dropOnce(page: Page, url: string, method: string) {
+  let dropped = false;
+  await page.route(url, async (route) => {
+    if (!dropped && route.request().method() === method) {
+      dropped = true;
+      await route.abort("connectionfailed");
+    } else {
+      await route.fallback();
+    }
+  });
+  return () => dropped;
+}
+
+test("when the connection drops on sign-in, the message is plain and Try again signs in", async ({ page }) => {
+  const number = await createAccount(page, "worker");
+  await page.getByLabel(/What work do you do\?/).fill("fundi wa umeme");
+  await page.getByLabel(/About you/).fill("Five years of electrical work.");
+  await page.getByLabel(/Where do you work\?/).selectOption("Nyeri");
+  await page.getByRole("button", { name: "Create profile" }).click();
+  await expect(page).toHaveURL(/\/worker\/matches$/);
+  await page.getByRole("button", { name: /Sign out/ }).click();
+  await expect(page).toHaveURL(/\/sign-in$/);
+
+  const dropped = await dropOnce(page, "**/auth/sessions", "POST");
+  await view(page).getByLabel("Phone number", { exact: true }).fill(number);
+  await fillPin(page, /4-digit PIN/, PIN);
+  await view(page).getByRole("button", { name: "Continue" }).click();
+
+  const alert = view(page).getByRole("alert");
+  await expect(alert).toContainText("We couldn't reach the service. Check your connection and try again.");
+  await expect(alert).not.toContainText(/API|running/);
+  expect(dropped()).toBe(true);
+
+  await view(page).getByRole("button", { name: "Try again" }).click();
+  await expect(page).toHaveURL(/\/worker\/matches$/);
+});
+
+test("when the connection drops while posting a job, Try again posts it once", async ({ page }) => {
+  await createAccount(page, "client");
+  await expect(page).toHaveURL(/\/client\/post$/);
+  await page.getByLabel("Job title").fill("Fix bathroom leakage");
+  await page.getByLabel(/What skills does this job need\?/).fill("replace faucets, plumbing tools");
+  await page.getByLabel("Description").fill("Need a fundi bomba. Bathroom leaking at the joints, materials are on site.");
+  await page.getByLabel(/Budget per day/).fill("2200");
+  await page.getByLabel(/Where is the job\?/).selectOption("Nairobi - Kawangware");
+
+  const dropped = await dropOnce(page, "**/jobs", "POST");
+  await page.getByRole("button", { name: /Post job/ }).click();
+  await expect(view(page).getByRole("alert")).toContainText("We couldn't reach the service");
+  expect(dropped()).toBe(true);
+  await expect(view(page).getByLabel("Job title")).toHaveValue("Fix bathroom leakage"); // nothing retyped
+
+  await view(page).getByRole("button", { name: "Try again" }).click();
+  await expect(page).toHaveURL(/\/client\/postings\/[0-9a-f-]+$/);
+  await expect(page.getByRole("heading", { name: "Your job has been posted." })).toBeVisible();
+});
+
+test("tapping \"+N more\" on a match opens that match's explanation", async ({ page }) => {
+  await createAccount(page, "worker");
+  await page
+    .getByLabel(/What work do you do\?/)
+    .fill("solar panels installation, lighting systems installation, wiring, diagnostics, compliance inspection, electrical repair, electrical maintenance");
+  await page.getByLabel(/About you/).fill("Seasoned electrician: installation, maintenance and repair of electrical systems in homes and offices.");
+  await page.getByLabel(/Where do you work\?/).selectOption("Nairobi - Westlands");
+  await page.getByLabel(/When can you work\?/).selectOption("Full-time");
+  await page.getByLabel(/Your daily rate/).fill("3000");
+  await page.getByRole("button", { name: "Create profile" }).click();
+  await expect(page).toHaveURL(/\/worker\/matches$/);
+
+  const card = view(page).locator("article").filter({ has: page.getByRole("link", { name: /\+\d+ more/ }) }).first();
+  await expect(card).toBeVisible();
+  const title = await card.getByRole("heading", { level: 3 }).innerText();
+  const more = card.getByRole("link", { name: /\+\d+ more/ });
+  await expect(more).toHaveText(/^\+\d+ more$/);
+  expect((await more.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  await more.focus();
+  await expect(more).toBeFocused(); // reachable by keyboard
+  await more.click();
+
+  await expect(page).toHaveURL(/\/worker\/matches\/[0-9a-f-]+$/);
+  await expect(page.getByRole("heading", { name: "What lined up" })).toBeVisible();
+  await expect(view(page)).toContainText(title);
+});

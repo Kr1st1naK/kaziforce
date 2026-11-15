@@ -122,6 +122,11 @@ export function useRedirectIfSignedIn(): void {
   }, [loading, session, router]);
 }
 
+/** True when the last request got no response, so offering "Try again" makes sense. */
+export function isNetworkFailure(error: unknown): boolean {
+  return error instanceof ApiError && error.isNetworkFailure;
+}
+
 export function ApiErrorMessage(error: unknown): string {
   return error instanceof ApiError ? error.message : "Something went wrong. Please try again.";
 }

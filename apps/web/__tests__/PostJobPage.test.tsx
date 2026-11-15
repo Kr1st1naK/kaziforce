@@ -10,6 +10,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import Page from "@/app/client/post/page";
+import { ApiError, NETWORK_MESSAGE } from "@/lib/api";
 
 const push = vi.fn();
 vi.mock("next/navigation", () => ({
@@ -103,5 +104,21 @@ describe("cancel on the posting form", () => {
     expect(screen.queryByRole("alertdialog")).toBeNull();
     expect(fields().title).toHaveValue("");
     expect(fields().location).toHaveValue("");
+  });
+});
+
+describe("when the service cannot be reached", () => {
+  it("offers Try again, which posts the same job once more", async () => {
+    createJob.mockRejectedValueOnce(new ApiError(0, "network_error", NETWORK_MESSAGE)).mockResolvedValueOnce({ posting_id: "p-9" });
+    render(<Page />);
+    await fillIn();
+    await userEvent.click(screen.getByRole("button", { name: /Post job/ }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("We couldn't reach the service");
+    await userEvent.click(screen.getByRole("button", { name: "Try again" }));
+
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/client/postings/p-9"));
+    expect(createJob).toHaveBeenCalledTimes(2);
+    expect(createJob.mock.calls[1][0]).toEqual(createJob.mock.calls[0][0]);
   });
 });

@@ -21,7 +21,8 @@ import { AppShell } from "@/components/AppShell";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { AmountInput, Checkbox, Select, TextArea, TextInput } from "@/components/FormFields";
 import { formatKes } from "@/components/MatchCard";
-import { ApiErrorMessage, useGuard, useSession } from "@/components/SessionProvider";
+import { ApiErrorMessage, isNetworkFailure, useGuard, useSession } from "@/components/SessionProvider";
+import { FormAlert } from "@/components/FormAlert";
 import { ApiError, api } from "@/lib/api";
 import { useIdleWhenHidden } from "@/lib/useIdleWhenHidden";
 import { SUGGESTED_LOCATIONS } from "@/lib/locations";
@@ -160,6 +161,7 @@ export default function Page() {
   const [fields, setFields] = useState<Fields>(EMPTY);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  const [retryable, setRetryable] = useState(false); // the last submit got no response: offer "Try again"
   // Creating a profile leaves this page for the matches and stays mounted, hidden; clear busy so that it
   // does not say "Saving…" with nothing submitted when the worker comes back.
   useIdleWhenHidden(() => setBusy(false));
@@ -185,8 +187,8 @@ export default function Page() {
     };
   }, [existing]);
 
-  const submit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const submit = async (event?: React.FormEvent) => {
+    event?.preventDefault();
     const found: Record<string, string> = {};
     if (!fields.skills.trim()) found.skills = "Tell us what work you do.";
     if (!fields.biography.trim()) found.biography = "Add a short description of your work.";
@@ -216,6 +218,7 @@ export default function Page() {
     };
 
     setBusy(true);
+    setRetryable(false);
     try {
       if (saved) {
         const { worker, contact: own } = await api.updateMyProfile(
@@ -241,6 +244,7 @@ export default function Page() {
       }
     } catch (error) {
       setBusy(false);
+      setRetryable(isNetworkFailure(error));
       setErrors(
         error instanceof ApiError && error.field
           ? { [error.field.replace("worker.", "")]: error.message }
@@ -272,9 +276,7 @@ export default function Page() {
       <p className={`subtitle ${styles.subtitle}`}>{subtitle}</p>
 
       {errors.form && (
-        <div className={`alert ${styles.alert}`} role="alert">
-          {errors.form}
-        </div>
+        <FormAlert className={styles.alert} message={errors.form} onRetry={retryable ? () => void submit() : undefined} busy={busy} />
       )}
 
       {loading && (
