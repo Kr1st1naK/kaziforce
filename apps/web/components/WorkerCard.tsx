@@ -23,8 +23,9 @@ export function WorkerCard({ worker, trade, postingId }: { worker: TradeWorker; 
     : null;
 
   return (
-    <article className={styles.card}>
+    <article className={`${styles.card} ${href && worker.name ? styles.openable : ""}`}>
       {href && worker.name && (
+        // The link's own box is stretched over the whole card (see .name::after), so the card is one target.
         <Link className={styles.name} href={href}>
           {worker.name}
         </Link>
@@ -36,6 +37,11 @@ export function WorkerCard({ worker, trade, postingId }: { worker: TradeWorker; 
         <span>{worker.availability ?? "Availability not stated"}</span>
         <span>{worker.rate_expectation === null ? "Rate not stated" : formatKes(worker.rate_expectation)}</span>
       </p>
+      {href && worker.name && (
+        <span className={styles.open} aria-hidden="true">
+          Open profile →
+        </span>
+      )}
     </article>
   );
 }

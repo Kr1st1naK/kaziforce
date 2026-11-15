@@ -202,3 +202,37 @@ test("a signed-out visitor cannot open a worker's page", async ({ page }) => {
   await page.goto("/client/workers/00000000-0000-4000-8000-00000000dead");
   await expect(page).toHaveURL(/\/sign-in$/);
 });
+
+test("the trade list says which workers can be opened, and an openable card is one big, visible target", async ({ browser }) => {
+  const { context, page } = await newClient(browser);
+  await postPlumbingJob(page);
+
+  await expect(
+    view(page).getByText("Workers who have agreed to be shown can be opened to see contact details. The others cannot."),
+  ).toBeVisible();
+
+  const cards = view(page).locator("article");
+  const openable = cards.filter({ has: page.getByRole("link", { name: "Amina Wanjiru" }) });
+  const plain = cards.filter({ hasNot: page.getByRole("link") }).first();
+  await expect(openable).toBeVisible();
+  await expect(plain).toBeVisible();
+
+  // Visibly clickable: a cue on the card, a pointer, and a target well over 44 px high.
+  await expect(openable).toContainText("Open profile");
+  await expect(plain).not.toContainText("Open profile");
+  expect(await openable.evaluate((el) => getComputedStyle(el).cursor)).toBe("pointer");
+  expect(await plain.evaluate((el) => getComputedStyle(el).cursor)).not.toBe("pointer");
+  expect((await openable.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+
+  // Keyboard: the name link takes focus and the card shows it.
+  await openable.getByRole("link", { name: "Amina Wanjiru" }).focus();
+  await expect(openable.getByRole("link", { name: "Amina Wanjiru" })).toBeFocused();
+  expect(await openable.evaluate((el) => getComputedStyle(el).outlineStyle)).not.toBe("none");
+
+  // The whole card opens the profile, not only the name.
+  const box = (await openable.boundingBox())!;
+  await page.mouse.click(box.x + box.width - 12, box.y + box.height - 12);
+  await expect(page).toHaveURL(/\/client\/workers\/[0-9a-f-]{36}\?posting=/);
+  await expect(view(page).getByRole("heading", { name: "Amina Wanjiru" })).toBeVisible();
+  await context.close();
+});

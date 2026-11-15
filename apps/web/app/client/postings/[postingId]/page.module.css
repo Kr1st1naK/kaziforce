@@ -90,6 +90,11 @@
 
 .poolCount {
   color: var(--muted);
+  margin-bottom: var(--space-xs);
+}
+
+.poolNote {
+  color: var(--muted);
   margin-bottom: var(--space-md);
 }
 

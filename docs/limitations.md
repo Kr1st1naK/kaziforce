@@ -213,7 +213,7 @@
 
 32. **A client is shown an unordered sample of workers, not matches.** The confirmation screen
     lists a sample of the workers in the posting's trade, with the count. The cards carry no
-    score, no rank and no numbering, and are drawn the same whether or not the worker has a name.
+    score, no rank and no numbering, and are the same size and in the same place whether or not the worker has a name. A card that can be opened also looks openable (the whole card is a link, with an "Open profile" cue); that says the worker can be contacted, not that they fit.
     This is deliberate and not an omission. Matching runs from worker to job only: the relevance
     labels (a posting is relevant to a worker if and only if it is in their occupational area,
     item 21) were built for that direction, and there are no labels and no evaluation for ranking
@@ -226,8 +226,8 @@
     **What the cards now add.** A worker who has a name and has consented is shown with their name,
     as a link to a page with their trade, facts, their own words and a number to ring. That is a
     way to *contact* a worker, not a statement that they *fit* the job, and the design keeps the
-    two apart: a named card is no larger, no earlier and no more emphasised than an anonymous
-    one; there is no "recommended" and no sort; consenting does not change which workers are in
+    two apart: a named card is no larger and no earlier than an anonymous one, and its only
+    addition is the cue that it can be opened; there is no "recommended" and no sort; consenting does not change which workers are in
     the sample or how many there are (a test holds this). It is still true that a client cannot
     see which workers suit their job best. Bidirectional matching, with its own labels and
     evaluation, is future work. The page also gives a client nothing to compare two workers
@@ -235,6 +235,15 @@
 
     **The consequence of the sample (item 36).** Because the five are fixed and random, a
     worker who consents is usually not among them, and so usually cannot be reached.
+
+    **Most listed workers cannot be opened.** The workers in a trade list are mostly the 216
+    synthetic evaluation profiles, which have no account, no name and no contact details, so most
+    cards are plain by construction: a client who posts a job sees, say, five workers of whom none
+    can be opened unless a worker who signed up, named themselves and consented happens to be among
+    the five. The page now says so under the heading ("Workers who have agreed to be shown can be
+    opened to see contact details. The others cannot."), which explains the gap and does not close
+    it. The demo seed adds two consenting workers each for the plumber, carpenter, electrician and
+    cook trades (`docs/demo.md`) so that a demonstration has someone to open.
 
 ## 8. Privacy and security
 

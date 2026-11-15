@@ -79,7 +79,7 @@ export default function Page() {
                         {[
                           posting.location ?? "Location not stated",
                           formatKes(posting.budget),
-                          posting.availability ?? "No strict timeline",
+                          posting.availability ?? "No fixed pattern",
                         ].join(" · ")}
                         {posting.trades.length > 0 && (
                           <>

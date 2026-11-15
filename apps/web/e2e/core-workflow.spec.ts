@@ -429,3 +429,29 @@ test("at 375px the matches list gives a job's title the row, and the header's li
     expect(box!.height, `"${await link.innerText()}" wraps`).toBeLessThan(34); // one line of 16 px text plus its underline
   }
 });
+
+test("the job form asks for a working pattern, not a date, and still stores the same values", async ({ page }) => {
+  await createAccount(page, "client");
+  await expect(page).toHaveURL(/\/client\/post$/);
+
+  const field = view(page).getByLabel(/What working pattern does the job need\?/);
+  await expect(field).toBeVisible();
+  await expect(view(page).getByLabel(/When is it needed/)).toHaveCount(0);
+  expect(await field.locator("option").evaluateAll((options) => options.map((o) => [(o as HTMLOptionElement).value, o.textContent]))).toEqual([
+    ["", "No fixed pattern"],
+    ["Full-time", "Full-time"],
+    ["Part-time", "Part-time"],
+    ["Weekends", "Weekends"],
+  ]);
+
+  // A pattern chosen here is what the posting keeps.
+  await view(page).getByLabel("What do you need done?").fill("Electrician needed, a socket keeps sparking");
+  await view(page).getByLabel("Job title").fill("Fix a socket");
+  await view(page).getByLabel(/Budget per day/).fill("1500");
+  await view(page).getByLabel(/Where is the job\?/).selectOption("Nairobi - Kawangware");
+  await field.selectOption("Weekends");
+  await view(page).getByRole("button", { name: /Post job/ }).click();
+  await expect(page).toHaveURL(/\/client\/postings\/[0-9a-f-]+$/);
+  await page.getByRole("link", { name: "My postings" }).click();
+  await expect(view(page).getByText("Weekends")).toBeVisible();
+});
