@@ -214,7 +214,7 @@ KES 2,000 / day
 
 ## Findings
 
-Six findings came out of the sessions. "Seen by" gives what `Testing.md` supports and what the author has since stated. Where neither says who met a thing, it says **not recorded**.
+Seven findings have come out of the sessions (U-7 added after the first six). "Seen by" gives what `Testing.md` supports and what the author has since stated. Where neither says who met a thing, it says **not recorded**.
 
 | # | Finding | Seen by | Kind | Status |
 |---|---|---|---|---|
@@ -224,6 +224,7 @@ Six findings came out of the sessions. "Seen by" gives what `Testing.md` support
 | U-4 | "See more keywords that matched" did not work | P3 (Dia, laptop) | unclear affordance, not a broken control: the only such text was "+N more" on a match card, plain text that did nothing in any browser | **Fixed in `660a184`**: "+N more" is now a link to that match's "Why this job?" page, keyboard reachable, 44 px tall |
 | U-5 | The match score does not follow pay: P3's strongest match (job 1) paid much less than the daily rate; P3 would pick the two highest-paying jobs | P3 | a question about what the score means, not an interface defect | **Open, not changed**: the score is the matching and scoring path, which this phase does not touch |
 | U-6 | "looking for a mechanic for a car" is not matched to a trade ("We couldn't match this to a trade we know") | P2 | vocabulary coverage in the knowledge graph | **Open, not changed**: enrichment is not touched in this phase; P2 recorded no difficulty ("Was there anything you didn't understand? No") |
+| U-7 | Clients could not list the skills a job needs; most know only that they need a plumber or an electrician ("it was a bit of a problem for someone to create an account as a client and list the possible skills needed for a certain job", as reported by the author) | [CONFIRM: who ran the test, device, date] | the form asked for something clients could not supply; and what they could type (skills in their own words) matched nothing | **Fixed, pending retest, in `b313756`**: the form asks "What do you need done?" first, then a short title, and skills are optional; the result screen says plainly when none were listed. The ranking effect of a posting with no skills is accepted and documented (`docs/limitations.md`, items 41 and 42) |
 
 ---
 
