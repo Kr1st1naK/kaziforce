@@ -214,7 +214,7 @@ KES 2,000 / day
 
 ## Findings
 
-Seven findings have come out of the sessions (U-7 added after the first six). "Seen by" gives what `Testing.md` supports and what the author has since stated. Where neither says who met a thing, it says **not recorded**.
+Nine findings have come out of the sessions (U-7 to U-9 added after the first six). "Seen by" gives what `Testing.md` supports and what the author has since stated. Where neither says who met a thing, it says **not recorded**.
 
 | # | Finding | Seen by | Kind | Status |
 |---|---|---|---|---|
@@ -225,6 +225,8 @@ Seven findings have come out of the sessions (U-7 added after the first six). "S
 | U-5 | The match score does not follow pay: P3's strongest match (job 1) paid much less than the daily rate; P3 would pick the two highest-paying jobs | P3 | a question about what the score means, not an interface defect | **Open, not changed**: the score is the matching and scoring path, which this phase does not touch |
 | U-6 | "looking for a mechanic for a car" is not matched to a trade ("We couldn't match this to a trade we know") | P2 | vocabulary coverage in the knowledge graph | **Open, not changed**: enrichment is not touched in this phase; P2 recorded no difficulty ("Was there anything you didn't understand? No") |
 | U-7 | Clients could not list the skills a job needs; most know only that they need a plumber or an electrician ("it was a bit of a problem for someone to create an account as a client and list the possible skills needed for a certain job", as reported by the author) | [CONFIRM: who ran the test, device, date] | the form asked for something clients could not supply; and what they could type (skills in their own words) matched nothing | **Fixed, pending retest, in `b313756`**: the form asks "What do you need done?" first, then a short title, and skills are optional; the result screen says plainly when none were listed. The ranking effect of a posting with no skills is accepted and documented (`docs/limitations.md`, items 41 and 42) |
+| U-8 | The availability field on the job form did not make sense for a client: "When is it needed?" reads as a date, but the field holds a working pattern (Full-time, Part-time, Weekends) that is compared with a worker's availability | [CONFIRM: tester, device, date] | wording of a field | **Fixed, pending retest, in `3975f71`**: the label reads "What working pattern does the job need?", the empty choice "No fixed pattern", with a hint that it is compared with when each worker is available. The stored values are unchanged and there is no date field |
+| U-9 | Clients could not open the workers shown in the trade list; most of those workers come from the evaluation dataset and have no name or contact details | [CONFIRM: tester, device, date] | expectation against the data: only a worker who named themselves and consented can be opened | **Fixed, pending retest, in `3975f71`**: a sentence under the heading says which workers can be opened and which cannot; an openable card looks openable (whole card a link, "Open profile" cue, visible focus, tall target); plain cards stay plain. Which workers appear, their number and their order are unchanged. The demo seed now has two consenting workers each in the carpenter, electrician and cook trades. See `docs/limitations.md` item 32 |
 
 ---
 
@@ -265,3 +267,11 @@ Left empty on purpose. Nothing below has been filled in from memory or inference
 ## Recordings
 
 What participants were told about being recorded: **not recorded**. The recordings are to be **deleted after analysis**; deletion date: **not yet** (they have not been deleted).
+
+---
+
+## Worker sessions, and the U-7 retest
+
+**No feedback has been received for the worker sessions.** Nothing about them is recorded here.
+
+**U-7 retest result (skills optional on the job form):** [CONFIRM: who retested, device, date, and what happened].

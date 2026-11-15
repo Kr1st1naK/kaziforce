@@ -119,8 +119,10 @@ Sign out first, or use a second browser window.
    then "We matched this to the trade **plumber**", the skills it recognised, and
    *Workers in this trade* — at most five, in their own words, with no score and
    no ranking.
-   With the demo plumbers seeded (`python scripts/seed_demo_workers.py`, phones
-   700 000 001 to 003, PIN 4821), three cards show a name as a link. Opening
+   With the demo workers seeded (`python scripts/seed_demo_workers.py`, phones
+   700 000 001 to 009, PIN 4821), three cards show a name as a link and an
+   *Open profile* cue (the whole card opens). Under the heading a sentence says that
+   workers who have agreed to be shown can be opened and the others cannot. Opening
    **Amina Wanjiru** gives her trade, her own words, and a tap-to-call number
    (+254 700 000 001, a made-up number; do not ring it). The other cards are
    anonymous, as for any worker who has not given a name and agreed.
@@ -194,3 +196,21 @@ would otherwise keep serving the postings you added.
 | Submitting gives a 500, or the API fails to start with "no job postings" | The database is not seeded. Run step 2. |
 | The same job appears several times at the top | Postings added in an earlier demo or test run. Run step 2 and restart the API. |
 | `curl http://localhost:5000/health` returns 403 | macOS AirPlay Receiver. Use `127.0.0.1:5000`, or turn it off in System Settings → General → AirDrop & Handoff. |
+
+## Demo workers
+
+`python scripts/seed_demo_workers.py` creates nine made-up, consenting workers (safe to run twice; it also
+switches consent back on). It does not touch the 216 profiles and 280 postings that `seed_database.py` loads, and
+it uses the same PIN for all of them, so it is for a demonstration database only. Phones are in the made-up
+700 000 0xx range: do not ring them.
+
+| Trade | Workers (phone) | Post a job such as |
+|---|---|---|
+| plumber | Amina Wanjiru (700 000 001), Joseph Otieno (002), Grace Achieng (003) | "I need a plumber to fix a leaking tap" |
+| carpenter | Peter Kamau (004), Esther Njeri (005) | "I need a carpenter to fix a door", or "fundi wa mbao wa kutengeneza kabati" |
+| electrician | David Mwangi (006), Faith Wambui (007) | "Electrician needed, a socket keeps sparking" |
+| cook | Hassan Ali (008), Mary Atieno (009) | "I need a cook for an event", or "mpishi wa harusi" |
+
+Each worker describes their work with the accepted Kiswahili term for the trade (*fundi bomba*, *fundi wa mbao*,
+*fundi wa umeme*, *mpishi*), which the knowledge graph maps, so a posting in that trade lists them first. Each of
+the four trades was checked on a scratch database to show its demo workers by name.
