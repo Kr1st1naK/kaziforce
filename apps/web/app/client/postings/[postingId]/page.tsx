@@ -155,6 +155,9 @@ function Posting({ params }: { params: Promise<{ postingId: string }> }) {
             {pool.workers} {pool.workers === 1 ? "worker" : "workers"} on the platform describe themselves as{" "}
             {trade.label}s.
           </p>
+          <p className={styles.poolNote}>
+            Workers who have agreed to be shown can be opened to see contact details. The others cannot.
+          </p>
           <ul className={styles.workers}>
             {pool.sample.map((worker, index) => (
               <li key={`${index}-${worker.describes_as}`}>

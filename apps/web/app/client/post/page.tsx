@@ -24,8 +24,11 @@ import { SUGGESTED_LOCATIONS } from "@/lib/locations";
 import { AVAILABILITY, type Availability } from "@/lib/types";
 import styles from "./page.module.css";
 
-/** The design's wording for "no availability stated". */
-const NO_TIMELINE = "No strict timeline";
+/**
+ * The field holds a working pattern (Full-time, Part-time, Weekends), which the scorer compares with a worker's
+ * availability. It is not a date, and the option values are what the API stores. Only the label says so.
+ */
+const NO_PATTERN = "No fixed pattern";
 
 export default function Page() {
   const waiting = useGuard("client");
@@ -156,11 +159,12 @@ export default function Page() {
               error={errors.location}
             />
             <Select
-              label="When is it needed?"
+              label="What working pattern does the job need?"
               value={availability}
               onChange={setAvailability}
               options={AVAILABILITY}
-              placeholder={NO_TIMELINE}
+              placeholder={NO_PATTERN}
+              hint="Compared with when each worker is available."
               error={errors.availability}
             />
           </div>

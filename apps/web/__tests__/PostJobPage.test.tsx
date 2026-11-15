@@ -163,3 +163,28 @@ describe("the skills field is optional, and the description comes first", () => 
     expect(createJob).not.toHaveBeenCalled();
   });
 });
+
+describe("the working-pattern field says what it is", () => {
+  it("is labelled as a working pattern, offers No fixed pattern, and keeps the stored option values", () => {
+    render(<Page />);
+    const field = screen.getByLabelText(/What working pattern does the job need\?/) as HTMLSelectElement;
+    expect(screen.queryByLabelText(/When is it needed/)).not.toBeInTheDocument();
+    const options = [...field.options].map((option) => [option.value, option.textContent]);
+    expect(options).toEqual([["", "No fixed pattern"], ["Full-time", "Full-time"], ["Part-time", "Part-time"], ["Weekends", "Weekends"]]);
+    expect(screen.queryByText(/No strict timeline/)).not.toBeInTheDocument();
+  });
+
+  it("sends the value as before, and nothing when it is left empty", async () => {
+    createJob.mockResolvedValue({ posting_id: "p-5" });
+    render(<Page />);
+    await userEvent.type(screen.getByLabelText(/What do you need done\?/), "Electrician needed, a socket keeps sparking");
+    await userEvent.type(screen.getByLabelText(/Job title/), "Fix a socket");
+    await userEvent.type(screen.getByLabelText(/Budget per day/), "1500");
+    await userEvent.selectOptions(screen.getByLabelText(/Where is the job\?/), "Nairobi - Kasarani");
+    await userEvent.selectOptions(screen.getByLabelText(/What working pattern does the job need\?/), "Weekends");
+    await userEvent.click(screen.getByRole("button", { name: /Post job/ }));
+
+    await waitFor(() => expect(createJob).toHaveBeenCalled());
+    expect(createJob.mock.calls[0][0]).toMatchObject({ availability: "Weekends" });
+  });
+});

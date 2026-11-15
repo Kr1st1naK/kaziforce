@@ -28,6 +28,8 @@ vi.mock("@/components/SessionProvider", async (importOriginal) => ({
 vi.mock("@/components/AppShell", () => ({ AppShell: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
 
 const PLUMBER = { id: "occ:plumber", label: "plumber" };
+const NAMED = { describes_as: "fundi bomba", location: "Nairobi - Kasarani", availability: "Full-time" as const, rate_expectation: 2400, public_id: "11111111-2222-4333-8444-555555555555", name: "Amina Wanjiru" };
+const ANONYMOUS = { describes_as: "fundi bomba, install pipes", location: "Meru", availability: "Weekends" as const, rate_expectation: 1800 };
 const PARAMS = Promise.resolve({ postingId: "p-1" });
 
 function posting(over: Partial<JobInterpretation["interpretation"]>): JobInterpretation {
@@ -79,5 +81,30 @@ describe("a posting with skills listed", () => {
     expect(await screen.findByText(/We match on the skills you listed above, and nothing else/)).toBeInTheDocument();
     expect(screen.getByText("replace faucets")).toBeInTheDocument();
     expect(screen.queryByText(/You didn't list any skills/)).not.toBeInTheDocument();
+  });
+});
+
+describe("Workers in this trade", () => {
+  const shown = (sample: unknown[]) => posting({ worker_pool: [{ occupation: PLUMBER, workers: 18, sample: sample as never }] });
+
+  it("says which workers can be opened and which cannot, under the heading", async () => {
+    job.mockResolvedValue(shown([NAMED, ANONYMOUS]));
+    await show();
+
+    const heading = await screen.findByRole("heading", { name: "Workers in this trade" });
+    const note = screen.getByText("Workers who have agreed to be shown can be opened to see contact details. The others cannot.");
+    expect(heading.compareDocumentPosition(note) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("makes a worker who agreed an openable card, and leaves the others plain, in the order given", async () => {
+    job.mockResolvedValue(shown([ANONYMOUS, NAMED]));
+    await show();
+
+    const cards = await screen.findAllByRole("article");
+    expect(cards).toHaveLength(2);
+    expect(cards[0].textContent).toContain("install pipes"); // the order the API returned
+    expect(cards[0].querySelector("a")).toBeNull();
+    expect(cards[1].querySelector("a")).toHaveAccessibleName("Amina Wanjiru");
+    expect(screen.getAllByRole("link", { name: "Amina Wanjiru" })).toHaveLength(1);
   });
 });

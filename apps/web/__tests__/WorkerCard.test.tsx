@@ -88,11 +88,29 @@ describe("WorkerCard for a worker who has agreed to be shown", () => {
     expect(container.textContent).not.toMatch(/score|rank|match|best|top|#\d/i);
   });
 
-  it("is drawn the same as an anonymous card: one article, no emphasis", () => {
+  it("is still one article, drawn no larger than an anonymous card; the only difference is that it can be opened", () => {
     const { container: plain } = render(<WorkerCard worker={worker} trade="electrician" />);
     const { container: withName } = render(<WorkerCard worker={named} trade="electrician" />);
     expect(plain.querySelectorAll("article")).toHaveLength(1);
     expect(withName.querySelectorAll("article")).toHaveLength(1);
-    expect(withName.querySelector("article")?.className).toBe(plain.querySelector("article")?.className);
+    // Both share the base card style, so neither is larger or earlier; the named one adds only the openable style.
+    const named_ = withName.querySelector("article")!.className.split(" ").filter(Boolean);
+    const plain_ = plain.querySelector("article")!.className.split(" ").filter(Boolean);
+    expect(plain_).toHaveLength(1);
+    expect(named_.slice(0, 1)).toEqual(plain_);
+    expect(named_).toHaveLength(2);
+  });
+
+  it("looks openable: a link on the name, and a visible \"Open profile\" cue that is not read twice", () => {
+    const { container } = render(<WorkerCard worker={named} trade="electrician" />);
+    expect(screen.getByRole("link", { name: named.name! })).toHaveAttribute("href", expect.stringContaining("/client/workers/"));
+    const cue = container.querySelector('[aria-hidden="true"]');
+    expect(cue).toHaveTextContent("Open profile");
+  });
+
+  it("gives a card that cannot be opened no link and no cue", () => {
+    const { container } = render(<WorkerCard worker={worker} trade="electrician" />);
+    expect(screen.queryByRole("link")).not.toBeInTheDocument();
+    expect(container.textContent).not.toMatch(/Open profile/);
   });
 });
