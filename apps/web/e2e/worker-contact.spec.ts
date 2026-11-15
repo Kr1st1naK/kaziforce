@@ -70,8 +70,8 @@ async function newClient(browser: Browser) {
 /** Posts the plumbing job and waits for the confirmation screen with its worker cards. */
 async function postPlumbingJob(page: Page) {
   await view(page).getByLabel("Job title").fill("Fix bathroom leakage");
-  await view(page).getByLabel(/What skills does this job need\?/).fill("replace faucets, plumbing tools");
-  await view(page).getByLabel("Description").fill("Need a fundi bomba. Bathroom leaking at the joints.");
+  await view(page).getByLabel("Add skills if you know them").fill("replace faucets, plumbing tools");
+  await view(page).getByLabel("What do you need done?").fill("Need a fundi bomba. Bathroom leaking at the joints.");
   await view(page).getByLabel(/Budget per day/).fill("2200");
   await view(page).getByLabel(/Where is the job\?/).selectOption("Nairobi - Kawangware");
   await view(page).getByRole("button", { name: /Post job/ }).click();

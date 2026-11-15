@@ -4,6 +4,10 @@
  * side. Flat throughout: no shadows and no gradients. It sits on the app's own tokens (globals.css); the only
  * values set here are the blue, and a darker slate for small text, which the app's muted slate (#64748b) leaves just
  * under 4.5:1 on the pale blue.
+ *
+ * The hero adds a picture drawn as inline SVG (components/LandingArt.tsx) and a blueprint dot grid and a measuring-tape
+ * edge, both SVG patterns, so there are still no gradients. Nothing moves, so there is nothing to switch off under
+ * prefers-reduced-motion.
  */
 
 .landing {
@@ -65,21 +69,58 @@
   font-size: 14px;
 }
 
-/* Hero */
+/* Hero: the words on the left, the picture on the right, a measuring-tape edge underneath. */
 
 .hero {
+  position: relative;
   background: var(--tint);
-  padding: 5rem 0;
-  text-align: center;
+  overflow: hidden;
+}
+
+.dots {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.heroGrid {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: var(--space-lg);
+  align-items: center;
+  padding-top: 3.5rem;
+  padding-bottom: 2.5rem;
+}
+
+.kicker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-mono), ui-monospace, Menlo, monospace;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--slate);
+}
+
+.kickerDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+  flex: none;
 }
 
 .heading {
-  max-width: 20ch;
-  margin: 0 auto var(--space-lg);
-  font-size: 36px;
-  line-height: 44px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  margin: 0 0 var(--space-md);
+  font-size: 48px;
+  line-height: 52px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
 }
 
 .headingBlue {
@@ -87,18 +128,35 @@
 }
 
 .lead {
-  max-width: 62ch;
-  margin: 0 auto 3rem;
+  max-width: 34em;
+  margin: 0;
+  font-size: 18px;
+  line-height: 28px;
   color: var(--slate);
+}
+
+.art {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 560px;
+  justify-self: end;
+}
+
+.tape {
+  position: relative;
+  display: block;
+  height: 22px;
+}
+
+.start {
+  padding: 2rem 0 3.5rem;
 }
 
 .entries {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-lg);
-  max-width: 760px;
-  margin: 0 auto;
-  text-align: left;
   scroll-margin-top: var(--space-xl);
 }
 
@@ -107,8 +165,13 @@
   flex-direction: column;
   background: var(--surface);
   border: 1px solid var(--line);
+  border-top: 4px solid var(--primary);
   border-radius: var(--radius);
   padding: var(--space-lg);
+}
+
+.entry:nth-child(2) {
+  border-top-color: var(--blue);
 }
 
 .eyebrow {
@@ -473,6 +536,16 @@
 /* Tablet */
 
 @media (max-width: 900px) {
+  .heroGrid {
+    grid-template-columns: 1fr;
+    padding-top: 2.5rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .art {
+    justify-self: center;
+  }
+
   .steps {
     grid-template-columns: 1fr;
   }
@@ -494,8 +567,14 @@
     padding: 0 var(--space-md);
   }
 
-  .hero {
-    padding: 3rem 0;
+  /* After .shell, whose shorthand would otherwise reset the hero's vertical padding. */
+  .heroGrid {
+    padding-top: 2rem;
+    padding-bottom: 1.25rem;
+  }
+
+  .start {
+    padding: 1.5rem 0 3rem;
   }
 
   .trades,
@@ -512,9 +591,14 @@
   }
 
   .heading {
-    font-size: 28px;
-    line-height: 36px;
-    letter-spacing: -0.01em;
+    font-size: 34px;
+    line-height: 40px;
+    letter-spacing: -0.02em;
+  }
+
+  .lead {
+    font-size: 16px;
+    line-height: 26px;
   }
 
   .sectionHeading,

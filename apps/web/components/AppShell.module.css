@@ -35,6 +35,7 @@
   font-weight: 600;
   text-decoration: none;
   padding-bottom: 4px;
+  white-space: nowrap; /* a label such as "My matches" stays on one line (M-3) */
 }
 
 .navLink {

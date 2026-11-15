@@ -34,8 +34,8 @@ vi.mock("@/components/AppShell", () => ({ AppShell: ({ children }: { children: R
 
 const fields = () => ({
   title: screen.getByLabelText(/Job title/),
-  skills: screen.getByLabelText(/What skills does this job need\?/),
-  description: screen.getByLabelText(/Description/),
+  skills: screen.getByLabelText(/Add skills if you know them/),
+  description: screen.getByLabelText(/What do you need done\?/),
   budget: screen.getByLabelText(/Budget per day/),
   location: screen.getByLabelText(/Where is the job\?/),
 });
@@ -120,5 +120,46 @@ describe("when the service cannot be reached", () => {
     await waitFor(() => expect(push).toHaveBeenCalledWith("/client/postings/p-9"));
     expect(createJob).toHaveBeenCalledTimes(2);
     expect(createJob.mock.calls[1][0]).toEqual(createJob.mock.calls[0][0]);
+  });
+});
+
+describe("the skills field is optional, and the description comes first", () => {
+  it("asks what you need done first, then the title, then the optional skills", () => {
+    render(<Page />);
+    const order = screen.getAllByRole("textbox").map((box) => box.getAttribute("id"));
+    const label = (re: RegExp) => screen.getByLabelText(re).getAttribute("id");
+    expect(order.slice(0, 3)).toEqual([label(/What do you need done\?/), label(/Job title/), label(/Add skills if you know them/)]);
+  });
+
+  it("shows examples the system reaches a trade from, and none it does not", () => {
+    const { container } = render(<Page />);
+    const text = container.textContent ?? "";
+    expect(text).toMatch(/I need a plumber to fix a leaking tap/);
+    expect(text).toMatch(/Electrician needed, a socket keeps sparking/);
+    expect(text).toMatch(/fundi bomba wa kurekebisha bomba/);
+    expect(text).not.toMatch(/mechanic|roof|welder/i);
+  });
+
+  it("posts with no skills and shows no error about them", async () => {
+    createJob.mockResolvedValue({ posting_id: "p-3" });
+    render(<Page />);
+    await userEvent.type(screen.getByLabelText(/What do you need done\?/), "I need a plumber to fix a leaking tap");
+    await userEvent.type(screen.getByLabelText(/Job title/), "Fix a leaking tap");
+    await userEvent.type(screen.getByLabelText(/Budget per day/), "2500");
+    await userEvent.selectOptions(screen.getByLabelText(/Where is the job\?/), "Nairobi - Kasarani");
+    await userEvent.click(screen.getByRole("button", { name: /Post job/ }));
+
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/client/postings/p-3"));
+    expect(createJob.mock.calls[0][0]).toMatchObject({ required_skills: [], description: "I need a plumber to fix a leaking tap" });
+    expect(screen.queryByText(/List what the work involves/)).not.toBeInTheDocument();
+  });
+
+  it("still requires the description and the title", async () => {
+    render(<Page />);
+    await userEvent.click(screen.getByRole("button", { name: /Post job/ }));
+
+    expect(await screen.findByText("Say what you need done.")).toBeInTheDocument();
+    expect(screen.getByText("Give the job a short title.")).toBeInTheDocument();
+    expect(createJob).not.toHaveBeenCalled();
   });
 });

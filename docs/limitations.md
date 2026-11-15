@@ -298,3 +298,35 @@
 40. **The access log records who viewed whom.** A profile view is `GET /workers/<public_id>`, so the
     web server's request log ties a client's address to a worker's page. The id is opaque and the log
     is the server's, not the application's, and no retention rule exists for it.
+
+## 9. Client postings
+
+41. **A posting with no skills is scored without a skill criterion, and can reach workers of other
+    trades.** Since 2026-11-15 a client may post without listing skills (usability finding U-7), and
+    the rule-based score then leaves the skill criterion out and divides its weight among place,
+    pay and time (`rule_based.py`, `skill_overlap` returns none; `combine_present`), so the posting
+    can outrank comparable ones for workers of unrelated trades. Measured on the synthetic data with
+    60 typed-in workers and seven postings, each posted with and without skills (`handoff/29`):
+    without skills a posting reached the top 50 of 32 to 44 of the 60 workers, the top 10 of 0 to 17
+    (the Kiswahili plumber posting, *fundi bomba wa kurekebisha bomba*, 17, all of them workers of
+    other trades; the other six 0 to 4), and was shown (score of 55 or more) to 3 to 9 workers; the
+    same postings with typed skills reached the top 50 of 1 to 18, the top 10 of 0 to 3, and were
+    shown to none. This is accepted and documented, not changed: it follows from how the score treats
+    a missing criterion (`docs/scoring-policy.md` §1), which this work does not touch.
+
+42. **Skills typed in a client's own words match only identical text, so such a posting is nearly
+    invisible to workers.** A listed skill that is not an ESCO label is kept as literal text
+    (`unmapped`), and a worker's skills match it only if the text is identical. The seven postings
+    above, given plausible skills in ordinary words, were shown to none of the 60 workers and ranked
+    at a mean of 31 to 47 where they appeared at all, and the skills changed the trade reached in none
+    of the seven. The form says so by making skills optional and by asking for the description first;
+    it does not turn the words into skills.
+
+43. **Semantic scores for existing pairs can shift by about 1e-7 when the posting pool changes.**
+    When a posting is added the whole list of texts is embedded again, and sentence-transformers sorts
+    by length to form its batches (`matching/semantic.py`, note on batching; measured in
+    `tests/test_semantic_scorer.py`), so float32 rounding differs in the last bit. A 60-worker check
+    on 280 and on 294 postings found no displayed score or band change in any configuration, none in
+    the rule-based ones, and differences of at most 1.2e-7 in the embedding-based ones. The evaluation
+    uses a fixed pool and is unaffected.
+

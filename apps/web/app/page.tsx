@@ -16,6 +16,7 @@
 
 import Link from "next/link";
 import { StartupNotice } from "@/components/AppShell";
+import { DotGrid, LandingArt, Ruler } from "@/components/LandingArt";
 import { useRedirectIfSignedIn } from "@/components/SessionProvider";
 import styles from "./landing.module.css";
 
@@ -92,16 +93,30 @@ export default function Page() {
 
       <main>
         <section className={styles.hero} aria-labelledby="headline">
-          <div className={styles.shell}>
-            <h1 id="headline" className={styles.heading}>
-              Work that fits your hands.
-              <span className={styles.headingBlue}> Said in your own words.</span>
-            </h1>
-            <p className={styles.lead}>
-              KaziForce understands how tradespeople describe their work and matches them with the jobs that need those
-              skills. Type in English or Kiswahili.
-            </p>
+          <DotGrid className={styles.dots} />
+          <div className={`${styles.shell} ${styles.heroGrid}`}>
+            <div>
+              <p className={styles.kicker}>
+                <span className={styles.kickerDot} aria-hidden="true" />
+                Job matching for Kenyan trades
+              </p>
+              <h1 id="headline" className={styles.heading}>
+                Work that fits your hands.
+                <span className={styles.headingBlue}> Said in your own words.</span>
+              </h1>
+              <p className={styles.lead}>
+                KaziForce understands how tradespeople describe their work and matches them with the jobs that need those
+                skills. Describe your work in your own words, in English or Kiswahili. We know the common terms for the
+                trades listed below.
+              </p>
+            </div>
+            <LandingArt className={styles.art} />
+          </div>
+          <Ruler className={styles.tape} />
+        </section>
 
+        <section className={styles.start}>
+          <div className={styles.shell}>
             <div id="start" className={styles.entries}>
               <div className={styles.entry}>
                 <p className={`${styles.eyebrow} ${styles.eyebrowOrange}`}>Kwa mafundi</p>

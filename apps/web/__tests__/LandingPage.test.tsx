@@ -159,3 +159,31 @@ describe("the page's behaviour", () => {
     }
   });
 });
+
+describe("the hero picture", () => {
+  it("is decoration: aria-hidden, no title, nothing focusable inside any drawing", () => {
+    const { container } = render(<Page />);
+    const drawings = [...container.querySelectorAll("main svg")].filter((svg) => svg.getAttribute("viewBox") === "0 0 560 400");
+    expect(drawings).toHaveLength(1);
+    for (const svg of container.querySelectorAll("svg")) {
+      expect(svg).toHaveAttribute("aria-hidden", "true");
+      expect(svg.querySelector("title, desc")).toBeNull();
+      expect(svg.querySelectorAll("a, button, input, select, textarea, [tabindex]")).toHaveLength(0);
+    }
+  });
+
+  it("labels its job slip as an example, so it cannot read as a real job or a testimonial", () => {
+    const { container } = render(<Page />);
+    const slip = container.querySelector('svg[viewBox="0 0 560 400"]')!;
+    expect(slip.textContent).toMatch(/EXAMPLE/);
+    expect(slip.textContent).toMatch(/Same trade/);
+    expect(slip.textContent).not.toMatch(/\d/);
+  });
+
+  it("keeps the first sentence of the lead and describes what the page now offers", () => {
+    render(<Page />);
+    expect(screen.getByText(/Describe your work in your own words, in English or Kiswahili/)).toBeInTheDocument();
+    expect(screen.getByText(/We know the common terms for the trades listed below/)).toBeInTheDocument();
+    expect(screen.queryByText(/Type in English or Kiswahili/)).not.toBeInTheDocument();
+  });
+});
