@@ -405,3 +405,27 @@ test("a client whose words reach no trade, with no skills, is told so plainly", 
   await expect(view(page).getByText(/You didn't list any skills, so we couldn't compare skills/)).toBeVisible();
   await expect(page.getByRole("heading", { name: "Workers in this trade" })).toHaveCount(0);
 });
+
+test("at 375px the matches list gives a job's title the row, and the header's links stay on one line", async ({ page }) => {
+  // M-2 (the title was squeezed into a column about 100 px wide by the score beside it) and M-3 (the header wrapped).
+  await page.setViewportSize({ width: 375, height: 812 });
+  await createAccount(page, "worker");
+  await page.getByLabel(/What work do you do\?/).fill("fundi wa umeme, wiring, solar installation");
+  await page.getByLabel(/About you/).fill("Nina uzoefu wa miaka mitano. Domestic and commercial installations.");
+  await page.getByLabel(/Where do you work\?/).selectOption("Nairobi - Kasarani");
+  await page.getByRole("button", { name: "Create profile" }).click();
+  await expect(page).toHaveURL(/\/worker\/matches$/);
+
+  const card = view(page).locator("article").first();
+  await expect(card).toBeVisible();
+  const title = await card.getByRole("heading", { level: 3 }).boundingBox();
+  const cardBox = await card.boundingBox();
+  expect(title!.width).toBeGreaterThan(cardBox!.width * 0.6); // it was about a third of the card
+
+  const links = page.locator("header:visible nav a");
+  expect(await links.count()).toBeGreaterThan(0);
+  for (const link of await links.all()) {
+    const box = await link.boundingBox();
+    expect(box!.height, `"${await link.innerText()}" wraps`).toBeLessThan(34); // one line of 16 px text plus its underline
+  }
+});

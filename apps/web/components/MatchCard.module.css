@@ -138,6 +138,17 @@ span.below_threshold {
     flex-wrap: wrap;
   }
 
+  /* The title and its facts take the whole row; the score and band drop to the line below instead of
+     squeezing the title into a column about 100 px wide (M-2). */
+  .headline {
+    flex: 1 1 calc(100% - 3.5rem);
+  }
+
+  .badge {
+    flex-basis: 100%;
+    padding-left: 3.5rem;
+  }
+
   .bottom {
     flex-direction: column;
     align-items: flex-start;
