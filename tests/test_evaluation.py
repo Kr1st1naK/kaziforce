@@ -28,11 +28,26 @@ def run():
     return loader, Evaluator(loader, recommenders, max_queries=12).run()
 
 
-@pytest.mark.parametrize("split", ["validation", "test", "train"])
-def test_only_the_development_split_may_be_evaluated(split):
-    assert EVALUATION_SPLITS == ("development",)
+@pytest.mark.parametrize("split", ["validation", "train"])
+def test_only_the_development_and_test_splits_may_be_evaluated(split):
+    # The test split was allowed in the commit that prepares the single final run (docs/test-split-preflight.md).
+    # The guard still refuses everything else.
+    assert EVALUATION_SPLITS == ("development", "test")
     with pytest.raises(ValueError, match="may not be evaluated"):
         Evaluator(DataLoader(), {}, split=split)
+
+
+def test_the_default_split_is_still_development_and_the_test_split_must_be_asked_for():
+    """Allowing the test split must not make it the default, in the evaluator or in the script."""
+    import inspect
+    from pathlib import Path
+
+    assert inspect.signature(Evaluator).parameters["split"].default == "development"
+    script = (Path(__file__).resolve().parent.parent / "scripts" / "evaluate.py").read_text()
+    assert 'add_argument("--split", default="development", choices=["development", "test"])' in script
+    assert "split=args.split" in script and '"split": args.split' in script
+    # Constructing an evaluator for the test split reads nothing: it only passes the guard.
+    assert Evaluator(DataLoader(), {}, split="test").split == "test"
 
 
 def test_every_query_is_a_development_worker(run):
