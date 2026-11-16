@@ -2,7 +2,7 @@
 
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { MatchCard, MatchScoreBadge, SkillChips, formatKes } from "@/components/MatchCard";
+import { EXCERPT_CHARS, MatchCard, MatchScoreBadge, SkillChips, excerpt, formatKes } from "@/components/MatchCard";
 import type { Band } from "@/lib/types";
 
 describe("MatchScoreBadge", () => {
@@ -69,5 +69,52 @@ describe("MatchCard", () => {
     expect(screen.getByRole("link", { name: /\+2 more/ })).toHaveAttribute("href", "/worker/matches/p-7");
     expect(screen.getByRole("link", { name: "Why this job?" })).toHaveAttribute("href", "/worker/matches/p-7");
     expect(screen.getAllByText(/^[a-c]$/)).toHaveLength(3); // the card still shows the same three skills
+  });
+});
+
+describe("the job's details on the card (U-11)", () => {
+  const base = {
+    rank: 1, posting_id: "p-9", title: "Install a new distribution board", location: "Nairobi - Kasarani", budget: 3000,
+    availability: "Full-time", match_score: 71, band: "moderate", matched_skills: [],
+  };
+  const withDescription = (description: string) => ({ ...base, description }) as unknown as import("@/lib/types").MatchResult;
+
+  it("shows a short description under the title and facts", () => {
+    render(<MatchCard result={withDescription("A new board for a three-bedroom house in Kasarani. Materials are on site.")} href="/worker/matches/p-9" />);
+    expect(screen.getByText(/A new board for a three-bedroom house in Kasarani/)).toBeInTheDocument();
+  });
+
+  it("cuts a very long description at a word, so the card takes a few lines and not thousands of characters", () => {
+    const long = "work location pay details compensation ".repeat(400); // about 15,600 characters
+    const { container } = render(<MatchCard result={withDescription(long)} href="/worker/matches/p-9" />);
+    const shown = container.querySelector("[class*=excerpt]")!.textContent!;
+    expect(shown.length).toBeLessThanOrEqual(EXCERPT_CHARS + 1);
+    expect(shown.endsWith("…")).toBe(true);
+    expect(shown).not.toMatch(/ …$/); // cut at a word, no dangling space
+  });
+
+  it("is plain text: markup in a description is shown as written and never becomes an element", () => {
+    const { container } = render(<MatchCard result={withDescription('<b>Urgent</b> <img src=x onerror="alert(1)"> wiring')} href="/worker/matches/p-9" />);
+    expect(container.querySelector("b, img, script")).toBeNull();
+    expect(container.textContent).toContain("<b>Urgent</b>");
+  });
+
+  it("has no empty paragraph when a posting has no description", () => {
+    const { container } = render(<MatchCard result={withDescription("   ")} href="/worker/matches/p-9" />);
+    expect(container.querySelector("[class*=excerpt]")).toBeNull();
+  });
+});
+
+describe("excerpt", () => {
+  it("leaves a short text alone, collapses whitespace, and copes with nothing", () => {
+    expect(excerpt("  Rewire   a\nshop ")).toBe("Rewire a shop");
+    expect(excerpt("")).toBe("");
+    expect(excerpt(null)).toBe("");
+    expect(excerpt(undefined)).toBe("");
+  });
+
+  it("cuts a word-less run of characters at the limit rather than not at all", () => {
+    const run = "a".repeat(1000);
+    expect(excerpt(run, 100)).toBe(`${"a".repeat(100)}…`);
   });
 });

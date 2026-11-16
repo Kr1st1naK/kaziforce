@@ -62,3 +62,30 @@
 .loading {
   color: var(--muted);
 }
+
+.about {
+  margin-top: var(--space-lg);
+}
+
+.aboutHeading {
+  margin: 0 0 var(--space-sm);
+  font-size: 18px;
+  line-height: 24px;
+}
+
+.aboutText {
+  /* The text can be thousands of characters (the 200 postings from the Job Skill Set run to 13,000): it scrolls in
+     its own box, wraps anywhere, and keeps the poster's line breaks. */
+  max-height: 20rem;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+  color: var(--ink);
+  line-height: 24px;
+  padding-right: var(--space-sm);
+}
+
+.aboutText:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}

@@ -92,6 +92,18 @@ function Explanation({ params }: { params: Promise<{ postingId: string }> }) {
         </div>
       </div>
 
+      {result.description.trim() && (
+        <section className={`card ${styles.about}`} aria-labelledby="about-heading">
+          <h2 id="about-heading" className={styles.aboutHeading}>
+            About this job
+          </h2>
+          {/* Plain text, as the poster wrote it. Long descriptions scroll inside the box instead of lengthening the page. */}
+          <div className={styles.aboutText} tabIndex={0} role="region" aria-label="Full job description">
+            {result.description}
+          </div>
+        </section>
+      )}
+
       <PlainExplanation explanation={result.explanation} />
     </>
   );

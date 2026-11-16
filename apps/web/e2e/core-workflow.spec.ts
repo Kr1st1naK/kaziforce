@@ -473,3 +473,34 @@ test("after posting a job, \"Post another job\" opens a form whose button is idl
   await expect(view(page).getByText("Posting…")).toHaveCount(0);
   await expect(view(page).getByLabel("What do you need done?")).toBeEnabled();
 });
+
+test("a match shows what the job is, and \"Why this job?\" shows the whole description", async ({ page }) => {
+  // Usability finding U-11 (R2-W1: "have descriptions about the job"). A phone, so the layout is tested as well.
+  await page.setViewportSize({ width: 375, height: 812 });
+  await createAccount(page, "worker");
+  await page.getByLabel(/What work do you do\?/).fill("fundi wa umeme, wiring, solar installation");
+  await page.getByLabel(/About you/).fill("Nina uzoefu wa miaka mitano. Domestic and commercial installations.");
+  await page.getByLabel(/Where do you work\?/).selectOption("Nairobi - Kasarani");
+  await page.getByRole("button", { name: "Create profile" }).click();
+  await expect(page).toHaveURL(/\/worker\/matches$/);
+
+  const card = view(page).locator("article").first();
+  const excerpt = card.locator("[class*=excerpt]");
+  await expect(excerpt).toBeVisible();
+  const shown = ((await excerpt.innerText()) ?? "").trim();
+  expect(shown.length).toBeGreaterThan(20);
+  expect((await excerpt.boundingBox())!.height).toBeLessThanOrEqual(3 * 22 + 2); // three lines at most
+  const noOverflow = await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth);
+  expect(noOverflow).toBe(true);
+
+  await card.getByRole("link", { name: "Why this job?" }).click();
+  await expect(page).toHaveURL(/\/worker\/matches\/[0-9a-f-]+$/);
+  await expect(view(page).getByRole("heading", { name: "About this job" })).toBeVisible();
+  const full = view(page).getByRole("region", { name: "Full job description" });
+  await expect(full).toBeVisible();
+  // The excerpt is the start of the same text (compared on its first words, whitespace collapsed).
+  const start = shown.replace(/…$/, "").split(" ").slice(0, 6).join(" ");
+  expect(((await full.innerText()) ?? "").replace(/\s+/g, " ")).toContain(start);
+  // The explanation is still there, unchanged.
+  await expect(page.getByRole("heading", { name: "What lined up" })).toBeVisible();
+});
