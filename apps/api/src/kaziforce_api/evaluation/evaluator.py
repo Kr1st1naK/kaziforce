@@ -20,7 +20,9 @@ from kaziforce_api.evaluation.metrics import first_relevant_rank, precision_at_k
 from kaziforce_api.explainability.base import Explainer
 from kaziforce_api.pipeline import Recommender
 
-EVALUATION_SPLITS = ("development",)
+# "test" was added in the commit that prepares the one final run (docs/test-split-preflight.md); the default
+# split everywhere stays "development", and a run on the test split must be asked for with --split test.
+EVALUATION_SPLITS = ("development", "test")
 VARIANTS = ("formal", "known_alias", "held_out", "minimal")
 ALL = "all"
 COVERAGE_K = 10  # NFR-02 is about the top-K shown to a worker (docs/scoring-policy.md §7)

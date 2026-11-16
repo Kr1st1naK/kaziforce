@@ -37,6 +37,20 @@ commit `46116e0` with a clean working tree.
 The file hashes differ **only** because each file carries wall-clock timings, which differ
 between any two runs. Every reported number is identical.
 
+### A third comparison, on the freeze commit (2026-11-16)
+
+Run C, `results/dev/20261116-002209_5c915fc` (commit `5c915fc`, clean tree), against run `results/dev/20261112-082720_64381de`,
+four days and several commits earlier (the interface, the API's job form and the demo seed changed in between; the scoring path did not):
+
+```
+metrics.csv     (35 rows)   differing cells outside the timing columns: 0
+per_query.csv   (1512 rows) differing cells outside the timing columns: 0
+run.json        keys that differ: created_at, git.commit, scoring_policy_sha256, startup_seconds
+```
+
+The scoring-policy checksum differs because `docs/scoring-policy.md` gained its "Deviations" section in `b44c924`
+(documentation; no rule changed). The dataset and knowledge-graph checksums are identical.
+
 ### Composite scores, bit for bit
 
 The run comparison above shows identical rankings and metrics, but `per_query.csv` records

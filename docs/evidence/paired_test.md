@@ -1,6 +1,6 @@
 # Paired test: `full` against `hybrid_no_kg`
 
-Metric: per-query **reciprocal rank**. Run: `results/dev/20261026-232037_46116e0` (216 development queries, each answered by both configurations).
+Metric: per-query **reciprocal rank**. Run: `results/dev/20261116-002209_5c915fc` (216 development queries, each answered by both configurations).
 
 ## Which test, and why
 
