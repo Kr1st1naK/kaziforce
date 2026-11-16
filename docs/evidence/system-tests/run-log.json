@@ -1,0 +1,255 @@
+{
+  "T-01": {
+    "id": "T-01",
+    "job": {
+      "screenshot": "T-01-1-job-posted.png",
+      "text": "\u2713\nYour job has been posted.\nHow we understood your posting\nCLIENT VERBATIM INPUT\n\u201cInstall a new distribution board\u201d\n\u2193\nWe matched this to the trade: electrician\ninstall electricity sockets\ntest electrical equipment\nelectrical installation\nWe read the words of your posting and they describe the work electricians do. We match on the skills you listed above, and nothing else. We didn't recognise \u201celectrical installation\u201d, so we kept it exactly as you wrote it.\nWorkers in this trade\n36 workers on the platform describe themselves as electricians.\n\u201cfundi wa umeme\u201d\nelectrician\nMombasa - Likoni\nWeekends\nKES 2,100 / day\n\u201cfundi wa umeme\u201d\nelectrician\nKitengela\nFull-time\nKES 3,100 / day\n\u201cfundi wa umeme\u201d\nelectrician\nMombasa - Nyali\nWeekends\nKES 1,700 / day\n\u201cinspect electrical supplies, bind wire, follow health and safety procedures in construction, install electric switches\u2026\u201d\nelectrician\nNairobi - Kasarani\nPart-time\nKES 3,100 / day\n\u201cfundi wa umeme\u201d\nelectrician\nThika\nAvailability not stated\nRate not stated\n+\nPost another job"
+    },
+    "profileScreenshot": "T-01-2-profile-filled.png",
+    "worker": {
+      "matchesScreenshot": "T-01-3-matches.png",
+      "matchesText": "Your matches\nJobs ranked by how well they fit your profile.\n#1\nInstall a new distribution board\nNairobi - Kasarani \u00b7 KES 3,600 / day \u00b7 Weekends\nMatch score 86\nStrong\ntest electrical equipment\nkeep records of work progress\nmaintain electrical equipment\n+1 more\nWhy this job?\n#2\nHouse wiring for new rental units\nNairobi - Westlands \u00b7 KES 1,800 / day \u00b7 Part-time\nMatch score 82\nStrong\nuse precision tools\nelectricity\ninspect electrical supplies\n+1 more\nWhy this job?\n#3\nRewire an old shop\nNairobi - Githurai \u00b7 KES 2,500 / day \u00b7 Full-time\nMatch score 82\nStrong\nfollow health and safety procedures in construction\nuse safety equipment in construction\ninspect electrical supplies\nWhy this job?\n#4\nInstall a new distribution board\nNairobi - Kasarani \u00b7 KES 2,800 / day \u00b7 Not stated\nMatch score 75\nModerate\ninstall electricity sockets\ntest electrical equipment\nelectrical installation\nWhy this job?\n#5\nHouse wiring for new rental units\nMachakos \u00b7 KES 3,700 / day \u00b7 Weekends\nMatch score 71\nModerate\nfollow health and safety procedures in construction\nuse measurement instruments\nsplice cable\n+2 more\nWhy this job?\n#6\nElectrical fault-finding in an office\nMeru \u00b7 KES 4,700 / day \u00b7 Part-time\nMatch score 69\nModerate\ninstall electricity sockets\nuse measurement instruments\nwork in a construction team\n+1 more\nWhy this job?\n#7\nRewire an old shop\nThika \u00b7 KES 3,700 / day \u00b7 Full-time\nMatch score 69\nModerate\nmaintain electrical equipment\nsplice cable\ninstall lightning protection system\nWhy this job?\n#8\nHouse wiring for new rental units\nEldoret \u00b7 KES 1,900 / day \u00b7 Part-time\nMatch score 67\nModerate\nreact to events in time-critical environments\nsplice cable\nuse safety equipment in construction\nWhy this job?\n#9\nInstall security lights in a compound\nNyeri \u00b7 KES 5,100 / day \u00b7 Full-time\nMatch score 65\nModerate\nuse precision tools\nelectricity\ninstall lightning protection system\n+2 more\nWhy this job?\n#10\nReplace brake pads and discs\nNairobi - Umoja \u00b7 KES 3,100 / day \u00b7 Weekends\nMatch score 57\nWeak\nWhy this job?",
+      "cardCount": 10,
+      "top3": [
+        "#1 | Install a new distribution board | Nairobi - Kasarani \u00b7 KES 3,600 / day \u00b7 Weekends | Match score 86 | Strong | test electrical equipment | keep records of work progress | maintain electrical equipment | +1 more | Why this job?",
+        "#2 | House wiring for new rental units | Nairobi - Westlands \u00b7 KES 1,800 / day \u00b7 Part-time | Match score 82 | Strong | use precision tools | electricity | inspect electrical supplies | +1 more | Why this job?",
+        "#3 | Rewire an old shop | Nairobi - Githurai \u00b7 KES 2,500 / day \u00b7 Full-time | Match score 82 | Strong | follow health and safety procedures in construction | use safety equipment in construction | inspect electrical supplies | Why this job?"
+      ],
+      "ownJobListed": true,
+      "ownJobPosition": 1,
+      "explanationOf": "Install a new distribution board",
+      "explanationScreenshot": "T-01-3-explanation.png",
+      "explanationText": "\u2190\nBack to your matches\nWhy this job suits you\nYour profile\n\u21c4\nInstall a new distribution board\nMatch score 86 \u2014 Strong\nWhat lined up\n\u2713\nThis job needs someone to keep records of work progress. That's part of electrical work.\n\u2713\nThis job needs someone to maintain electrical equipment. That's part of electrical work.\n\u2713\nThis job needs electricity. That's part of electrical work.\n\u2713\nYou said you do test electrical equipment, and this job mentions it.\n\u2713\nYou're both in Nairobi - Kasarani.\n\u2713\nYour rate of KES 2,500 a day fits their budget.\n\u2713\nYou can work full-time, and that suits this job."
+    }
+  },
+  "T-02": {
+    "id": "T-02",
+    "job": {
+      "screenshot": "T-02-1-job-posted.png",
+      "text": "\u2713\nYour job has been posted.\nHow we understood your posting\nCLIENT VERBATIM INPUT\n\u201cFix bathroom leakage\u201d\n\u2193\nWe matched this to the trade: plumber\ninstall sanitary equipment\nrepair pipes\nWe read the words of your posting and they describe the work plumbers do. We match on the skills you listed above, and nothing else. We didn't recognise \u201cinstall sanitary equipment\u201d, \u201crepair pipes\u201d, so we kept it exactly as you wrote it.\nWorkers in this trade\n15 workers on the platform describe themselves as plumbers.\n\u201cwork ergonomically, interpret 3D plans, transport construction supplies, order construction supplies\u2026\u201d\nplumber\nNairobi - Kasarani\nPart-time\nKES 1,800 / day\n\u201cfundi bomba\u201d\nplumber\nNairobi - Kasarani\nPart-time\nKES 1,800 / day\n\u201cfundi bomba\u201d\nplumber\nNairobi - Umoja\nAvailability not stated\nRate not stated\n\u201cinstall plumbing systems, place sanitary equipment, use measurement instruments, check water pressure\u2026\u201d\nplumber\nMeru\nPart-time\nKES 2,700 / day\n\u201cfundi bomba\u201d\nplumber\nNairobi - Kasarani\nAvailability not stated\nRate not stated\n+\nPost another job"
+    },
+    "profileScreenshot": "T-02-2-profile-filled.png",
+    "worker": {
+      "matchesScreenshot": "T-02-3-matches.png",
+      "matchesText": "Your matches\nJobs ranked by how well they fit your profile.\n#1\nInstall a water tank and piping\nNairobi - Kibera \u00b7 KES 3,100 / day \u00b7 Part-time\nMatch score 78\nModerate\ninstall metal gas piping\nplumbing tools\nuse safety equipment in construction\n+2 more\nWhy this job?\n#2\nPlumbing for a new bathroom\nNairobi - Kasarani \u00b7 KES 1,800 / day \u00b7 Full-time\nMatch score 70\nModerate\nwork ergonomically\nuse welding equipment\nprepare copper pipes for use as gas lines\n+2 more\nWhy this job?\n#3\nInstall a water tank and piping\nNairobi - Githurai \u00b7 KES 2,200 / day \u00b7 Weekends\nMatch score 69\nModerate\nuse safety equipment in construction\ntypes of piping\ninterpret 2D plans\nWhy this job?\n#4\nConnect a borehole pump to a house\nMachakos \u00b7 KES 2,600 / day \u00b7 Part-time\nMatch score 64\nWeak\ntransport construction supplies\nreplace faucets\nprepare copper pipes for use as gas lines\n+1 more\nWhy this job?\n#5\nRepair leaking pipes in an apartment\nNairobi - Embakasi \u00b7 KES 1,500 / day \u00b7 Weekends\nMatch score 63\nWeak\nreplace faucets\ninstall plumbing systems\nprepare copper pipes for use as gas lines\n+1 more\nWhy this job?\n#6\nLay foundation blocks for a house\nNairobi - Kibera \u00b7 KES 2,100 / day \u00b7 Part-time\nMatch score 61\nWeak\ninterpret 2D plans\ntransport construction supplies\nfollow health and safety procedures in construction\nWhy this job?\n#7\nRepair leaking pipes in an apartment\nKisumu \u00b7 KES 3,000 / day \u00b7 Full-time\nMatch score 58\nWeak\ninterpret 3D plans\nclear out drains\ninstall plumbing systems\n+2 more\nWhy this job?\n#8\nRoof timber work for a bungalow\nNairobi - Embakasi \u00b7 KES 2,700 / day \u00b7 Part-time\nMatch score 56\nWeak\ninspect construction supplies\nfollow health and safety procedures in construction\nWhy this job?\n#9\nRewire an old shop\nNairobi - Githurai \u00b7 KES 2,500 / day \u00b7 Full-time\nMatch score 56\nWeak\nfollow health and safety procedures in construction\nuse safety equipment in construction\nWhy this job?\n#10\nConnect a borehole pump to a house\nThika \u00b7 KES 4,300 / day \u00b7 Weekends\nMatch score 55\nWeak\ntransport construction supplies\nplace sanitary equipment\nwork ergonomically\nWhy this job?",
+      "cardCount": 10,
+      "top3": [
+        "#1 | Install a water tank and piping | Nairobi - Kibera \u00b7 KES 3,100 / day \u00b7 Part-time | Match score 78 | Moderate | install metal gas piping | plumbing tools | use safety equipment in construction | +2 more | Why this job?",
+        "#2 | Plumbing for a new bathroom | Nairobi - Kasarani \u00b7 KES 1,800 / day \u00b7 Full-time | Match score 70 | Moderate | work ergonomically | use welding equipment | prepare copper pipes for use as gas lines | +2 more | Why this job?",
+        "#3 | Install a water tank and piping | Nairobi - Githurai \u00b7 KES 2,200 / day \u00b7 Weekends | Match score 69 | Moderate | use safety equipment in construction | types of piping | interpret 2D plans | Why this job?"
+      ],
+      "ownJobListed": false,
+      "explanationOf": "rank #1 (own job not listed)",
+      "explanationScreenshot": "T-02-3-explanation.png",
+      "explanationText": "\u2190\nBack to your matches\nWhy this job suits you\nYour profile\n\u21c4\nInstall a water tank and piping\nMatch score 78 \u2014 Moderate\nWhat lined up\n\u2713\nThis job needs someone to install metal gas piping. That's part of plumbing work.\n\u2713\nThis job needs plumbing tools. That's part of plumbing work.\n\u2713\nThis job needs someone to use safety equipment in construction. That's part of plumbing work.\n\u2713\nThis job needs someone to follow health and safety procedures in construction. That's part of plumbing work.\n\u2713\nThis job needs someone to inspect construction supplies. That's part of plumbing work.\n\u2713\nYou're both in Nairobi - Kawangware.\n\u2713\nYour rate of KES 2,200 a day fits their budget.\n\u2713\nYou can work part-time, and that suits this job.\n\u21c4\nYou described yourself as a fundi bomba. We matched that to the trade plumber."
+    }
+  },
+  "T-03": {
+    "id": "T-03",
+    "job": {
+      "screenshot": "T-03-1-job-posted.png",
+      "text": "\u2713\nYour job has been posted.\nHow we understood your posting\nCLIENT VERBATIM INPUT\n\u201cMake school desks\u201d\n\u2193\nWe matched this to the trade: carpenter\nwoodworking\nassemble furniture\nuse woodworking tools\nWe read the words of your posting and they describe the work carpenters do. We match on the skills you listed above, and nothing else. We didn't recognise \u201cwoodworking\u201d, \u201cassemble furniture\u201d, \u201cuse woodworking tools\u201d, so we kept it exactly as you wrote it.\nWorkers in this trade\n15 workers on the platform describe themselves as carpenters.\n\u201cfundi wa mbao\u201d\ncarpenter\nNairobi - Rongai\nAvailability not stated\nRate not stated\n\u201cfundi wa mbao\u201d\ncarpenter\nRuiru\nAvailability not stated\nRate not stated\n\u201cfundi wa mbao\u201d\ncarpenter\nKakamega\nAvailability not stated\nRate not stated\n\u201csort waste, keep track of wooden elements, create smooth wood surface, wood cuts\u201d\ncarpenter\nRuiru\nWeekends\nKES 1,900 / day\n\u201cfundi wa mbao\u201d\ncarpenter\nKakamega\nWeekends\nKES 2,700 / day\n+\nPost another job"
+    },
+    "profileScreenshot": "T-03-2-profile-filled.png",
+    "worker": {
+      "matchesScreenshot": "T-03-3-matches.png",
+      "matchesText": "Your matches\nJobs ranked by how well they fit your profile.\n#1\nRoof timber work for a bungalow\nMombasa - Likoni \u00b7 KES 2,700 / day \u00b7 Full-time\nMatch score 67\nModerate\nfollow health and safety procedures in construction\napply wood finishes\nsort waste\nWhy this job?\n#2\nBuild a wooden gate\nNairobi - Kawangware \u00b7 KES 3,100 / day \u00b7 Weekends\nMatch score 66\nModerate\nwoodworking tools\ncreate wood joints\ninstall construction profiles\n+1 more\nWhy this job?\n#3\nBuild kitchen cabinets\nKisumu \u00b7 KES 3,600 / day \u00b7 Weekends\nMatch score 66\nModerate\nsnap chalk line\ninstall wood hardware\ninterpret 3D plans\n+2 more\nWhy this job?\n#4\nMake school desks\nKitengela \u00b7 KES 3,900 / day \u00b7 Weekends\nMatch score 65\nModerate\nwork ergonomically\ntransport construction supplies\njoin wood elements\n+2 more\nWhy this job?\n#5\nRoof timber work for a bungalow\nNairobi - Embakasi \u00b7 KES 2,700 / day \u00b7 Part-time\nMatch score 65\nModerate\nkeep sawing equipment in good condition\ninspect construction supplies\ninstall wood hardware\n+2 more\nWhy this job?\n#6\nRepair wooden doors and frames\nNakuru \u00b7 KES 2,100 / day \u00b7 Full-time\nMatch score 65\nModerate\ntransport construction supplies\nkeep track of wooden elements\ninstall construction profiles\n+1 more\nWhy this job?\n#7\nFit wardrobes in a new flat\nNairobi - Umoja \u00b7 KES 2,600 / day \u00b7 Full-time\nMatch score 63\nWeak\ncreate smooth wood surface\nwork ergonomically\nsort waste\n+2 more\nWhy this job?\n#8\nFit wardrobes in a new flat\nRuiru \u00b7 KES 3,600 / day \u00b7 Full-time\nMatch score 63\nWeak\nuse safety equipment in construction\nsort waste\nfollow health and safety procedures in construction\n+1 more\nWhy this job?\n#9\nConnect a borehole pump to a house\nThika \u00b7 KES 4,300 / day \u00b7 Weekends\nMatch score 57\nWeak\ntransport construction supplies\nwork ergonomically\nWhy this job?",
+      "cardCount": 9,
+      "top3": [
+        "#1 | Roof timber work for a bungalow | Mombasa - Likoni \u00b7 KES 2,700 / day \u00b7 Full-time | Match score 67 | Moderate | follow health and safety procedures in construction | apply wood finishes | sort waste | Why this job?",
+        "#2 | Build a wooden gate | Nairobi - Kawangware \u00b7 KES 3,100 / day \u00b7 Weekends | Match score 66 | Moderate | woodworking tools | create wood joints | install construction profiles | +1 more | Why this job?",
+        "#3 | Build kitchen cabinets | Kisumu \u00b7 KES 3,600 / day \u00b7 Weekends | Match score 66 | Moderate | snap chalk line | install wood hardware | interpret 3D plans | +2 more | Why this job?"
+      ],
+      "ownJobListed": true,
+      "ownJobPosition": 4,
+      "explanationOf": "Make school desks",
+      "explanationScreenshot": "T-03-3-explanation.png",
+      "explanationText": "\u2190\nBack to your matches\nWhy this job suits you\nYour profile\n\u21c4\nMake school desks\nMatch score 65 \u2014 Moderate\nWhat lined up\n\u2713\nThis job needs someone to work ergonomically. That's part of carpentry.\n\u2713\nThis job needs someone to transport construction supplies. That's part of carpentry.\n\u2713\nThis job needs someone to join wood elements. That's part of carpentry.\n\u2713\nThis job needs someone to use safety equipment in construction. That's part of carpentry.\n\u2713\nThis job needs wood cuts. That's part of carpentry.\n\u2713\nYour rate of KES 2,000 a day fits their budget.\n\u2713\nYou can work full-time, and that suits this job.\n\u21c4\nYou described yourself as a fundi wa mbao. We matched that to the trade carpenter."
+    }
+  },
+  "T-04": {
+    "id": "T-04",
+    "job": {
+      "screenshot": "T-04-1-job-posted.png",
+      "text": "\u2713\nYour job has been posted.\nHow we understood your posting\nCLIENT VERBATIM INPUT\n\u201cGari haina nguvu\u201d\n\u2193\nWe matched this to the trade: vehicle technician\ndiagnose engine fault\nYou wrote \u201cmakanika\u201d, which is another way of saying vehicle technician, so that is the trade we read your posting as. We match on the skills you listed above, and nothing else. We didn't recognise \u201cdiagnose engine fault\u201d, so we kept it exactly as you wrote it.\nWorkers in this trade\n15 workers on the platform describe themselves as vehicle technicians.\n\u201cmaintain vehicle records, position vehicles for maintenance and repair, adapt to new technology used in cars\u2026\u201d\nvehicle technician\nKisumu\nPart-time\nKES 3,100 / day\n\u201cthink analytically, teamwork principles, apply health and safety standards, maintain motor vehicle steering system\u2026\u201d\nvehicle technician\nKitengela\nPart-time\nKES 1,700 / day\n\u201cfundi wa magari\u201d\nvehicle technician\nNairobi - Embakasi\nFull-time\nKES 3,900 / day\n\u201cfundi wa magari\u201d\nvehicle technician\nNakuru\nAvailability not stated\nRate not stated\n\u201cfundi wa magari\u201d\nvehicle technician\nMachakos\nAvailability not stated\nRate not stated\n+\nPost another job"
+    },
+    "profileScreenshot": "T-04-2-profile-filled.png",
+    "worker": {
+      "matchesScreenshot": "T-04-3-matches.png",
+      "matchesText": "Your matches\nJobs ranked by how well they fit your profile.\nNo strong matches yet\nWe didn't find a job that fits your profile well. Adding more detail about your skills usually helps.\nEdit your profile",
+      "cardCount": 0,
+      "top3": [],
+      "ownJobListed": false
+    }
+  },
+  "T-05": {
+    "id": "T-05",
+    "job": {
+      "screenshot": "T-05-1-job-posted.png",
+      "text": "\u2713\nYour job has been posted.\nHow we understood your posting\nCLIENT VERBATIM INPUT\n\u201cMpishi wa harusi\u201d\n\u2193\nWe matched this to the trade: cook\nuse cooking techniques\nprepare food\nYou wrote \u201cmpikaji\u201d, which is another way of saying cook, so that is the trade we read your posting as. We match on the skills you listed above, and nothing else. We didn't recognise \u201cprepare food\u201d, so we kept it exactly as you wrote it.\nWorkers in this trade\n15 workers on the platform describe themselves as cooks.\n\u201cmpishi\u201d\ncook\nEldoret\nAvailability not stated\nRate not stated\n\u201chandover the food preparation area, comply with standard portion sizes, use food cutting tools\u2026\u201d\ncook\nEldoret\nPart-time\nKES 1,600 / day\n\u201cidentify nutritional properties of food, comply with food safety and hygiene, use culinary finishing techniques\u2026\u201d\ncook\nKakamega\nWeekends\nKES 900 / day\n\u201cuse cooking techniques, comply with food safety and hygiene, use food cutting tools, work in a hospitality team\u2026\u201d\ncook\nNairobi - Umoja\nFull-time\nKES 800 / day\n\u201cmpishi\u201d\ncook\nNairobi - Umoja\nFull-time\nKES 800 / day\n+\nPost another job"
+    },
+    "profileScreenshot": "T-05-2-profile-filled.png",
+    "worker": {
+      "matchesScreenshot": "T-05-3-matches.png",
+      "matchesText": "Your matches\nJobs ranked by how well they fit your profile.\n#1\nCook for a small restaurant\nNairobi - Rongai \u00b7 KES 2,200 / day \u00b7 Weekends\nMatch score 67\nModerate\nreceive kitchen supplies\nstore raw food materials\nmaintain a safe, hygienic and secure working environment\nWhy this job?\n#2\nMpishi wa harusi\nNakuru \u00b7 KES 2,000 / day \u00b7 Not stated\nMatch score 67\nModerate\nuse cooking techniques\nWhy this job?\n#3\nCook for a family\nNairobi - Westlands \u00b7 KES 1,900 / day \u00b7 Weekends\nMatch score 64\nWeak\nensure cleanliness of food preparation area\ndispose waste\ncontrol of expenses\n+2 more\nWhy this job?\n#4\nCatering for a wedding\nKisumu \u00b7 KES 1,600 / day \u00b7 Weekends\nMatch score 62\nWeak\nuse cooking techniques\norder supplies\nuse food cutting tools\n+2 more\nWhy this job?",
+      "cardCount": 4,
+      "top3": [
+        "#1 | Cook for a small restaurant | Nairobi - Rongai \u00b7 KES 2,200 / day \u00b7 Weekends | Match score 67 | Moderate | receive kitchen supplies | store raw food materials | maintain a safe, hygienic and secure working environment | Why this job?",
+        "#2 | Mpishi wa harusi | Nakuru \u00b7 KES 2,000 / day \u00b7 Not stated | Match score 67 | Moderate | use cooking techniques | Why this job?",
+        "#3 | Cook for a family | Nairobi - Westlands \u00b7 KES 1,900 / day \u00b7 Weekends | Match score 64 | Weak | ensure cleanliness of food preparation area | dispose waste | control of expenses | +2 more | Why this job?"
+      ],
+      "ownJobListed": true,
+      "ownJobPosition": 2,
+      "explanationOf": "Mpishi wa harusi",
+      "explanationScreenshot": "T-05-3-explanation.png",
+      "explanationText": "\u2190\nBack to your matches\nWhy this job suits you\nYour profile\n\u21c4\nMpishi wa harusi\nMatch score 67 \u2014 Moderate\nWhat lined up\n\u2713\nThis job needs someone to use cooking techniques. That's part of cooking.\n\u2713\nYou're both in Nakuru.\n\u2713\nYour rate of KES 1,800 a day fits their budget.\nWhat we couldn't check\nThis job doesn't say when the work is, so we couldn't check that.\n\u21c4\nYou described yourself as a mpishi. We matched that to the trade cook."
+    }
+  },
+  "T-06": {
+    "id": "T-06",
+    "profileScreenshot": "T-06-2-profile-filled.png",
+    "worker": {
+      "matchesScreenshot": "T-06-3-matches.png",
+      "matchesText": "Your matches\nJobs ranked by how well they fit your profile.\nNo strong matches yet\nWe didn't find a job that fits your profile well. Adding more detail about your skills usually helps.\nEdit your profile",
+      "cardCount": 0,
+      "top3": [],
+      "ownJobListed": false
+    },
+    "contrastProfileScreenshot": "T-06-4-contrast-profile.png",
+    "afterSaveUrl": "http://127.0.0.1:3002/worker/profile",
+    "contrast": {
+      "matchesScreenshot": "T-06-5-contrast-matches.png",
+      "matchesText": "Your matches\nJobs ranked by how well they fit your profile.\n#1\nInstall security lights in a compound\nNyeri \u00b7 KES 5,100 / day \u00b7 Full-time\nMatch score 71\nModerate\nuse precision tools\nelectricity\ninstall lightning protection system\n+2 more\nWhy this job?\n#2\nHouse wiring for new rental units\nMachakos \u00b7 KES 3,700 / day \u00b7 Weekends\nMatch score 67\nModerate\nfollow health and safety procedures in construction\nuse measurement instruments\nsplice cable\n+2 more\nWhy this job?\n#3\nElectrical fault-finding in an office\nMeru \u00b7 KES 4,700 / day \u00b7 Part-time\nMatch score 66\nModerate\ninstall electricity sockets\nuse measurement instruments\nwork in a construction team\n+1 more\nWhy this job?\n#4\nRewire an old shop\nThika \u00b7 KES 3,700 / day \u00b7 Full-time\nMatch score 65\nModerate\nmaintain electrical equipment\nsplice cable\ninstall lightning protection system\nWhy this job?\n#5\nInstall a new distribution board\nNairobi - Kasarani \u00b7 KES 3,600 / day \u00b7 Weekends\nMatch score 64\nWeak\ntest electrical equipment\nkeep records of work progress\nmaintain electrical equipment\n+1 more\nWhy this job?\n#6\nHouse wiring for new rental units\nEldoret \u00b7 KES 1,900 / day \u00b7 Part-time\nMatch score 63\nWeak\nreact to events in time-critical environments\nsplice cable\nuse safety equipment in construction\nWhy this job?\n#7\nHouse wiring for new rental units\nNairobi - Westlands \u00b7 KES 1,800 / day \u00b7 Part-time\nMatch score 62\nWeak\nuse precision tools\nelectricity\ninspect electrical supplies\n+1 more\nWhy this job?\n#8\nRewire an old shop\nNairobi - Githurai \u00b7 KES 2,500 / day \u00b7 Full-time\nMatch score 62\nWeak\nfollow health and safety procedures in construction\nuse safety equipment in construction\ninspect electrical supplies\nWhy this job?",
+      "cardCount": 8,
+      "top3": [
+        "#1 | Install security lights in a compound | Nyeri \u00b7 KES 5,100 / day \u00b7 Full-time | Match score 71 | Moderate | use precision tools | electricity | install lightning protection system | +2 more | Why this job?",
+        "#2 | House wiring for new rental units | Machakos \u00b7 KES 3,700 / day \u00b7 Weekends | Match score 67 | Moderate | follow health and safety procedures in construction | use measurement instruments | splice cable | +2 more | Why this job?",
+        "#3 | Electrical fault-finding in an office | Meru \u00b7 KES 4,700 / day \u00b7 Part-time | Match score 66 | Moderate | install electricity sockets | use measurement instruments | work in a construction team | +1 more | Why this job?"
+      ],
+      "ownJobListed": true,
+      "ownJobPosition": 5,
+      "explanationOf": "Install a new distribution board",
+      "explanationScreenshot": "T-06-5-contrast-explanation.png",
+      "explanationText": "\u2190\nBack to your matches\nWhy this job suits you\nYour profile\n\u21c4\nInstall a new distribution board\nMatch score 64 \u2014 Weak\nWhat lined up\n\u2713\nThis job needs someone to test electrical equipment. That's part of electrical work.\n\u2713\nThis job needs someone to keep records of work progress. That's part of electrical work.\n\u2713\nThis job needs someone to maintain electrical equipment. That's part of electrical work.\n\u2713\nThis job needs electricity. That's part of electrical work.\n\u2713\nYour rate of KES 2,300 a day fits their budget.\n\u2713\nYou can work full-time, and that suits this job.\n\u21c4\nYou described yourself as a fundi wa umeme. We matched that to the trade electrician."
+    }
+  },
+  "T-07": {
+    "id": "T-07",
+    "error": "TimeoutError: page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n============================================================",
+    "errorScreenshot": "T-07-error.png",
+    "errorText": "Post a job\nDescribe the work you need done.\nJob title (required)\nWhat skills does this job need? (required)\n\u6587\nList what the work involves. Local terms are understood.\nDescription (required)\nBudget per day (required)\nKES\nGive a budget per day.\nWhere is the job? (required)\nSelect location\nNairobi - Kasarani\nNairobi - Embakasi\nNairobi - Westlands\nNairobi - Kibera\nNairobi - Kawangware\nNairobi - Githurai\nNairobi - Umoja\nNairobi - Rongai\nMombasa - Likoni\nMombasa - Nyali\nKisumu\nNakuru\nEldoret\nThika\nMachakos\nKitengela\nRuiru\nNyeri\nKakamega\nMeru\nWhen is it needed? (optional)\nNo strict timeline\nFull-time\nPart-time\nWeekends\nCancel\nPost job\n\u2192"
+  },
+  "T-07a": {
+    "id": "T-07a",
+    "job": {
+      "screenshot": "T-07a-1-job-posted.png",
+      "text": "\u2713\nYour job has been posted.\nHow we understood your posting\nCLIENT VERBATIM INPUT\n\u201cWeekend barber for a busy salon\u201d\n\u2193\nWe matched this to the trade: barber\nbarbering techniques\nstyle hair\nWe read the words of your posting and they describe the work barbers do. We match on the skills you listed above, and nothing else.\nWorkers in this trade\n9 workers on the platform describe themselves as barbers.\n\u201cmaintain equipment, hair products, show social competences, give massages, process payments\u201d\nbarber\nNairobi - Embakasi\nFull-time\nKES 500 / day\n\u201cadvise on hair style, maintain equipment, stay up-to-date with fashion trends in hair style, promote yourself\u201d\nbarber\nKitengela\nFull-time\nKES 1,100 / day\n\u201ckinyozi\u201d\nbarber\nKitengela\nAvailability not stated\nRate not stated\n\u201ckinyozi\u201d\nbarber\nNairobi - Embakasi\nAvailability not stated\nRate not stated\n\u201cmaintain customer service, wash hair, listen actively, work ergonomically, process payments, use equipment for hair care\u201d\nbarber\nMombasa - Likoni\nFull-time\nKES 600 / day\n+\nPost another job"
+    },
+    "profileScreenshot": "T-07a-2-profile-filled.png",
+    "worker": {
+      "matchesScreenshot": "T-07a-3-matches.png",
+      "matchesText": "Your matches\nJobs ranked by how well they fit your profile.\n#1\nWeekend barber for a busy salon\nKitengela \u00b7 KES 2,000 / day \u00b7 Not stated\nMatch score 84\nStrong\nbarbering techniques\nstyle hair\nWhy this job?\n#2\nWeekend barber for a busy salon\nMeru \u00b7 KES 2,200 / day \u00b7 Part-time\nMatch score 60\nWeak\nstyle hair\nlisten actively\nshow social competences\n+2 more\nWhy this job?\n#3\nBarber for a new barbershop\nEldoret \u00b7 KES 1,300 / day \u00b7 Weekends\nMatch score 59\nWeak\nhair products\npromote yourself\nstay up-to-date with fashion trends in hair style\n+2 more\nWhy this job?\n#4\nWeekend barber for a busy salon\nNairobi - Rongai \u00b7 KES 700 / day \u00b7 Weekends\nMatch score 59\nWeak\nbarbering techniques\nwork ergonomically\nlisten actively\n+1 more\nWhy this job?\n#5\nHome visits for haircuts and shaves\nKisumu \u00b7 KES 500 / day \u00b7 Full-time\nMatch score 57\nWeak\nhair\nstay up-to-date with fashion trends in hair style\nwork ergonomically\n+2 more\nWhy this job?\n#6\nHair colouring service\nMombasa - Likoni \u00b7 KES 2,000 / day \u00b7 Full-time\nMatch score 56\nWeak\nshow social competences\nprocess payments\nstyle hair\nWhy this job?\n#7\nHair styling for a photo shoot\nKitengela \u00b7 KES 1,200 / day \u00b7 Weekends\nMatch score 55\nWeak\nadvise on hair style\nWhy this job?",
+      "cardCount": 7,
+      "top3": [
+        "#1 | Weekend barber for a busy salon | Kitengela \u00b7 KES 2,000 / day \u00b7 Not stated | Match score 84 | Strong | barbering techniques | style hair | Why this job?",
+        "#2 | Weekend barber for a busy salon | Meru \u00b7 KES 2,200 / day \u00b7 Part-time | Match score 60 | Weak | style hair | listen actively | show social competences | +2 more | Why this job?",
+        "#3 | Barber for a new barbershop | Eldoret \u00b7 KES 1,300 / day \u00b7 Weekends | Match score 59 | Weak | hair products | promote yourself | stay up-to-date with fashion trends in hair style | +2 more | Why this job?"
+      ],
+      "ownJobListed": true,
+      "ownJobPosition": 1,
+      "explanationOf": "Weekend barber for a busy salon",
+      "explanationScreenshot": "T-07a-3-explanation.png",
+      "explanationText": "\u2190\nBack to your matches\nWhy this job suits you\nYour profile\n\u21c4\nWeekend barber for a busy salon\nMatch score 84 \u2014 Strong\nWhat lined up\n\u2713\nThis job needs barbering techniques. That's part of barbering.\n\u2713\nThis job needs someone to style hair. That's part of barbering.\n\u2713\nYou're both in Kitengela.\nWhat we couldn't check\nYou haven't given a daily rate, so we couldn't compare it with their budget.\nYou haven't said when you can work, so we couldn't check that.\n\u21c4\nYou described yourself as a kinyozi. We matched that to the trade barber."
+    }
+  },
+  "T-08": {
+    "id": "T-08",
+    "error": "TimeoutError: locator.selectOption: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByLabel(/Where do you work\\?/)\n    - locator resolved to <select id=\"_r_2_\" class=\"FormFields-module__jIJ9Bq__control FormFields-module__jIJ9Bq__select \">\u2026</select>\n  - attempting select option action\n    2 \u00d7 waiting for element to be visible and enabled\n      - did not find some options\n    - retrying select option action\n    - waiting 20ms\n    2 \u00d7 waiting for element to be visible and enabled\n      - did",
+    "errorScreenshot": "T-08-error.png",
+    "errorText": "Create your worker profile\nTell us about your work. We'll find jobs that suit you.\nWhat work do you do? (required)\nUse your own words, in English or Kiswahili. For example: fundi wa umeme, wiring, solar installation.\nAbout you (required)\nA short description of your work and how long you've been doing it.\nWhere do you work? (required)\nSelect location\nNairobi - Kasarani\nNairobi - Embakasi\nNairobi - Westlands\nNairobi - Kibera\nNairobi - Kawangware\nNairobi - Githurai\nNairobi - Umoja\nNairobi - Rongai\nMombasa - Likoni\nMombasa - Nyali\nKisumu\nNakuru\nEldoret\nThika\nMachakos\nKitengela\nRuiru\nNyeri\nKakamega\nMeru\nWhen can you work? (optional)\nSelect availability\nFull-time\nPart-time\nWeekends\nYour daily rate (optional)\nKES\nAdding this helps us find better matches.\nCancel\nCreate profile"
+  },
+  "T-08a": {
+    "id": "T-08a",
+    "profileScreenshot": "T-08a-2-profile-filled.png",
+    "worker": {
+      "matchesScreenshot": "T-08a-3-matches.png",
+      "matchesText": "Your matches\nJobs ranked by how well they fit your profile.\nNo strong matches yet\nWe didn't find a job that fits your profile well. Adding more detail about your skills usually helps.\nEdit your profile",
+      "cardCount": 0,
+      "top3": [],
+      "ownJobListed": false
+    }
+  },
+  "T-01s": {
+    "id": "T-01s",
+    "profileScreenshot": "T-01s-2-profile-filled.png",
+    "worker": {
+      "matchesScreenshot": "T-01s-3-matches.png",
+      "matchesText": "Your matches\nJobs ranked by how well they fit your profile.\n#1\nInstall a new distribution board\nNairobi - Kasarani \u00b7 KES 3,600 / day \u00b7 Weekends\nMatch score 86\nStrong\ntest electrical equipment\nkeep records of work progress\nmaintain electrical equipment\n+1 more\nWhy this job?\n#2\nHouse wiring for new rental units\nNairobi - Westlands \u00b7 KES 1,800 / day \u00b7 Part-time\nMatch score 82\nStrong\nuse precision tools\nelectricity\ninspect electrical supplies\n+1 more\nWhy this job?\n#3\nRewire an old shop\nNairobi - Githurai \u00b7 KES 2,500 / day \u00b7 Full-time\nMatch score 82\nStrong\nfollow health and safety procedures in construction\nuse safety equipment in construction\ninspect electrical supplies\nWhy this job?\n#4\nInstall a new distribution board\nNairobi - Kasarani \u00b7 KES 2,800 / day \u00b7 Not stated\nMatch score 75\nModerate\ninstall electricity sockets\ntest electrical equipment\nelectrical installation\nWhy this job?\n#5\nHouse wiring for new rental units\nMachakos \u00b7 KES 3,700 / day \u00b7 Weekends\nMatch score 71\nModerate\nfollow health and safety procedures in construction\nuse measurement instruments\nsplice cable\n+2 more\nWhy this job?\n#6\nElectrical fault-finding in an office\nMeru \u00b7 KES 4,700 / day \u00b7 Part-time\nMatch score 69\nModerate\ninstall electricity sockets\nuse measurement instruments\nwork in a construction team\n+1 more\nWhy this job?\n#7\nRewire an old shop\nThika \u00b7 KES 3,700 / day \u00b7 Full-time\nMatch score 69\nModerate\nmaintain electrical equipment\nsplice cable\ninstall lightning protection system\nWhy this job?\n#8\nHouse wiring for new rental units\nEldoret \u00b7 KES 1,900 / day \u00b7 Part-time\nMatch score 67\nModerate\nreact to events in time-critical environments\nsplice cable\nuse safety equipment in construction\nWhy this job?\n#9\nInstall security lights in a compound\nNyeri \u00b7 KES 5,100 / day \u00b7 Full-time\nMatch score 65\nModerate\nuse precision tools\nelectricity\ninstall lightning protection system\n+2 more\nWhy this job?\n#10\nReplace brake pads and discs\nNairobi - Umoja \u00b7 KES 3,100 / day \u00b7 Weekends\nMatch score 57\nWeak\nWhy this job?",
+      "cardCount": 10,
+      "top3": [
+        "#1 | Install a new distribution board | Nairobi - Kasarani \u00b7 KES 3,600 / day \u00b7 Weekends | Match score 86 | Strong | test electrical equipment | keep records of work progress | maintain electrical equipment | +1 more | Why this job?",
+        "#2 | House wiring for new rental units | Nairobi - Westlands \u00b7 KES 1,800 / day \u00b7 Part-time | Match score 82 | Strong | use precision tools | electricity | inspect electrical supplies | +1 more | Why this job?",
+        "#3 | Rewire an old shop | Nairobi - Githurai \u00b7 KES 2,500 / day \u00b7 Full-time | Match score 82 | Strong | follow health and safety procedures in construction | use safety equipment in construction | inspect electrical supplies | Why this job?"
+      ],
+      "ownJobListed": false,
+      "explanationOf": "rank #1 (own job not listed)",
+      "explanationScreenshot": "T-01s-3-explanation.png",
+      "explanationText": "\u2190\nBack to your matches\nWhy this job suits you\nYour profile\n\u21c4\nInstall a new distribution board\nMatch score 86 \u2014 Strong\nWhat lined up\n\u2713\nThis job needs someone to keep records of work progress. That's part of electrical work.\n\u2713\nThis job needs someone to maintain electrical equipment. That's part of electrical work.\n\u2713\nThis job needs electricity. That's part of electrical work.\n\u2713\nYou said you do test electrical equipment, and this job mentions it.\n\u2713\nYou're both in Nairobi - Kasarani.\n\u2713\nYour rate of KES 2,500 a day fits their budget.\n\u2713\nYou can work full-time, and that suits this job."
+    },
+    "ownExplanationScreenshot": "T-01s-6-own-posting-explanation.png",
+    "ownExplanationText": "\u2190\nBack to your matches\nWhy this job suits you\nYour profile\n\u21c4\nInstall a new distribution board\nMatch score 75 \u2014 Moderate\nWhat lined up\n\u2713\nThis job needs someone to install electricity sockets. That's part of electrical work.\n\u2713\nYou said you do test electrical equipment, and this job mentions it.\n\u2713\nYou said you do electrical installation, and this job mentions it.\n\u2713\nYou're both in Nairobi - Kasarani.\n\u2713\nYour rate of KES 2,500 a day fits their budget.\nWhat we couldn't check\nThis job doesn't say when the work is, so we couldn't check that."
+  },
+  "T-02s": {
+    "id": "T-02s",
+    "profileScreenshot": "T-02s-2-profile-filled.png",
+    "worker": {
+      "matchesScreenshot": "T-02s-3-matches.png",
+      "matchesText": "Your matches\nJobs ranked by how well they fit your profile.\n#1\nInstall a water tank and piping\nNairobi - Kibera \u00b7 KES 3,100 / day \u00b7 Part-time\nMatch score 78\nModerate\ninstall metal gas piping\nplumbing tools\nuse safety equipment in construction\n+2 more\nWhy this job?\n#2\nPlumbing for a new bathroom\nNairobi - Kasarani \u00b7 KES 1,800 / day \u00b7 Full-time\nMatch score 70\nModerate\nwork ergonomically\nuse welding equipment\nprepare copper pipes for use as gas lines\n+2 more\nWhy this job?\n#3\nInstall a water tank and piping\nNairobi - Githurai \u00b7 KES 2,200 / day \u00b7 Weekends\nMatch score 69\nModerate\nuse safety equipment in construction\ntypes of piping\ninterpret 2D plans\nWhy this job?\n#4\nConnect a borehole pump to a house\nMachakos \u00b7 KES 2,600 / day \u00b7 Part-time\nMatch score 64\nWeak\ntransport construction supplies\nreplace faucets\nprepare copper pipes for use as gas lines\n+1 more\nWhy this job?\n#5\nRepair leaking pipes in an apartment\nNairobi - Embakasi \u00b7 KES 1,500 / day \u00b7 Weekends\nMatch score 63\nWeak\nreplace faucets\ninstall plumbing systems\nprepare copper pipes for use as gas lines\n+1 more\nWhy this job?\n#6\nLay foundation blocks for a house\nNairobi - Kibera \u00b7 KES 2,100 / day \u00b7 Part-time\nMatch score 61\nWeak\ninterpret 2D plans\ntransport construction supplies\nfollow health and safety procedures in construction\nWhy this job?\n#7\nRepair leaking pipes in an apartment\nKisumu \u00b7 KES 3,000 / day \u00b7 Full-time\nMatch score 58\nWeak\ninterpret 3D plans\nclear out drains\ninstall plumbing systems\n+2 more\nWhy this job?\n#8\nRoof timber work for a bungalow\nNairobi - Embakasi \u00b7 KES 2,700 / day \u00b7 Part-time\nMatch score 56\nWeak\ninspect construction supplies\nfollow health and safety procedures in construction\nWhy this job?\n#9\nRewire an old shop\nNairobi - Githurai \u00b7 KES 2,500 / day \u00b7 Full-time\nMatch score 56\nWeak\nfollow health and safety procedures in construction\nuse safety equipment in construction\nWhy this job?\n#10\nConnect a borehole pump to a house\nThika \u00b7 KES 4,300 / day \u00b7 Weekends\nMatch score 55\nWeak\ntransport construction supplies\nplace sanitary equipment\nwork ergonomically\nWhy this job?",
+      "cardCount": 10,
+      "top3": [
+        "#1 | Install a water tank and piping | Nairobi - Kibera \u00b7 KES 3,100 / day \u00b7 Part-time | Match score 78 | Moderate | install metal gas piping | plumbing tools | use safety equipment in construction | +2 more | Why this job?",
+        "#2 | Plumbing for a new bathroom | Nairobi - Kasarani \u00b7 KES 1,800 / day \u00b7 Full-time | Match score 70 | Moderate | work ergonomically | use welding equipment | prepare copper pipes for use as gas lines | +2 more | Why this job?",
+        "#3 | Install a water tank and piping | Nairobi - Githurai \u00b7 KES 2,200 / day \u00b7 Weekends | Match score 69 | Moderate | use safety equipment in construction | types of piping | interpret 2D plans | Why this job?"
+      ],
+      "ownJobListed": false,
+      "explanationOf": "rank #1 (own job not listed)",
+      "explanationScreenshot": "T-02s-3-explanation.png",
+      "explanationText": "\u2190\nBack to your matches\nWhy this job suits you\nYour profile\n\u21c4\nInstall a water tank and piping\nMatch score 78 \u2014 Moderate\nWhat lined up\n\u2713\nThis job needs someone to install metal gas piping. That's part of plumbing work.\n\u2713\nThis job needs plumbing tools. That's part of plumbing work.\n\u2713\nThis job needs someone to use safety equipment in construction. That's part of plumbing work.\n\u2713\nThis job needs someone to follow health and safety procedures in construction. That's part of plumbing work.\n\u2713\nThis job needs someone to inspect construction supplies. That's part of plumbing work.\n\u2713\nYou're both in Nairobi - Kawangware.\n\u2713\nYour rate of KES 2,200 a day fits their budget.\n\u2713\nYou can work part-time, and that suits this job.\n\u21c4\nYou described yourself as a fundi bomba. We matched that to the trade plumber."
+    },
+    "ownExplanationScreenshot": "T-02s-6-own-posting-explanation.png",
+    "ownExplanationText": "\u2190\nBack to your matches\nWhy this job suits you\nYour profile\n\u21c4\nFix bathroom leakage\nMatch score 44 \u2014 Below threshold\nWhat lined up\n\u2713\nYou're both in Nairobi - Kawangware.\n\u2713\nYour rate of KES 2,200 a day fits their budget.\nWhat we couldn't check\nThis job doesn't say when the work is, so we couldn't check that."
+  },
+  "T-03s": {
+    "id": "T-03s",
+    "profileScreenshot": "T-03s-2-profile-filled.png",
+    "worker": {
+      "matchesScreenshot": "T-03s-3-matches.png",
+      "matchesText": "Your matches\nJobs ranked by how well they fit your profile.\n#1\nRoof timber work for a bungalow\nMombasa - Likoni \u00b7 KES 2,700 / day \u00b7 Full-time\nMatch score 67\nModerate\nfollow health and safety procedures in construction\napply wood finishes\nsort waste\nWhy this job?\n#2\nBuild a wooden gate\nNairobi - Kawangware \u00b7 KES 3,100 / day \u00b7 Weekends\nMatch score 66\nModerate\nwoodworking tools\ncreate wood joints\ninstall construction profiles\n+1 more\nWhy this job?\n#3\nBuild kitchen cabinets\nKisumu \u00b7 KES 3,600 / day \u00b7 Weekends\nMatch score 66\nModerate\nsnap chalk line\ninstall wood hardware\ninterpret 3D plans\n+2 more\nWhy this job?\n#4\nMake school desks\nKitengela \u00b7 KES 3,900 / day \u00b7 Weekends\nMatch score 65\nModerate\nwork ergonomically\ntransport construction supplies\njoin wood elements\n+2 more\nWhy this job?\n#5\nRoof timber work for a bungalow\nNairobi - Embakasi \u00b7 KES 2,700 / day \u00b7 Part-time\nMatch score 65\nModerate\nkeep sawing equipment in good condition\ninspect construction supplies\ninstall wood hardware\n+2 more\nWhy this job?\n#6\nRepair wooden doors and frames\nNakuru \u00b7 KES 2,100 / day \u00b7 Full-time\nMatch score 65\nModerate\ntransport construction supplies\nkeep track of wooden elements\ninstall construction profiles\n+1 more\nWhy this job?\n#7\nFit wardrobes in a new flat\nNairobi - Umoja \u00b7 KES 2,600 / day \u00b7 Full-time\nMatch score 63\nWeak\ncreate smooth wood surface\nwork ergonomically\nsort waste\n+2 more\nWhy this job?\n#8\nFit wardrobes in a new flat\nRuiru \u00b7 KES 3,600 / day \u00b7 Full-time\nMatch score 63\nWeak\nuse safety equipment in construction\nsort waste\nfollow health and safety procedures in construction\n+1 more\nWhy this job?\n#9\nConnect a borehole pump to a house\nThika \u00b7 KES 4,300 / day \u00b7 Weekends\nMatch score 57\nWeak\ntransport construction supplies\nwork ergonomically\nWhy this job?",
+      "cardCount": 9,
+      "top3": [
+        "#1 | Roof timber work for a bungalow | Mombasa - Likoni \u00b7 KES 2,700 / day \u00b7 Full-time | Match score 67 | Moderate | follow health and safety procedures in construction | apply wood finishes | sort waste | Why this job?",
+        "#2 | Build a wooden gate | Nairobi - Kawangware \u00b7 KES 3,100 / day \u00b7 Weekends | Match score 66 | Moderate | woodworking tools | create wood joints | install construction profiles | +1 more | Why this job?",
+        "#3 | Build kitchen cabinets | Kisumu \u00b7 KES 3,600 / day \u00b7 Weekends | Match score 66 | Moderate | snap chalk line | install wood hardware | interpret 3D plans | +2 more | Why this job?"
+      ],
+      "ownJobListed": false,
+      "explanationOf": "rank #1 (own job not listed)",
+      "explanationScreenshot": "T-03s-3-explanation.png",
+      "explanationText": "\u2190\nBack to your matches\nWhy this job suits you\nYour profile\n\u21c4\nRoof timber work for a bungalow\nMatch score 67 \u2014 Moderate\nWhat lined up\n\u2713\nThis job needs someone to follow health and safety procedures in construction. That's part of carpentry.\n\u2713\nThis job needs someone to apply wood finishes. That's part of carpentry.\n\u2713\nThis job needs someone to sort waste. That's part of carpentry.\n\u2713\nYour rate of KES 2,000 a day fits their budget.\n\u2713\nYou can work full-time, and that suits this job.\n\u21c4\nYou described yourself as a fundi wa mbao. We matched that to the trade carpenter."
+    },
+    "ownExplanationScreenshot": "T-03s-6-own-posting-explanation.png",
+    "ownExplanationText": "\u2190\nBack to your matches\nWhy this job suits you\nYour profile\n\u21c4\nMake school desks\nMatch score 52 \u2014 Below threshold\nWhat lined up\n\u2713\nYou're both in Thika.\n\u2713\nYour rate of KES 2,000 a day fits their budget.\nWhat we couldn't check\nThis job doesn't say when the work is, so we couldn't check that."
+  },
+  "T-04s": {
+    "id": "T-04s",
+    "profileScreenshot": "T-04s-2-profile-filled.png",
+    "worker": {
+      "matchesScreenshot": "T-04s-3-matches.png",
+      "matchesText": "Your matches\nJobs ranked by how well they fit your profile.\nNo strong matches yet\nWe didn't find a job that fits your profile well. Adding more detail about your skills usually helps.\nEdit your profile",
+      "cardCount": 0,
+      "top3": [],
+      "ownJobListed": false
+    },
+    "ownExplanationScreenshot": "T-04s-6-own-posting-explanation.png",
+    "ownExplanationText": "\u2190\nBack to your matches\nWhy this job suits you\nYour profile\n\u21c4\nGari haina nguvu\nMatch score 25 \u2014 Below threshold\nWhat lined up\n\u2713\nYou're both in Nairobi - Embakasi.\n\u2713\nYour rate of KES 3,000 a day fits their budget.\nWhat we couldn't check\nThis job doesn't say when the work is, so we couldn't check that."
+  }
+}

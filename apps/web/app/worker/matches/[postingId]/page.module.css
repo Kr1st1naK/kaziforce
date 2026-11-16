@@ -1,0 +1,91 @@
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 15px;
+  text-decoration: none;
+  margin-bottom: var(--space-md);
+}
+
+.back:hover {
+  color: var(--ink);
+}
+
+.heading {
+  margin-bottom: var(--space-lg);
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.pair {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+}
+
+.jobTitle {
+  font-weight: 700;
+}
+
+.swap {
+  color: var(--muted);
+}
+
+.score {
+  border-radius: var(--radius-tag);
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  background: #dcfce7;
+  color: #15803d;
+  white-space: nowrap;
+}
+
+.scoreModerate {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.scoreWeak {
+  background: #f1f5f9;
+  color: var(--muted);
+}
+
+.loading {
+  color: var(--muted);
+}
+
+.about {
+  margin-top: var(--space-lg);
+}
+
+.aboutHeading {
+  margin: 0 0 var(--space-sm);
+  font-size: 18px;
+  line-height: 24px;
+}
+
+.aboutText {
+  /* The text can be thousands of characters (the 200 postings from the Job Skill Set run to 13,000): it scrolls in
+     its own box, wraps anywhere, and keeps the poster's line breaks. */
+  max-height: 20rem;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+  color: var(--ink);
+  line-height: 24px;
+  padding-right: var(--space-sm);
+}
+
+.aboutText:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}

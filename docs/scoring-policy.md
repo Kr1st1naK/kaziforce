@@ -1,7 +1,7 @@
 # Scoring policy (decided before any score exists)
 
 **Decided and committed 2026-10-16, before any scorer was implemented or any
-score computed** (keyword score revised to BM25 on 2026-10-17, still before any score; see "Revisions" below). These rules are frozen. Any change after results exist is
+score computed** (keyword score revised to BM25 on 2026-10-17, before any score; presentation bands added 2026-10-23, display only; see "Revisions" below). These rules are frozen. Any change after results exist is
 recorded below under "Deviations" with its date and reason, and the affected
 results are re-run and labelled as such.
 
@@ -129,12 +129,138 @@ Jobs are ranked by descending score. Ties are broken by one fixed random order
 of the 280 postings (seed 42), the same order for every configuration, so no
 configuration gains from the incidental order of `jobs.csv`.
 
-## Revisions before any score existed
+## 6. Presentation bands (display only)
+
+A composite score is shown to a person as a whole number out of 100,
+`match_score = round(composite x 100)`, in one of four bands:
+
+| Band | Match score | Shown as |
+|---|---|---|
+| Strong | 80-100 | a card, labelled Strong |
+| Moderate | 65-79 | a card, labelled Moderate |
+| Weak | 55-64 | a card, labelled Weak |
+| Below the threshold | under 55 | not shown; if nothing remains, "No strong matches yet" |
+
+**These affect display only.** They do not reorder results, do not change any score, and are
+not read by the evaluation, which computes Precision@K and MRR from the full ranking
+(`scripts/evaluate.py` reads the frozen CSVs and never calls the API). The bands live in one
+place, `apps/api/src/kaziforce_api/matching/bands.py`, and the API reports each result's band
+alongside its unchanged scores.
+
+**Where 55 comes from.** The top-1 composite score of every development worker was measured
+under the full configuration. The distribution separates by whether the worker's wording is in
+the vocabulary:
+
+| Variant | min | median | max |
+|---|---|---|---|
+| formal | 61 | 77 | 95 |
+| known_alias | 62 | 72 | 82 |
+| minimal | 55 | 72 | 85 |
+| held_out (term withheld from the graph) | 35 | 44 | 59 |
+
+At a threshold of 55, no worker using a known term is ever shown "No strong matches yet", and
+between 84% and 96% of the postings they are shown are genuinely relevant. 96% of workers whose
+term was withheld correctly see "No strong matches yet" instead of a misleading list. A lower
+threshold of 50 shows held-out workers postings that are only 9% relevant; a higher threshold of
+60 begins hiding real matches from sparse profiles (25% of `minimal` workers).
+
+## 7. Explanation coverage (NFR-02)
+
+**Fixed on 2026-10-26, before the explanation generator was written and before any
+coverage figure existed.** The definition is recorded here first so it cannot be chosen
+to suit a result.
+
+NFR-02 asks for "an interpretable explanation for at least 85% of the top-K
+recommendations across the evaluation dataset". That sentence needs three things pinned
+down: what is counted, what counts as interpretable, and what is excluded.
+
+### The unit
+
+One **(worker, posting) pair in the top-K of one query under one configuration**. For the
+development split that is 216 workers x K = 10 = 2,160 units per configuration.
+
+Coverage is computed over the **whole top-K, not only the results the interface would
+show**. The display threshold of §6 must not enter this metric. Computing coverage over
+displayed results only would measure the threshold rather than the explanation generator,
+and would let a presentation constant leak into a reported number.
+
+### What counts as interpretable
+
+A recommendation is **covered** when the generator can state **at least one concrete,
+attributable, checkable reason** — something the worker could verify about themselves.
+
+Three reason types are recognised:
+
+| Type | Condition | Example |
+|---|---|---|
+| **Graph-traced skill** | A `MatchedSkill` with `source` in {`informal_term`, `occupation_label`} and a non-empty `graph_path` | "This job needs someone to install electricity sockets. That's part of electrical work." |
+| **Literal skill** | A `MatchedSkill` with `source` in {`listed`, `text`} | "You said you do breaker box repair, and this job mentions it." |
+| **Assessed criterion** | A `components` entry that is not `None` and is > 0 | "You're both in Nyeri." (at a partial score the sentence says so: "This job is in Nairobi - Rongai: the same town as you, but a different area") |
+
+### The headline rule: strict
+
+**The NFR-02 figure is the strict rule: a recommendation is covered if and only if at
+least one skill is shared** — graph-traced or literal. A criterion match alone does not
+cover it.
+
+The reason is that a posting sharing no skill with the worker, matched only on location,
+is not a recommendation this system can honestly claim to explain. Counting it would
+inflate coverage with sentences that say nothing about the work. If the strict figure
+falls below 85%, that is the finding, and it is reported as such rather than redefined.
+
+Two further columns are reported alongside it, for comparison and for Chapter 5, but they
+are not the NFR-02 figure:
+
+- **Inclusive** — strict, or at least one positively-scoring assessed criterion.
+- **Graph-traced** — at least one skill reached through the knowledge graph. This is the
+  direct evidence of the graph's contribution, and is near zero by construction for the
+  configurations that use `NullEnricher`.
+
+### Which configuration the 85% applies to
+
+**The NFR-02 target is assessed against `full`**, the deployed system. Coverage is computed
+and reported for all seven configurations, but the other six are context, not the target.
+
+This matters because three of them cannot produce a reason at all, by construction rather
+than by failure: `keyword`, `semantic_only` and `semantic_kg` have no rule component, so
+they yield no matched skills and no assessed criteria. Their strict coverage is
+necessarily 0. That is a finding in its own right — a ranker built only on a similarity
+number cannot say anything a worker could check — and it is the clearest argument for the
+hybrid design. It is not evidence that the generator is broken, and it must not be
+averaged together with the others into one figure.
+
+### What never counts
+
+- **A semantic similarity on its own.** A cosine value is a number, not a reason a worker
+  can check. Counting it would make coverage trivially 100% for every configuration with
+  a semantic component, and the metric meaningless.
+- **An absent criterion** (`None`). It does not count towards coverage, and it does not
+  count against it either; absent criteria are reported separately as what could not be
+  checked.
+- **The composite score, the rank, or the band.**
+
+### Separability
+
+The generator is a component in its own right behind an interface
+(`apps/api/.../explainability/`), which is the fourth component NFR-03 names. It reads a
+completed `MatchScore` and produces an explanation; it never feeds back into scoring or
+ranking, so computing coverage cannot change any other metric.
+
+## Revisions
 
 | Date | Change | Reason |
 |---|---|---|
+| 2026-10-26 | Added §7, the explanation coverage definition for NFR-02 | The definition had to be fixed before the generator existed, so that the rule could not be chosen to suit the number. Headline rule is strict: a shared skill is required. Evaluation-side only; it reads completed match scores and changes no score, ranking or metric |
+| 2026-10-23 | Added §6, presentation bands with a display threshold of 55 | The interface must decide what to show and when to say "No strong matches yet". Display only: no score, ranking or evaluation output changes, which `docs/evidence/evaluation_isolation.md` demonstrates by re-running the evaluation |
 | 2026-10-17 | Keyword score changed from Jaccard similarity to Okapi BM25 (k1 = 1.2, b = 0.75); tokeniser unchanged | Comparability with the BM25 baselines in the literature cited in Chapter 2. No scorer had been run on the dataset. |
 
 ## Deviations
 
-None.
+Changes made after results existed. Neither changes a rule in this policy; both change code that
+the evaluated configurations run, so the development split was re-run after each and the
+results compared with the run before. The test split had not been run when either was made.
+
+| Date | Change | Why | Effect on results |
+|---|---|---|---|
+| 2026-11-12 | **Enrichment reads occupation labels in the listed work entries, not only in the free text** (`cf644c3`). An entry such as "vehicle technician" now reaches its occupation, and is no longer kept as unmapped text | System test T-04 (S-2): a worker who named the occupation under "What work do you do?" but used another word in the biography reached no occupation and was shown "No strong matches yet" | **None.** Development re-run: `results/dev/20261112-012400_f5587b0` (before) and `results/dev/20261112-012811_cf644c3` (after) are identical in every metric and every per-query row. No profile in the dataset lists an occupation's name as a work entry (0 of 216 development, 96 validation and 216 test workers; 0 of 280 postings; see `docs/test-split-preflight.md` §1) |
+| 2026-11-12 | **Explanation sentences state the actual relation at partial criterion scores** (`64381de`). Location at 0.5 says "the same town as you, but a different area" instead of "You're both in …"; a rate above the budget names the gap instead of "fits their budget"; availability names the job's pattern when a full-time worker matches a different one. A reason is still given for exactly the criteria scored above zero (§7) | System test record S-7 and S-8: both sentences were false at partial scores. In the development top-10 of `full`, 536 of 2,160 explanations (24.8%) contained at least one such sentence (239 same-town location, 340 rate-above-budget) | **None.** Wording only: no score, ranking, or coverage figure (strict or inclusive) can change, because the reasons counted are unchanged. Development re-run: `results/dev/20261112-012811_cf644c3` (before) and `results/dev/20261112-082720_64381de` (after) are identical in every metric and every per-query row |

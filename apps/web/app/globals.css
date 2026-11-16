@@ -1,0 +1,223 @@
+/* Tokens from docs/UI views/DESIGN.md. Flat by rule: no shadows, no gradients. */
+
+/*
+ * The palette is light only. Saying so is not decoration: without it a browser on
+ * a dark-mode machine draws its own dark chrome for native controls — the open
+ * list of a <select> came out dark grey against this palette. The list itself is
+ * drawn by the operating system, so this is as far as theming it reaches.
+ */
+:root {
+  color-scheme: light;
+
+  --canvas: #f8fafc;
+  --surface: #ffffff;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --line: #e2e8f0;
+  --line-strong: #cbd5e1;
+
+  --primary: #c2410c;
+  --primary-hover: #9a3412;
+  --primary-active: #7c2d12;
+  --on-primary: #ffffff;
+
+  --strong: #16a34a;
+  --moderate: #d97706;
+  --weak: #64748b;
+  --error: #dc2626;
+  --error-surface: #ffdad6;
+
+  --tint: #eff4ff;
+  --tint-line: #dce9ff;
+
+  --radius: 8px;
+  --radius-control: 6px;
+  --radius-tag: 4px;
+
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+
+  --shell: 1100px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 44px;
+}
+
+h2 {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 28px;
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: 0;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--ink);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+@media (max-width: 640px) {
+  h1 {
+    font-size: 28px;
+    line-height: 36px;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* Shared primitives */
+
+.shell {
+  width: min(var(--shell), 100% - 2 * var(--space-md));
+  margin: 0 auto;
+}
+
+@media (min-width: 1024px) {
+  .shell {
+    width: min(var(--shell), 100% - 2 * var(--space-xl));
+  }
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+}
+
+@media (min-width: 640px) {
+  .card {
+    padding: var(--space-lg);
+  }
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 16px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-control);
+  background: var(--primary);
+  color: var(--on-primary);
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.button:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+.button:active {
+  background: var(--primary-active);
+  border-color: var(--primary-active);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.button-secondary {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.button-secondary:hover {
+  background: #f1f5f9;
+  border-color: var(--line-strong);
+}
+
+.link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--ink);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.mono {
+  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+.alert {
+  border: 1px solid var(--error);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--error);
+  padding: 12px 16px;
+  font-size: 14px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}

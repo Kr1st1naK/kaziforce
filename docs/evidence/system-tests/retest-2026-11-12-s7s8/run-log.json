@@ -1,0 +1,21 @@
+{
+  "R2-T-04": {
+    "id": "R2-T-04",
+    "profileScreenshot": "R2-T-04-2-profile-filled.png",
+    "worker": {
+      "matchesScreenshot": "R2-T-04-3-matches.png",
+      "matchesText": "Your matches\nJobs ranked by how well they fit your profile.\n#1\nService and repair a saloon car\nNairobi - Rongai · KES 5,000 / day · Part-time\nMatch score 68\nModerate\nmechanics\nidentify customer's needs\nmaintain work area cleanliness\nWhy this job?\n#2\nReplace brake pads and discs\nNairobi - Umoja · KES 3,100 / day · Weekends\nMatch score 66\nModerate\nrepair vehicle electrical systems\nthink analytically\nmechanical components of vehicles\nWhy this job?\n#3\nRoutine servicing for a fleet of pickups\nMachakos · KES 3,200 / day · Weekends\nMatch score 64\nWeak\nmaintain updated professional knowledge\nemission standards\nteamwork principles\n+1 more\nWhy this job?\n#4\nDiagnose an engine fault\nMombasa - Likoni · KES 3,900 / day · Part-time\nMatch score 63\nWeak\nfollow control of substances hazardous to health procedures\nadapt to new technology used in cars\napply health and safety standards\nWhy this job?\n#5\nRoutine servicing for a fleet of pickups\nKisumu · KES 2,700 / day · Part-time\nMatch score 62\nWeak\nrepair vehicle electrical systems\nuse traditional toolbox tools\nautomotive diagnostic equipment\n+2 more\nWhy this job?\n#6\nDiagnose an engine fault\nNakuru · KES 5,100 / day · Part-time\nMatch score 62\nWeak\nrepair vehicle electrical systems\nvehicle electrical systems\nprovide customer information related to repairs\nWhy this job?\n#7\nReplace brake pads and discs\nNairobi - Kawangware · KES 4,400 / day · Weekends\nMatch score 60\nWeak\nmaintain updated professional knowledge\nhealth and safety measures in transportation\nperform manual work autonomously\nWhy this job?\n#8\nDiagnose an engine fault\nMachakos · KES 1,600 / day · Weekends\nMatch score 59\nWeak\nemission standards\nthink analytically\ntypes of vehicles\n+2 more\nWhy this job?",
+      "cardCount": 8,
+      "top3": [
+        "#1 | Service and repair a saloon car | Nairobi - Rongai · KES 5,000 / day · Part-time | Match score 68 | Moderate | mechanics | identify customer's needs | maintain work area cleanliness | Why this job?",
+        "#2 | Replace brake pads and discs | Nairobi - Umoja · KES 3,100 / day · Weekends | Match score 66 | Moderate | repair vehicle electrical systems | think analytically | mechanical components of vehicles | Why this job?",
+        "#3 | Routine servicing for a fleet of pickups | Machakos · KES 3,200 / day · Weekends | Match score 64 | Weak | maintain updated professional knowledge | emission standards | teamwork principles | +1 more | Why this job?"
+      ],
+      "ownJobListed": true,
+      "ownJobPosition": 1,
+      "explanationOf": "Service and repair a saloon car",
+      "explanationScreenshot": "R2-T-04-3-explanation.png",
+      "explanationText": "←\nBack to your matches\nWhy this job suits you\nYour profile\n⇄\nService and repair a saloon car\nMatch score 68 — Moderate\nWhat lined up\n✓\nThis job needs mechanics. That's part of motor vehicle repair.\n✓\nThis job needs someone to identify customer's needs. That's part of motor vehicle repair.\n✓\nThis job needs someone to maintain work area cleanliness. That's part of motor vehicle repair.\n✓\nThis job is in Nairobi - Rongai: the same town as you, but a different area (you're in Nairobi - Embakasi).\n✓\nYour rate of KES 3,000 a day is within their budget of KES 5,000.\n✓\nYou can work full-time, so a part-time job suits you."
+    }
+  }
+}

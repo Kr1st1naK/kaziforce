@@ -1,0 +1,58 @@
+{
+  "R-T-01": {
+    "id": "R-T-01",
+    "job": {
+      "screenshot": "R-T-01-1-job-posted.png",
+      "text": "✓\nYour job has been posted.\nHow we understood your posting\nCLIENT VERBATIM INPUT\n“Install a new distribution board”\n↓\nWe matched this to the trade: electrician\ninstall electricity sockets\ntest electrical equipment\nelectrical installation\nWe read the words of your posting and they describe the work electricians do. We match on the skills you listed above, and nothing else. We didn't recognise “electrical installation”, so we kept it exactly as you wrote it.\nWorkers in this trade\n36 workers on the platform describe themselves as electricians.\n“fundi wa umeme”\nelectrician\nMombasa - Likoni\nWeekends\nKES 2,100 / day\n“fundi wa umeme”\nelectrician\nKitengela\nFull-time\nKES 3,100 / day\n“fundi wa umeme”\nelectrician\nMombasa - Nyali\nWeekends\nKES 1,700 / day\n“inspect electrical supplies, bind wire, follow health and safety procedures in construction, install electric switches…”\nelectrician\nNairobi - Kasarani\nPart-time\nKES 3,100 / day\n“fundi wa umeme”\nelectrician\nThika\nAvailability not stated\nRate not stated\n+\nPost another job"
+    },
+    "profileScreenshot": "R-T-01-2-profile-filled.png",
+    "worker": {
+      "matchesScreenshot": "R-T-01-3-matches.png",
+      "matchesText": "Your matches\nJobs ranked by how well they fit your profile.\n#1\nInstall a new distribution board\nNairobi - Kasarani · KES 3,600 / day · Weekends\nMatch score 86\nStrong\ntest electrical equipment\nkeep records of work progress\nmaintain electrical equipment\n+1 more\nWhy this job?\n#2\nHouse wiring for new rental units\nNairobi - Westlands · KES 1,800 / day · Part-time\nMatch score 82\nStrong\nuse precision tools\nelectricity\ninspect electrical supplies\n+1 more\nWhy this job?\n#3\nRewire an old shop\nNairobi - Githurai · KES 2,500 / day · Full-time\nMatch score 81\nStrong\nfollow health and safety procedures in construction\nuse safety equipment in construction\ninspect electrical supplies\nWhy this job?\n#4\nInstall a new distribution board\nNairobi - Kasarani · KES 2,800 / day · Not stated\nMatch score 75\nModerate\ninstall electricity sockets\ntest electrical equipment\nelectrical installation\nWhy this job?\n#5\nHouse wiring for new rental units\nMachakos · KES 3,700 / day · Weekends\nMatch score 71\nModerate\nfollow health and safety procedures in construction\nuse measurement instruments\nsplice cable\n+2 more\nWhy this job?\n#6\nElectrical fault-finding in an office\nMeru · KES 4,700 / day · Part-time\nMatch score 69\nModerate\ninstall electricity sockets\nuse measurement instruments\nwork in a construction team\n+1 more\nWhy this job?\n#7\nRewire an old shop\nThika · KES 3,700 / day · Full-time\nMatch score 69\nModerate\nmaintain electrical equipment\nsplice cable\ninstall lightning protection system\nWhy this job?\n#8\nHouse wiring for new rental units\nEldoret · KES 1,900 / day · Part-time\nMatch score 67\nModerate\nreact to events in time-critical environments\nsplice cable\nuse safety equipment in construction\nWhy this job?\n#9\nInstall security lights in a compound\nNyeri · KES 5,100 / day · Full-time\nMatch score 65\nModerate\nuse precision tools\nelectricity\ninstall lightning protection system\n+2 more\nWhy this job?\n#10\nReplace brake pads and discs\nNairobi - Umoja · KES 3,100 / day · Weekends\nMatch score 57\nWeak\nWhy this job?",
+      "cardCount": 10,
+      "top3": [
+        "#1 | Install a new distribution board | Nairobi - Kasarani · KES 3,600 / day · Weekends | Match score 86 | Strong | test electrical equipment | keep records of work progress | maintain electrical equipment | +1 more | Why this job?",
+        "#2 | House wiring for new rental units | Nairobi - Westlands · KES 1,800 / day · Part-time | Match score 82 | Strong | use precision tools | electricity | inspect electrical supplies | +1 more | Why this job?",
+        "#3 | Rewire an old shop | Nairobi - Githurai · KES 2,500 / day · Full-time | Match score 81 | Strong | follow health and safety procedures in construction | use safety equipment in construction | inspect electrical supplies | Why this job?"
+      ],
+      "ownJobListed": true,
+      "ownJobPosition": 1,
+      "explanationOf": "Install a new distribution board",
+      "explanationScreenshot": "R-T-01-3-explanation.png",
+      "explanationText": "←\nBack to your matches\nWhy this job suits you\nYour profile\n⇄\nInstall a new distribution board\nMatch score 86 — Strong\nWhat lined up\n✓\nThis job needs someone to keep records of work progress. That's part of electrical work.\n✓\nThis job needs someone to maintain electrical equipment. That's part of electrical work.\n✓\nThis job needs electricity. That's part of electrical work.\n✓\nYou said you do test electrical equipment, and this job mentions it.\n✓\nYou're both in Nairobi - Kasarani.\n✓\nYour rate of KES 2,500 a day fits their budget.\n✓\nYou can work full-time, and that suits this job."
+    }
+  },
+  "R-T-04": {
+    "id": "R-T-04",
+    "job": {
+      "screenshot": "R-T-04-1-job-posted.png",
+      "text": "✓\nYour job has been posted.\nHow we understood your posting\nCLIENT VERBATIM INPUT\n“Gari haina nguvu”\n↓\nWe matched this to the trade: vehicle technician\ndiagnose engine fault\nYou wrote “makanika”, which is another way of saying vehicle technician, so that is the trade we read your posting as. We match on the skills you listed above, and nothing else. We didn't recognise “diagnose engine fault”, so we kept it exactly as you wrote it.\nWorkers in this trade\n15 workers on the platform describe themselves as vehicle technicians.\n“maintain vehicle records, position vehicles for maintenance and repair, adapt to new technology used in cars…”\nvehicle technician\nKisumu\nPart-time\nKES 3,100 / day\n“think analytically, teamwork principles, apply health and safety standards, maintain motor vehicle steering system…”\nvehicle technician\nKitengela\nPart-time\nKES 1,700 / day\n“fundi wa magari”\nvehicle technician\nNairobi - Embakasi\nFull-time\nKES 3,900 / day\n“fundi wa magari”\nvehicle technician\nNakuru\nAvailability not stated\nRate not stated\n“fundi wa magari”\nvehicle technician\nMachakos\nAvailability not stated\nRate not stated\n+\nPost another job"
+    },
+    "profileScreenshot": "R-T-04-2-profile-filled.png",
+    "worker": {
+      "matchesScreenshot": "R-T-04-3-matches.png",
+      "matchesText": "Your matches\nJobs ranked by how well they fit your profile.\n#1\nService and repair a saloon car\nNairobi - Rongai · KES 5,000 / day · Part-time\nMatch score 68\nModerate\nmechanics\nidentify customer's needs\nmaintain work area cleanliness\nWhy this job?\n#2\nReplace brake pads and discs\nNairobi - Umoja · KES 3,100 / day · Weekends\nMatch score 66\nModerate\nrepair vehicle electrical systems\nthink analytically\nmechanical components of vehicles\nWhy this job?\n#3\nRoutine servicing for a fleet of pickups\nMachakos · KES 3,200 / day · Weekends\nMatch score 64\nWeak\nmaintain updated professional knowledge\nemission standards\nteamwork principles\n+1 more\nWhy this job?\n#4\nDiagnose an engine fault\nMombasa - Likoni · KES 3,900 / day · Part-time\nMatch score 63\nWeak\nfollow control of substances hazardous to health procedures\nadapt to new technology used in cars\napply health and safety standards\nWhy this job?\n#5\nRoutine servicing for a fleet of pickups\nKisumu · KES 2,700 / day · Part-time\nMatch score 62\nWeak\nrepair vehicle electrical systems\nuse traditional toolbox tools\nautomotive diagnostic equipment\n+2 more\nWhy this job?\n#6\nDiagnose an engine fault\nNakuru · KES 5,100 / day · Part-time\nMatch score 62\nWeak\nrepair vehicle electrical systems\nvehicle electrical systems\nprovide customer information related to repairs\nWhy this job?\n#7\nReplace brake pads and discs\nNairobi - Kawangware · KES 4,400 / day · Weekends\nMatch score 60\nWeak\nmaintain updated professional knowledge\nhealth and safety measures in transportation\nperform manual work autonomously\nWhy this job?\n#8\nDiagnose an engine fault\nMachakos · KES 1,600 / day · Weekends\nMatch score 59\nWeak\nemission standards\nthink analytically\ntypes of vehicles\n+2 more\nWhy this job?",
+      "cardCount": 8,
+      "top3": [
+        "#1 | Service and repair a saloon car | Nairobi - Rongai · KES 5,000 / day · Part-time | Match score 68 | Moderate | mechanics | identify customer's needs | maintain work area cleanliness | Why this job?",
+        "#2 | Replace brake pads and discs | Nairobi - Umoja · KES 3,100 / day · Weekends | Match score 66 | Moderate | repair vehicle electrical systems | think analytically | mechanical components of vehicles | Why this job?",
+        "#3 | Routine servicing for a fleet of pickups | Machakos · KES 3,200 / day · Weekends | Match score 64 | Weak | maintain updated professional knowledge | emission standards | teamwork principles | +1 more | Why this job?"
+      ],
+      "ownJobListed": false,
+      "explanationOf": "rank #1 (own job not listed)",
+      "explanationScreenshot": "R-T-04-3-explanation.png",
+      "explanationText": "←\nBack to your matches\nWhy this job suits you\nYour profile\n⇄\nService and repair a saloon car\nMatch score 68 — Moderate\nWhat lined up\n✓\nThis job needs mechanics. That's part of motor vehicle repair.\n✓\nThis job needs someone to identify customer's needs. That's part of motor vehicle repair.\n✓\nThis job needs someone to maintain work area cleanliness. That's part of motor vehicle repair.\n✓\nYou're both in Nairobi - Embakasi.\n✓\nYour rate of KES 3,000 a day fits their budget.\n✓\nYou can work full-time, and that suits this job."
+    }
+  },
+  "R-T-08a": {
+    "id": "R-T-08a",
+    "profileScreenshot": "R-T-08a-2-profile-filled.png",
+    "worker": {
+      "matchesScreenshot": "R-T-08a-3-matches.png",
+      "matchesText": "Your matches\nJobs ranked by how well they fit your profile.\nNo strong matches yet\nWe didn't find a job that fits your profile well. Adding more detail about your skills usually helps.\nEdit your profile",
+      "cardCount": 0,
+      "top3": [],
+      "ownJobListed": false
+    }
+  }
+}

@@ -1,0 +1,506 @@
+/**
+ * Both journeys through a real browser, in Chromium and WebKit (NFR-05):
+ * a worker signs up, describes their work and reads an explained match; a
+ * client signs up, posts a job and sees how it was understood.
+ *
+ * Needs the API running on 127.0.0.1:5000 with a seeded database. Accounts are
+ * created as the tests run; clear them afterwards with
+ * `python scripts/seed_database.py --reset`.
+ */
+
+import { expect, test, type Page } from "@playwright/test";
+
+const API = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:5000";
+const PIN = "4821";
+
+/** A fresh 9-digit Kenyan mobile number (7 + 8 digits), unique per run. */
+function phone(): string {
+  const unique = String(Date.now()).slice(-6) + String(Math.floor(Math.random() * 90) + 10);
+  return `7${unique}`;
+}
+
+/**
+ * The page a person can actually see.
+ *
+ * Next keeps a route mounted in a hidden Activity after navigating away, so it
+ * can restore state on back navigation. Every label therefore exists twice once
+ * a journey has passed through two forms, and an unscoped locator is ambiguous.
+ */
+function view(page: Page) {
+  return page.locator("main:visible");
+}
+
+async function fillPin(page: Page, label: RegExp, pin: string) {
+  for (const [index, digit] of [...pin].entries()) {
+    await view(page)
+      .getByLabel(new RegExp(`${label.source}, digit ${index + 1}`))
+      .fill(digit);
+  }
+}
+
+async function createAccount(page: Page, role: "worker" | "client"): Promise<string> {
+  const number = phone();
+  await page.goto("/create-account");
+  await expect(page.getByRole("heading", { name: "Create an account" })).toBeVisible();
+  await page.getByRole("radio", { name: role === "worker" ? "I'm a worker" : "I'm a client" }).click();
+  if (role === "worker") {
+    // A worker gives a name and agrees to be shown; a client is asked for neither.
+    await view(page).getByLabel(/^First name/).fill("Test");
+    await view(page).getByLabel(/^Last name/).fill("Worker");
+    await view(page).getByRole("checkbox", { name: /can see my name and phone number/ }).check();
+  }
+  await view(page).getByLabel("Phone number", { exact: true }).fill(number);
+  await fillPin(page, /Create a 4-digit PIN/, PIN);
+  await fillPin(page, /Confirm PIN/, PIN);
+  await page.getByRole("button", { name: "Create account" }).click();
+  return number;
+}
+
+test.beforeAll(async ({ request }) => {
+  const health = await request.get(`${API}/health`);
+  expect(health.ok(), `the API must be running at ${API}`).toBeTruthy();
+  expect((await health.json()).ready, "the engine must have finished loading").toBeTruthy();
+});
+
+test("a worker signs up, describes their work, and reads an explained match", async ({ page }) => {
+  await createAccount(page, "worker");
+
+  await expect(page).toHaveURL(/\/worker\/profile$/);
+  await expect(page.getByRole("heading", { name: "Create your worker profile" })).toBeVisible();
+  // The profile holds no name or contact field (DR-07): the name was given at sign-up, on the account.
+  await expect(view(page).getByLabel(/name/i)).toHaveCount(0);
+
+  await page.getByLabel(/What work do you do\?/).fill("fundi wa umeme, wiring, solar installation");
+  await page.getByLabel(/About you/).fill("Nina uzoefu wa miaka mitano. Domestic and commercial installations.");
+  await page.getByLabel(/Where do you work\?/).selectOption("Nairobi - Kasarani");
+  await page.getByLabel(/When can you work\?/).selectOption("Full-time");
+  await page.getByLabel(/Your daily rate/).fill("2500");
+  await page.getByRole("button", { name: "Create profile" }).click();
+
+  await expect(page).toHaveURL(/\/worker\/matches$/);
+  await expect(page.getByRole("heading", { name: "Your matches" })).toBeVisible();
+
+  const first = page.locator("article").first();
+  await expect(first).toContainText("#1");
+  await expect(first.getByText(/Match score \d+/)).toBeVisible();
+  await expect(first.getByText(/Strong|Moderate|Weak/).first()).toBeVisible();
+
+  await first.getByRole("link", { name: "Why this job?" }).click();
+  await expect(page).toHaveURL(/\/worker\/matches\/[0-9a-f-]+$/);
+  await expect(page.getByRole("heading", { name: "Why this job suits you" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "What lined up" })).toBeVisible();
+  await expect(page.getByText(/That's part of electrical work/).first()).toBeVisible();
+  // The term the worker used, and the trade it reached, are named in words.
+  await expect(page.getByText(/You described yourself as a/)).toBeVisible();
+  await expect(view(page).getByText("fundi wa umeme")).toBeVisible();
+  await expect(view(page).getByText("electrician", { exact: true })).toBeVisible(); // exact: the page now also shows the job's description, which says "electrician"
+
+  // No component score, criterion table or raw graph path is shown to a worker.
+  await expect(page.getByRole("button", { name: /technical detail/ })).toHaveCount(0);
+  await expect(view(page)).not.toContainText(/Rule-based score|Semantic score|MAPS_TO|HAS_ESSENTIAL_SKILL/);
+});
+
+test("a worker who gives no rate is told it could not be checked, not scored zero", async ({ page }) => {
+  await createAccount(page, "worker");
+  await page.getByLabel(/What work do you do\?/).fill("fundi wa umeme");
+  await page.getByLabel(/About you/).fill("Electrical work in Nyeri for five years.");
+  await page.getByLabel(/Where do you work\?/).selectOption("Nyeri");
+  await page.getByRole("button", { name: "Create profile" }).click();
+
+  await expect(page.getByRole("heading", { name: "Your matches" })).toBeVisible();
+  await page.locator("article").first().getByRole("link", { name: "Why this job?" }).click();
+  await expect(page.getByRole("heading", { name: "What we couldn't check" })).toBeVisible();
+  await expect(page.getByText(/so we couldn't check|couldn't compare/).first()).toBeVisible();
+  // Absent is said in words, and never reported as a zero.
+  await expect(view(page)).not.toContainText(/scored 0|: 0\b/);
+});
+
+test("a worker whose wording is outside the vocabulary is told so plainly", async ({ page }) => {
+  await createAccount(page, "worker");
+  // "fundi wa stima" is deliberately withheld from the knowledge graph.
+  await page.getByLabel(/What work do you do\?/).fill("fundi wa stima");
+  await page.getByLabel(/About you/).fill("Nafanya kazi ya stima.");
+  await page.getByLabel(/Where do you work\?/).selectOption("Thika");
+  await page.getByRole("button", { name: "Create profile" }).click();
+
+  await expect(page.getByRole("heading", { name: "Your matches" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "No strong matches yet" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Edit your profile" })).toBeVisible();
+});
+
+test("a client signs up, posts a job, and sees how it was understood", async ({ page }) => {
+  await createAccount(page, "client");
+
+  await expect(page).toHaveURL(/\/client\/post$/);
+  await expect(page.getByRole("heading", { name: "Post a job" })).toBeVisible();
+  // Category is not asked for: matching never reads it. A client has no profile either.
+  await expect(page.getByLabel(/category/i)).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "My profile" })).toHaveCount(0);
+
+  // "fundi bomba" is the accepted plumber alias in the frozen vocabulary, and the
+  // two skills are real ESCO labels, so this posting does reach a trade. Note the
+  // title is not read by matching: the description and required skills are.
+  await page.getByLabel("Job title").fill("Fix bathroom leakage");
+  await page.getByLabel("Add skills if you know them").fill("replace faucets, plumbing tools");
+  await page.getByLabel("What do you need done?").fill("Need a fundi bomba. Bathroom leaking at the joints, materials are on site.");
+  await page.getByLabel(/Budget per day/).fill("2200");
+  await page.getByLabel(/Where is the job\?/).selectOption("Nairobi - Kawangware");
+  await page.getByRole("button", { name: /Post job/ }).click();
+
+  await expect(page).toHaveURL(/\/client\/postings\/[0-9a-f-]+$/);
+  await expect(page.getByRole("heading", { name: "Your job has been posted." })).toBeVisible();
+  await expect(page.getByText("Client verbatim input")).toBeVisible();
+  await expect(page.getByText(/We matched this to the trade/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Workers in this trade" })).toBeVisible();
+  await expect(page.getByText(/describe themselves as/)).toBeVisible();
+
+  // The trade list carries no score and no ranking.
+  const pool = page.getByRole("heading", { name: "Workers in this trade" }).locator("..");
+  await expect(pool.getByText(/Match score|Strong|Moderate|Weak/)).toHaveCount(0);
+
+  await page.getByRole("link", { name: /Post another job/ }).click();
+  await expect(page).toHaveURL(/\/client\/post$/);
+});
+
+test("a client's postings are listed, and only their own", async ({ page }) => {
+  await createAccount(page, "client");
+  await page.getByLabel("Job title").fill("Rewire a small shop");
+  await page.getByLabel("Add skills if you know them").fill("install electricity sockets");
+  await page.getByLabel("What do you need done?").fill("Small shop in Nyeri needs a fundi wa umeme for rewiring.");
+  await page.getByLabel(/Budget per day/).fill("2600");
+  await page.getByLabel(/Where is the job\?/).selectOption("Nyeri");
+  await page.getByRole("button", { name: /Post job/ }).click();
+  await expect(page.getByRole("heading", { name: "Your job has been posted." })).toBeVisible();
+
+  await page.getByRole("link", { name: "My postings" }).click();
+  await expect(page).toHaveURL(/\/client\/postings$/);
+  await expect(view(page).getByRole("link", { name: /Rewire a small shop/ })).toBeVisible();
+  await expect(view(page).getByText("electrician", { exact: true })).toBeVisible(); // exact: the page now also shows the job's description, which says "electrician"
+});
+
+test("signing in returns a worker to their matches", async ({ page }) => {
+  const number = await createAccount(page, "worker");
+  await page.getByLabel(/What work do you do\?/).fill("fundi wa umeme");
+  await page.getByLabel(/About you/).fill("Five years of electrical work.");
+  await page.getByLabel(/Where do you work\?/).selectOption("Nyeri");
+  await page.getByRole("button", { name: "Create profile" }).click();
+  await expect(page).toHaveURL(/\/worker\/matches$/);
+
+  await page.getByRole("button", { name: /Sign out/ }).click();
+  await expect(page).toHaveURL(/\/sign-in$/);
+
+  await view(page).getByLabel("Phone number", { exact: true }).fill(number);
+  await fillPin(page, /4-digit PIN/, PIN);
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page).toHaveURL(/\/worker\/matches$/);
+});
+
+test("the wrong PIN is refused, and the form says so", async ({ page }) => {
+  const number = await createAccount(page, "client");
+  await page.getByRole("button", { name: /Sign out/ }).click();
+
+  await view(page).getByLabel("Phone number", { exact: true }).fill(number);
+  await fillPin(page, /4-digit PIN/, "0000");
+  await page.getByRole("button", { name: "Continue" }).click();
+  // Scoped: Next's route announcer is also role="alert".
+  await expect(view(page).getByRole("alert")).toContainText(/not right/);
+  await expect(page).toHaveURL(/\/sign-in$/);
+});
+
+test("no PIN is left behind in the page after signing up", async ({ page }) => {
+  // Next keeps the create-account route mounted but hidden after navigating
+  // away. Whatever is still in its state stays in the DOM for the rest of the
+  // session, so the PIN has to be cleared before leaving (DR-07).
+  await createAccount(page, "worker");
+  await expect(page).toHaveURL(/\/worker\/profile$/);
+
+  const retained = await page
+    .locator('input[type="password"], input[type="tel"]')
+    .evaluateAll((inputs) => inputs.map((input) => (input as HTMLInputElement).value).filter(Boolean));
+  expect(retained).toEqual([]);
+
+  // The name and the agreement the form held are cleared too: they are personal data in a hidden route.
+  const names = await page
+    .locator('input[type="text"], input[type="checkbox"]')
+    .evaluateAll((inputs) =>
+      inputs
+        .filter((input) => !(input as HTMLElement).checkVisibility())
+        .map((input) => (input as HTMLInputElement).value || (input as HTMLInputElement).checked)
+        .filter((value) => value === true || (typeof value === "string" && value !== "" && value !== "on")),
+    );
+  expect(names).toEqual([]);
+});
+
+test("a signed-out visitor is sent to sign in", async ({ page }) => {
+  await page.goto("/worker/matches");
+  await expect(page).toHaveURL(/\/sign-in$/);
+  await expect(page.getByRole("button", { name: "Continue" })).toBeVisible();
+});
+
+test("sign-in and create-account each have a way back to the landing page", async ({ page }) => {
+  for (const path of ["/sign-in", "/create-account"]) {
+    await page.goto(path);
+    await view(page).getByRole("link", { name: /Back to the home page/ }).click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  }
+});
+
+test("no button says Signing in…, Creating your account… or Saving… when nothing was submitted", async ({ page }) => {
+  // Next keeps a route it left mounted but hidden. A busy flag set by a successful submit used to survive that,
+  // so the page came back saying "Signing in…" with its fields disabled (first usability sessions).
+  const number = await createAccount(page, "worker");
+  await page.getByLabel(/What work do you do\?/).fill("fundi wa umeme");
+  await page.getByLabel(/About you/).fill("Five years of electrical work.");
+  await page.getByLabel(/Where do you work\?/).selectOption("Nyeri");
+  await page.getByRole("button", { name: "Create profile" }).click();
+  await expect(page).toHaveURL(/\/worker\/matches$/);
+
+  // Back to the profile page the worker created the profile on, and into editing it.
+  await page.locator("header:visible").getByRole("link", { name: /profile/i }).first().click();
+  await expect(page).toHaveURL(/\/worker\/profile$/);
+  await view(page).getByRole("button", { name: /Edit profile/ }).click();
+  await expect(view(page).getByRole("button", { name: "Save changes" })).toBeEnabled();
+  await expect(view(page).getByText("Saving…")).toHaveCount(0);
+  await view(page).getByRole("button", { name: "Save changes" }).click();
+  await expect(view(page).getByRole("button", { name: /Edit profile/ })).toBeVisible();
+
+  // Sign out to the page create-account left behind, then through sign-in and out again.
+  await page.getByRole("button", { name: /Sign out/ }).click();
+  await expect(page).toHaveURL(/\/sign-in$/);
+  await expect(view(page).getByRole("button", { name: "Continue" })).toBeEnabled();
+  await view(page).getByRole("link", { name: /New here/ }).click();
+  await expect(view(page).getByRole("button", { name: "Create account" })).toBeEnabled();
+  await expect(view(page).getByText("Creating your account…")).toHaveCount(0);
+
+  // By the page's own link, not a fresh load: the point is the sign-in route Next kept.
+  await view(page).getByRole("link", { name: /Already have an account/ }).click();
+  await expect(page).toHaveURL(/\/sign-in$/);
+  await view(page).getByLabel("Phone number", { exact: true }).fill(number);
+  await fillPin(page, /4-digit PIN/, PIN);
+  await view(page).getByRole("button", { name: "Continue" }).click();
+  await expect(page).toHaveURL(/\/worker\/matches$/);
+  await page.getByRole("button", { name: /Sign out/ }).click();
+  await expect(page).toHaveURL(/\/sign-in$/);
+  await expect(view(page).getByRole("button", { name: "Continue" })).toBeEnabled();
+  await expect(view(page).getByText("Signing in…")).toHaveCount(0);
+});
+
+/** Drops the first request that matches, as a dead connection would: the browser gets no response at all. */
+async function dropOnce(page: Page, url: string, method: string) {
+  let dropped = false;
+  await page.route(url, async (route) => {
+    if (!dropped && route.request().method() === method) {
+      dropped = true;
+      await route.abort("connectionfailed");
+    } else {
+      await route.fallback();
+    }
+  });
+  return () => dropped;
+}
+
+test("when the connection drops on sign-in, the message is plain and Try again signs in", async ({ page }) => {
+  const number = await createAccount(page, "worker");
+  await page.getByLabel(/What work do you do\?/).fill("fundi wa umeme");
+  await page.getByLabel(/About you/).fill("Five years of electrical work.");
+  await page.getByLabel(/Where do you work\?/).selectOption("Nyeri");
+  await page.getByRole("button", { name: "Create profile" }).click();
+  await expect(page).toHaveURL(/\/worker\/matches$/);
+  await page.getByRole("button", { name: /Sign out/ }).click();
+  await expect(page).toHaveURL(/\/sign-in$/);
+
+  const dropped = await dropOnce(page, "**/auth/sessions", "POST");
+  await view(page).getByLabel("Phone number", { exact: true }).fill(number);
+  await fillPin(page, /4-digit PIN/, PIN);
+  await view(page).getByRole("button", { name: "Continue" }).click();
+
+  const alert = view(page).getByRole("alert");
+  await expect(alert).toContainText("We couldn't reach the service. Check your connection and try again.");
+  await expect(alert).not.toContainText(/API|running/);
+  expect(dropped()).toBe(true);
+
+  await view(page).getByRole("button", { name: "Try again" }).click();
+  await expect(page).toHaveURL(/\/worker\/matches$/);
+});
+
+test("when the connection drops while posting a job, Try again posts it once", async ({ page }) => {
+  await createAccount(page, "client");
+  await expect(page).toHaveURL(/\/client\/post$/);
+  await page.getByLabel("Job title").fill("Fix bathroom leakage");
+  await page.getByLabel("Add skills if you know them").fill("replace faucets, plumbing tools");
+  await page.getByLabel("What do you need done?").fill("Need a fundi bomba. Bathroom leaking at the joints, materials are on site.");
+  await page.getByLabel(/Budget per day/).fill("2200");
+  await page.getByLabel(/Where is the job\?/).selectOption("Nairobi - Kawangware");
+
+  const dropped = await dropOnce(page, "**/jobs", "POST");
+  await page.getByRole("button", { name: /Post job/ }).click();
+  await expect(view(page).getByRole("alert")).toContainText("We couldn't reach the service");
+  expect(dropped()).toBe(true);
+  await expect(view(page).getByLabel("Job title")).toHaveValue("Fix bathroom leakage"); // nothing retyped
+
+  await view(page).getByRole("button", { name: "Try again" }).click();
+  await expect(page).toHaveURL(/\/client\/postings\/[0-9a-f-]+$/);
+  await expect(page.getByRole("heading", { name: "Your job has been posted." })).toBeVisible();
+});
+
+test("tapping \"+N more\" on a match opens that match's explanation", async ({ page }) => {
+  await createAccount(page, "worker");
+  await page
+    .getByLabel(/What work do you do\?/)
+    .fill("solar panels installation, lighting systems installation, wiring, diagnostics, compliance inspection, electrical repair, electrical maintenance");
+  await page.getByLabel(/About you/).fill("Seasoned electrician: installation, maintenance and repair of electrical systems in homes and offices.");
+  await page.getByLabel(/Where do you work\?/).selectOption("Nairobi - Westlands");
+  await page.getByLabel(/When can you work\?/).selectOption("Full-time");
+  await page.getByLabel(/Your daily rate/).fill("3000");
+  await page.getByRole("button", { name: "Create profile" }).click();
+  await expect(page).toHaveURL(/\/worker\/matches$/);
+
+  const card = view(page).locator("article").filter({ has: page.getByRole("link", { name: /\+\d+ more/ }) }).first();
+  await expect(card).toBeVisible();
+  const title = await card.getByRole("heading", { level: 3 }).innerText();
+  const more = card.getByRole("link", { name: /\+\d+ more/ });
+  await expect(more).toHaveText(/^\+\d+ more$/);
+  expect((await more.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  await more.focus();
+  await expect(more).toBeFocused(); // reachable by keyboard
+  await more.click();
+
+  await expect(page).toHaveURL(/\/worker\/matches\/[0-9a-f-]+$/);
+  await expect(page.getByRole("heading", { name: "What lined up" })).toBeVisible();
+  await expect(view(page)).toContainText(title);
+});
+
+test("a client who lists no skills posts a job and is told how it was read", async ({ page }) => {
+  // Usability finding U-7: most clients know only that they need a plumber or an electrician.
+  await createAccount(page, "client");
+  await expect(page).toHaveURL(/\/client\/post$/);
+
+  await view(page).getByLabel("What do you need done?").fill("I need a plumber to fix a leaking tap");
+  await view(page).getByLabel("Job title").fill("Fix a leaking tap");
+  await view(page).getByLabel(/Budget per day/).fill("2200");
+  await view(page).getByLabel(/Where is the job\?/).selectOption("Nairobi - Kawangware");
+  await expect(view(page).getByLabel(/Add skills if you know them/)).toHaveValue("");
+  await view(page).getByRole("button", { name: /Post job/ }).click();
+
+  await expect(page).toHaveURL(/\/client\/postings\/[0-9a-f-]+$/);
+  await expect(page.getByRole("heading", { name: "Your job has been posted." })).toBeVisible();
+  await expect(view(page).getByText(/We matched this to the trade:/)).toContainText("plumber");
+  await expect(view(page).getByText(/You didn't list any skills, so we couldn't compare skills/)).toBeVisible();
+  await expect(view(page)).not.toContainText("We match on the skills you listed above");
+  await expect(page.getByRole("heading", { name: "Workers in this trade" })).toBeVisible();
+});
+
+test("a client whose words reach no trade, with no skills, is told so plainly", async ({ page }) => {
+  // P2's own words in the first sessions: "looking for a mechanic for a car".
+  await createAccount(page, "client");
+  await view(page).getByLabel("What do you need done?").fill("looking for a mechanic for a car");
+  await view(page).getByLabel("Job title").fill("Mechanic for a car");
+  await view(page).getByLabel(/Budget per day/).fill("3000");
+  await view(page).getByLabel(/Where is the job\?/).selectOption("Nairobi - Kawangware");
+  await view(page).getByRole("button", { name: /Post job/ }).click();
+
+  await expect(page.getByRole("heading", { name: "Your job has been posted." })).toBeVisible();
+  await expect(view(page).getByText(/We couldn't match this to a trade we know/)).toBeVisible();
+  await expect(view(page).getByText(/You didn't list any skills, so we couldn't compare skills/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Workers in this trade" })).toHaveCount(0);
+});
+
+test("at 375px the matches list gives a job's title the row, and the header's links stay on one line", async ({ page }) => {
+  // M-2 (the title was squeezed into a column about 100 px wide by the score beside it) and M-3 (the header wrapped).
+  await page.setViewportSize({ width: 375, height: 812 });
+  await createAccount(page, "worker");
+  await page.getByLabel(/What work do you do\?/).fill("fundi wa umeme, wiring, solar installation");
+  await page.getByLabel(/About you/).fill("Nina uzoefu wa miaka mitano. Domestic and commercial installations.");
+  await page.getByLabel(/Where do you work\?/).selectOption("Nairobi - Kasarani");
+  await page.getByRole("button", { name: "Create profile" }).click();
+  await expect(page).toHaveURL(/\/worker\/matches$/);
+
+  const card = view(page).locator("article").first();
+  await expect(card).toBeVisible();
+  const title = await card.getByRole("heading", { level: 3 }).boundingBox();
+  const cardBox = await card.boundingBox();
+  expect(title!.width).toBeGreaterThan(cardBox!.width * 0.6); // it was about a third of the card
+
+  const links = page.locator("header:visible nav a");
+  expect(await links.count()).toBeGreaterThan(0);
+  for (const link of await links.all()) {
+    const box = await link.boundingBox();
+    expect(box!.height, `"${await link.innerText()}" wraps`).toBeLessThan(34); // one line of 16 px text plus its underline
+  }
+});
+
+test("the job form asks for a working pattern, not a date, and still stores the same values", async ({ page }) => {
+  await createAccount(page, "client");
+  await expect(page).toHaveURL(/\/client\/post$/);
+
+  const field = view(page).getByLabel(/What working pattern does the job need\?/);
+  await expect(field).toBeVisible();
+  await expect(view(page).getByLabel(/When is it needed/)).toHaveCount(0);
+  expect(await field.locator("option").evaluateAll((options) => options.map((o) => [(o as HTMLOptionElement).value, o.textContent]))).toEqual([
+    ["", "No fixed pattern"],
+    ["Full-time", "Full-time"],
+    ["Part-time", "Part-time"],
+    ["Weekends", "Weekends"],
+  ]);
+
+  // A pattern chosen here is what the posting keeps.
+  await view(page).getByLabel("What do you need done?").fill("Electrician needed, a socket keeps sparking");
+  await view(page).getByLabel("Job title").fill("Fix a socket");
+  await view(page).getByLabel(/Budget per day/).fill("1500");
+  await view(page).getByLabel(/Where is the job\?/).selectOption("Nairobi - Kawangware");
+  await field.selectOption("Weekends");
+  await view(page).getByRole("button", { name: /Post job/ }).click();
+  await expect(page).toHaveURL(/\/client\/postings\/[0-9a-f-]+$/);
+  await page.getByRole("link", { name: "My postings" }).click();
+  await expect(view(page).getByText("Weekends")).toBeVisible();
+});
+
+test("after posting a job, \"Post another job\" opens a form whose button is idle, not \"Posting…\"", async ({ page }) => {
+  // Usability finding U-10: Next keeps the post page mounted, hidden, and a busy flag set by the successful post came back with it.
+  await createAccount(page, "client");
+  await view(page).getByLabel("What do you need done?").fill("I need a plumber to fix a leaking tap");
+  await view(page).getByLabel("Job title").fill("Fix a leaking tap");
+  await view(page).getByLabel(/Budget per day/).fill("2200");
+  await view(page).getByLabel(/Where is the job\?/).selectOption("Nairobi - Kawangware");
+  await view(page).getByRole("button", { name: /Post job/ }).click();
+  await expect(page).toHaveURL(/\/client\/postings\/[0-9a-f-]+$/);
+  await expect(page.getByRole("heading", { name: "Your job has been posted." })).toBeVisible();
+
+  await page.getByRole("link", { name: /Post another job/ }).click();
+  await expect(page).toHaveURL(/\/client\/post$/);
+  await expect(view(page).getByRole("button", { name: /Post job/ })).toBeEnabled();
+  await expect(view(page).getByText("Posting…")).toHaveCount(0);
+  await expect(view(page).getByLabel("What do you need done?")).toBeEnabled();
+});
+
+test("a match shows what the job is, and \"Why this job?\" shows the whole description", async ({ page }) => {
+  // Usability finding U-11 (R2-W1: "have descriptions about the job"). A phone, so the layout is tested as well.
+  await page.setViewportSize({ width: 375, height: 812 });
+  await createAccount(page, "worker");
+  await page.getByLabel(/What work do you do\?/).fill("fundi wa umeme, wiring, solar installation");
+  await page.getByLabel(/About you/).fill("Nina uzoefu wa miaka mitano. Domestic and commercial installations.");
+  await page.getByLabel(/Where do you work\?/).selectOption("Nairobi - Kasarani");
+  await page.getByRole("button", { name: "Create profile" }).click();
+  await expect(page).toHaveURL(/\/worker\/matches$/);
+
+  const card = view(page).locator("article").first();
+  const excerpt = card.locator("[class*=excerpt]");
+  await expect(excerpt).toBeVisible();
+  const shown = ((await excerpt.innerText()) ?? "").trim();
+  expect(shown.length).toBeGreaterThan(20);
+  expect((await excerpt.boundingBox())!.height).toBeLessThanOrEqual(3 * 22 + 2); // three lines at most
+  const noOverflow = await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth);
+  expect(noOverflow).toBe(true);
+
+  await card.getByRole("link", { name: "Why this job?" }).click();
+  await expect(page).toHaveURL(/\/worker\/matches\/[0-9a-f-]+$/);
+  await expect(view(page).getByRole("heading", { name: "About this job" })).toBeVisible();
+  const full = view(page).getByRole("region", { name: "Full job description" });
+  await expect(full).toBeVisible();
+  // The excerpt is the start of the same text (compared on its first words, whitespace collapsed).
+  const start = shown.replace(/…$/, "").split(" ").slice(0, 6).join(" ");
+  expect(((await full.innerText()) ?? "").replace(/\s+/g, " ")).toContain(start);
+  // The explanation is still there, unchanged.
+  await expect(page.getByRole("heading", { name: "What lined up" })).toBeVisible();
+});

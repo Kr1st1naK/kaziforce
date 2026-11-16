@@ -1,0 +1,29 @@
+{
+  "browser": "webkit",
+  "samples": 10,
+  "warmup_discarded": 3,
+  "budget_ms": 5000,
+  "note": "Next.js development server; a production build would be faster.",
+  "end_to_end_ms": {
+    "median": 332.5,
+    "p95": 344,
+    "max": 344
+  },
+  "engine_ms": {
+    "median": 9.45,
+    "p95": 10.4,
+    "max": 10.4
+  },
+  "end_to_end_samples_ms": [
+    285,
+    297,
+    297,
+    342,
+    333,
+    340,
+    341,
+    344,
+    332,
+    293
+  ]
+}

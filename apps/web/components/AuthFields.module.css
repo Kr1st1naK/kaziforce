@@ -1,0 +1,148 @@
+.roles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.role {
+  border-radius: var(--radius-control);
+  padding: 14px 16px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--surface);
+}
+
+.roleSelected {
+  background: var(--primary);
+  border: 1px solid var(--primary);
+  color: var(--on-primary);
+}
+
+.roleBordered {
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+
+.rolePlain {
+  border: 1px solid transparent;
+  color: var(--ink);
+}
+
+.roleBordered:hover,
+.rolePlain:hover {
+  background: #f1f5f9;
+}
+
+.field {
+  margin-bottom: var(--space-lg);
+}
+
+.label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  margin-bottom: var(--space-sm);
+}
+
+.phone {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-control);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.phone:focus-within {
+  border-color: var(--primary);
+}
+
+.prefix {
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  background: var(--tint);
+  border-right: 1px solid var(--line);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.phoneInput {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  padding: 12px 14px;
+  font-size: 16px;
+  background: transparent;
+}
+
+.phoneInput::placeholder {
+  color: var(--muted);
+}
+
+.pinHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--space-sm);
+}
+
+.pinHeader .label {
+  margin-bottom: 0;
+}
+
+.show {
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--muted);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.show:hover {
+  color: var(--ink);
+}
+
+.pin {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+}
+
+.pinBox {
+  width: 48px;
+  height: 48px;
+  text-align: center;
+  font-size: 20px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+}
+
+.pinBox:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+.invalid {
+  border-color: var(--error);
+}
+
+.hint {
+  display: block;
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: var(--space-sm);
+}
+
+.error {
+  display: block;
+  color: var(--error);
+  font-size: 14px;
+  margin-top: var(--space-sm);
+}

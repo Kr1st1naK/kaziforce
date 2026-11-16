@@ -22,7 +22,7 @@ recommendations that work from the moment a worker or job joins the platform.
 ```
 kaziforce/
 ├── apps/
-│   ├── web/                      # Next.js/React/TypeScript interface (not yet scaffolded)
+│   ├── web/                      # Next.js/React/TypeScript interface (eight screens)
 │   └── api/                      # Flask REST API + recommendation engine
 │       └── src/kaziforce_api/
 │           ├── app.py            # Flask entry point
@@ -44,8 +44,13 @@ kaziforce/
 **Current status.** The frozen vocabulary (`data/vocabulary/`) and the synthetic
 evaluation dataset (`data/raw/synthetic/`) are built and tested. The knowledge
 graph, enrichment, scorers, end-to-end pipeline, evaluation runner and
-`POST /recommend` are built; the explanation generator, the PostgreSQL-backed
-application store and the web interface are in progress.
+`POST /recommend` are built, with PostgreSQL as the application store. The web
+interface covers the eight approved screens in `docs/UI views/`, behind a
+phone-and-PIN sign-in that gives a worker's profile and a client's postings an
+owner (a proof of concept, not a production auth system — `docs/limitations.md`
+§7 says what it does and does not protect against). The explanation is composed
+in the interface from the score components, provenance and graph paths the API
+returns: plain words first, with the numbers behind a disclosure.
 
 ## Setup from a fresh clone
 
@@ -85,15 +90,19 @@ ruff check apps/api packages scripts tests  # lint
 # data/raw/synthetic/difficulty_report.md)
 python scripts/report_synthetic_difficulty.py
 
-# End-to-end recommendation for one development-split worker (command line)
+# End-to-end recommendation for one stored worker (reads PostgreSQL; add --source csv without a database)
 python scripts/run_recommendation.py --list 5
 python scripts/run_recommendation.py --worker-id <id> --k 10
 
 # Development-split evaluation (writes results/dev/<time>_<commit>/)
 python scripts/evaluate.py
 
-# REST API: POST /recommend, GET /health (contract: docs/api.md)
+# REST API (contract: docs/api.md)
 flask --app kaziforce_api.app run          # engine ready after ~30 s; check http://127.0.0.1:5000/health
+
+# Web interface (needs the API running; see apps/web/README.md)
+cd apps/web && npm install
+npm run dev -- --hostname 127.0.0.1        # http://127.0.0.1:3000
 ```
 
 **Do not regenerate the synthetic dataset.** It is frozen: its input checksums are
@@ -106,11 +115,15 @@ Optional raw data (only needed to rebuild inputs, not to run anything above):
 `python scripts/download_esco.py` for the ESCO subset, and the manual downloads
 described in `data/raw/*/README.md`.
 
-## Database (optional)
+## Database
 
-The relational schema (proposal Figure 4.6) is defined as versioned SQL
-migrations in `apps/api/src/kaziforce_api/data/migrations/`. Nothing else uses
-the database yet.
+PostgreSQL is the application store: the command-line demo and the REST API read
+worker profiles and job postings from it, and the demo writes each ranking to
+`match_score`. The schema (proposal Figure 4.6, extended in migrations 0002 to 0006) is
+defined as versioned SQL migrations in `apps/api/src/kaziforce_api/data/migrations/`.
+The evaluation deliberately reads the frozen CSVs instead, so its results stay
+traceable through the dataset checksums and run in CI without a database.
+Without a database, use `--source csv` (demo) or `KAZIFORCE_PROFILE_SOURCE=csv` (API).
 
 Copy the environment template and set `DATABASE_URL`:
 ```bash
@@ -127,13 +140,39 @@ psql -d postgres -c "CREATE ROLE kaziforce_app LOGIN PASSWORD '<password>';"
 createdb -O kaziforce_app kaziforce
 psql kaziforce -c "REVOKE CREATE ON SCHEMA public FROM PUBLIC; GRANT USAGE, CREATE ON SCHEMA public TO kaziforce_app;"
 ```
+**The database must use UTF-8.** The migrations and the data contain non-ASCII text
+(Kiswahili terms, dashes), and a database in the `SQL_ASCII` encoding makes the first
+migration fail with `UnicodeEncodeError: 'ascii' codec can't encode character`. Most
+installers create UTF-8 clusters, but a cluster made with a bare `initdb` under the `C`
+locale is `SQL_ASCII`. Check with `psql kaziforce -c "SHOW server_encoding;"`; if it is not
+`UTF8`, create the database explicitly:
+```bash
+createdb -O kaziforce_app -E UTF8 -T template0 kaziforce
+```
+(or initialise a new cluster with `initdb -E UTF8 --locale=en_US.UTF-8`).
+
 Then set `DATABASE_URL=postgresql://kaziforce_app:<password>@localhost:5432/kaziforce` in `.env`.
 
-Test the connection, then create the schema:
+**Keys.** Phone numbers and workers' names are encrypted in the application, so the API needs two
+secrets in `.env`. Generate them and paste the two lines it prints:
+```bash
+python -m kaziforce_api.crypto
+```
+Outside development (`KAZIFORCE_ENV` other than `development` or `test`) the API will not start without
+them, or without `KAZIFORCE_CORS_ORIGIN`. A database that already holds accounts needs a one-off
+encrypting migration first: see the runbook in `docs/privacy-and-keys.md`.
+
+Test the connection, create the schema, and load the dataset:
 ```bash
 python -m kaziforce_api.data.db
 python -m kaziforce_api.data.migrate          # safe to re-run; --status lists applied migrations
+python scripts/seed_database.py              # development-split workers + all 280 postings; idempotent
+python scripts/seed_database.py --reset      # clear profiles and postings stored through the API, then re-seed
+python scripts/seed_demo_workers.py          # optional: three named, consenting demo plumbers
 ```
+
+With `DATABASE_URL` set, `pytest` also runs the PostgreSQL round-trip tests
+(`tests/test_store.py`) in a throwaway schema; without it they are skipped.
 
 ## Development workflow
 
@@ -149,7 +188,7 @@ Commit convention: `feat:`, `fix:`, `docs:`, `chore:`, `test:`, `data:` prefixes
 ## Tech stack
 
 Python · NetworkX · Sentence Transformers (all-MiniLM-L6-v2) · Flask ·
-PostgreSQL · Next.js/React/TypeScript (planned)
+PostgreSQL · Next.js / React / TypeScript
 
 ## Licensing
 

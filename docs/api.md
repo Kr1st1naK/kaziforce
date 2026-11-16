@@ -1,8 +1,30 @@
 # REST API
 
 Flask API between the web app and the recommendation engine (IR-02). JSON in, JSON out.
-Implementation: `apps/api/src/kaziforce_api/app.py` (routes, validation) and
-`service.py` (engine, response building). Tests: `tests/test_api.py`.
+Implementation: `apps/api/src/kaziforce_api/app.py` (routes, validation),
+`service.py` (engine, response building), `auth.py` (phone numbers, PINs, session
+tokens) and `data/accounts.py` (accounts, sessions, ownership). Tests:
+`tests/test_api.py`, `tests/test_api_db.py`, `tests/test_auth.py` and
+`tests/test_api_accounts.py`.
+
+| Method | Path | Purpose | Sign-in |
+|---|---|---|---|
+| GET | `/health` | Readiness and the size of the candidate pool | — |
+| POST | `/auth/accounts` | Create an account; signs it in | — |
+| POST | `/auth/sessions` | Sign in | — |
+| DELETE | `/auth/sessions` | Sign out | — |
+| GET | `/auth/session` | Who is signed in, and what they own | Any |
+| POST | `/recommend` | Ranked jobs for a stored worker or a typed-in profile | Optional |
+| POST | `/workers` | Store a worker profile; returns its identifier and enrichment | Optional |
+| GET | `/workers/me` | The signed-in worker's own profile and enrichment, with their own name, consent and number | Worker |
+| PUT | `/workers/me` | Replace the signed-in worker's own profile; optionally their name and consent | Worker |
+| GET | `/workers/{public_id}` | A consenting worker's profile and phone number | Client |
+| POST | `/jobs` | Store a job posting, add it to the candidate pool, return how it was understood | Optional |
+| GET | `/jobs` | The signed-in client's own postings | Client |
+| GET | `/jobs/{posting_id}` | How a stored posting was understood | Optional |
+
+"Optional" means the endpoint works signed out, and does more when signed in: a stored
+profile or posting is claimed by the account that created it.
 
 Run it:
 
@@ -13,19 +35,128 @@ all-MiniLM-L6-v2 model and the job embeddings, taking about 20–30 s on CPU. Un
 `/health` reports `"ready": false` and `/recommend` answers 503. After that, a request takes
 well under 0.2 s.
 
-**CORS.** Browser requests are allowed from `http://localhost:3000` (the Next.js dev server).
-Set `KAZIFORCE_CORS_ORIGIN` to change it. Other origins get no CORS headers.
+**Profile source.** Stored workers and the job postings are read from PostgreSQL
+(`DATABASE_URL`). Set `KAZIFORCE_PROFILE_SOURCE=csv` to read the frozen CSVs instead
+(e.g. without a database); profiles cannot then be stored, and `POST /workers` and
+`POST /jobs` answer 501. An unseeded database makes startup fail, and `/recommend` then
+answers 500.
+
+**The candidate pool grows, the evaluation does not.** A posting stored through
+`POST /jobs` joins the live candidate pool at once, so the pool is larger than 280 for the
+rest of that server's life, and every posting's tie-break position is recomputed. This is
+correct behaviour for a running service, and it never touches the published metrics: the
+evaluation runner (`scripts/evaluate.py`) builds its own pipeline from the frozen CSV
+dataset and never calls this API, so results always come from exactly the 280 committed
+postings. `GET /health` reports the live pool size, so a demo can state it.
+
+Profiles and postings stored during a demo or a browser test stay in the database.
+`python scripts/seed_database.py --reset` clears them and re-seeds, leaving exactly the
+frozen dataset. Restart the API afterwards, because it holds the candidate pool in memory.
+
+**CORS.** Browser requests are allowed from `http://localhost:3000` and
+`http://127.0.0.1:3000` (the Next.js dev server, either spelling).
+`KAZIFORCE_CORS_ORIGIN` replaces that list and takes comma-separated origins. Any other
+origin gets no CORS headers, so the browser blocks the response. Credentials are allowed
+(`Access-Control-Allow-Credentials: true`), because the session travels in a cookie.
+
+**Use one host throughout.** The session cookie is `SameSite=Lax`, so a page served from
+`localhost:3000` will not send it to `127.0.0.1:5000`: the browser treats those as
+different sites. The web app derives the API host from the page's own hostname for this
+reason, and the browser tests pin both to `127.0.0.1`.
+
+**On macOS, use `127.0.0.1:5000`, not `localhost:5000`.** AirPlay Receiver listens on port
+5000 over IPv6 and answers 403, while Flask binds IPv4 only, so `localhost` can reach the
+wrong service. Turn AirPlay Receiver off in System Settings → General → AirDrop & Handoff,
+or keep using `127.0.0.1`.
+
+## Accounts and sessions
+
+A proof-of-concept sign-in so a worker's profile and a client's postings belong to
+someone. A person is identified by a Kenyan mobile number and a 4-digit PIN.
+`docs/limitations.md` §6 states plainly what this does and does not protect against.
+
+- The PIN is stored as PBKDF2-HMAC-SHA256, 600,000 iterations, with a per-account salt.
+  It is never logged and never returned.
+- Five wrong PINs lock the account for 15 minutes (423). The counter is committed even
+  though the attempt fails, so a lockout cannot be rolled back.
+- The session lives server-side in a `session` table, keyed by the SHA-256 of the token.
+  The token itself is only ever in an `HttpOnly`, `SameSite=Lax` cookie, which expires
+  after 7 days. `Secure` is set when the request arrives over HTTPS.
+- Phone numbers are normalised to `254XXXXXXXXX`. `0712345678`, `712345678`,
+  `254712345678` and `+254 712 345 678` are the same account. Responses give the local
+  form (`0712345678`).
+- **The phone number and a worker's name are encrypted** (AES-256-GCM) in the database, and the
+  number is found by an HMAC of it, so no plaintext is stored. See `docs/privacy-and-keys.md`.
+  The API needs `KAZIFORCE_FIELD_KEY` and `KAZIFORCE_PHONE_HMAC_KEY`, and outside development
+  it will not start without them or without `KAZIFORCE_CORS_ORIGIN`.
+
+### `POST /auth/accounts`
+
+```json
+{ "phone": "0712345678", "pin": "4821", "role": "worker",
+  "first_name": "Amina", "last_name": "Wanjiru", "contact_consent": true }
+```
+
+| Field | Rules |
+|---|---|
+| `phone` | Required, a Kenyan mobile number in any of the forms above |
+| `pin` | Required, exactly 4 digits |
+| `role` | Required, `worker` or `client` |
+| `first_name`, `last_name` | **Workers: required.** Trimmed, runs of spaces made single, 1–60 characters, letters in any script with single spaces, hyphens, apostrophes or full stops between parts. **Clients: not accepted** (400, `field` names it) |
+| `contact_consent` | **Workers: required, and must be the JSON value `true`.** It records the worker's agreement that clients who post a job in their trade can see their name and phone number. **Clients: not accepted** |
+
+A worker who does not agree cannot create an account: consent is a condition of sign-up, and is
+withdrawable afterwards (`PUT /workers/me`). Sign-in (`POST /auth/sessions`) takes none of these.
+
+**Response 201** is the session payload below, and sets the session cookie. A phone
+number already registered is a 409 `already_exists`; the role is **not** part of the
+identity, so one number cannot hold both a worker and a client account.
+
+### `POST /auth/sessions`
+
+The same body without `role`. **Response 200** is the session payload, and sets the
+cookie. A wrong number or PIN is a 401 `invalid_credentials` with the same message
+either way, so the response does not reveal whether the number is registered.
+
+### `DELETE /auth/sessions`
+
+Ends the session server-side and clears the cookie. `{ "signed_out": true }`. Safe to
+call when not signed in.
+
+### `GET /auth/session`
+
+The session payload for whoever holds the cookie; 401 if nobody does.
+
+```json
+{
+  "account": { "account_id": "a3f1…", "phone": "0712345678", "role": "worker" },
+  "worker_profile_id": "e5a7c1d2-…",
+  "postings": 0
+}
+```
+
+`worker_profile_id` is `null` for a worker who has not created a profile yet, and always
+`null` for a client. `postings` counts a client's own postings, and is always 0 for a
+worker. Between them the interface knows where to send the person and which navigation
+to draw.
+
+**A client has an account, not a profile.** Clients are not matched, so there is nothing
+to enrich and no profile screen. See `docs/limitations.md` item 27.
 
 ## `GET /health`
 
 ```json
-{ "status": "ok", "ready": true }
+{ "status": "ok", "ready": true, "candidate_jobs": 280 }
 ```
+
+`candidate_jobs` is 0 until the engine is ready, and grows as postings are stored.
 
 ## `POST /recommend`
 
 Ranked jobs for one worker, either a **stored** worker (`worker_id`) or a **typed-in** profile
-(`worker`). Send exactly one of the two.
+(`worker`). Send exactly one of the two — or neither, when a signed-in worker is asking for
+their own matches, in which case their profile is used. A signed-in worker who has no profile
+yet gets a 403.
 
 ### Request
 
@@ -52,7 +183,7 @@ Ranked jobs for one worker, either a **stored** worker (`worker_id`) or a **type
 
 | Field | Type | Rules |
 |---|---|---|
-| `worker_id` | string | A stored worker. For now this means the development split of the synthetic dataset; #41 moves it to PostgreSQL |
+| `worker_id` | string | A worker stored in PostgreSQL (seeded with the development-split workers by `scripts/seed_database.py`) |
 | `worker.biography` | string | Required, non-empty, at most 4000 characters |
 | `worker.skills` | string[] | Optional (default `[]`), at most 50 entries of 200 characters; blank entries are dropped |
 | `worker.location` | string \| null | Optional, at most 200 characters, e.g. `"Nairobi - Kasarani"` |
@@ -69,6 +200,7 @@ Unknown fields are rejected, both at the top level and inside `worker`, so typos
 {
   "configuration": "full",
   "k": 10,
+  "display_threshold": 55,
   "worker": {
     "worker_id": "3917d39f-d0c0-46c2-aa34-9158711f68f3",
     "biography": "Niko Nyeri, ni fundi wa umeme. Experience miaka 20, rates from KSh 2000.",
@@ -93,12 +225,15 @@ Unknown fields are rejected, both at the top level and inside `worker`, so typos
       "availability": "Part-time",
       "budget": 4700.0,
       "scores": { "composite": 0.698, "rule": 0.8, "semantic": 0.595 },
+      "match_score": 70,
+      "band": "moderate",
       "rule_components": { "skill_overlap": 1.0, "location": 0.0, "budget_fit": 1.0, "availability": 1.0 },
       "matched_skills": [
         {
           "skill": "http://data.europa.eu/esco/skill/52d6eb67-56c0-4ad7-b5c2-71e7c2362ece",
           "skill_label": "install electricity sockets",
           "source": "informal_term",
+          "skill_type": "skill",
           "graph_path": [
             { "source": { "id": "term:fundi umeme", "label": "fundi wa umeme", "type": "InformalTerm" },
               "relation": "MAPS_TO",
@@ -143,10 +278,281 @@ A real 0 is a real score: e.g. `location: 0.0` means "assessed, different town".
 Every node in `graph_path` carries `id`, `label` and `type` (`InformalTerm`, `Occupation`, `Skill`),
 so the UI never needs a second lookup.
 
+**`matched_skills[].skill_type`** is ESCO's own split, `"skill"` or `"knowledge"` (`null` for a
+`text` match, which is not an ESCO node). It exists so an explanation can be written in correct
+English: a job *needs someone to* install electricity sockets (a skill), but simply *needs*
+electrical wiring plans (knowledge).
+
+### `explanation`
+
+Every result carries an explanation generated by the backend (FR-09), not assembled by the
+interface. It is the readable form of the same evidence the rest of the result carries.
+
+```json
+"explanation": {
+  "worker_id": "3917d39f-…", "posting_id": "979d6da3-…", "rank": 1,
+  "scores": { "composite": 0.698, "rule": 0.8, "semantic": 0.595 },
+  "reasons": [
+    { "kind": "graph_skill",
+      "text": "This job needs someone to install electricity sockets. That's part of electrical work.",
+      "skill": "http://data.europa.eu/esco/skill/52d6eb67-…",
+      "skill_label": "install electricity sockets", "source": "informal_term",
+      "occupation": "electrician", "term": "fundi wa umeme",
+      "graph_path": [["term:fundi umeme", "MAPS_TO", "http://…/electrician"],
+                     ["http://…/electrician", "HAS_ESSENTIAL_SKILL", "http://…/52d6eb67-…"]] },
+    { "kind": "criterion", "text": "You're both in Nyeri.", "criterion": "location", "score": 1.0 }
+  ],
+  "not_assessed": ["This job doesn't give a budget, so we couldn't compare it with your rate."],
+  "covered": true
+}
+```
+
+| `kind` | When |
+|---|---|
+| `graph_skill` | A shared skill reached through the knowledge graph; carries `occupation`, the `graph_path`, and `term` when an informal term started it |
+| `literal_skill` | A shared skill the worker listed, or matched from their own words |
+| `criterion` | A rule criterion that was assessed and scored above 0. `skill_overlap` is deliberately absent: it is the same evidence as the skill reasons, and would count one fact twice |
+
+`not_assessed` names the criteria that had nothing to compare and which side was silent.
+Absent is not failure: it never counts towards `covered`, and never against it. A criterion
+assessed and scored 0 appears in neither list — it is a real 0, not a missing value.
+
+**A semantic similarity is never offered as a reason.** A cosine value is a number, not
+something a worker can check.
+
+`covered` is the NFR-02 rule from `docs/scoring-policy.md` §7: true when at least one
+**skill** is shared. A criterion match alone leaves it false. The generator reads a
+finished match and never feeds back into scoring or ranking, so asking for an explanation
+cannot change a score, a rank or any reported metric.
+
+### Presentation: `match_score`, `band` and `display_threshold`
+
+`composite` is the number the engine ranks and the evaluation measures. `match_score` and
+`band` are the same number dressed for a screen, and `display_threshold` is the score below
+which the interface shows nothing rather than a bad suggestion.
+
+| Field | Meaning |
+|---|---|
+| `match_score` | `round(composite * 100)`, an integer 0–100 |
+| `band` | `strong` (≥ 80), `moderate` (65–79), `weak` (55–64), `below_threshold` (< 55) |
+| `display_threshold` | 55, the lowest `match_score` worth showing |
+
+**These are presentation only.** Ranking, `k` and the order of `results` ignore them entirely,
+and `scripts/evaluate.py` never reads them, so no published metric moves when the bands change.
+Results below the threshold are still returned, labelled `below_threshold`; the decision to hide
+them belongs to the interface. The evidence for the number 55 is in `docs/scoring-policy.md` §6,
+and the proof that adding it changed no metric is in `docs/evidence/evaluation_isolation.md`.
+Implementation: `apps/api/src/kaziforce_api/matching/bands.py`.
+
 `enrichment.unmapped` lists the worker's skills entries that matched nothing in the knowledge
 graph (FR-10). A withheld alias such as *fundi wa stima* appears there.
 
-### Errors
+## `POST /workers`
+
+Stores a worker profile and returns the identifier the database gave it, so the client can
+immediately ask for recommendations. The body **is** the worker object of `POST /recommend`,
+with the same fields and the same rules.
+
+```json
+{
+  "biography": "Mimi ni fundi wa umeme, niko Nyeri.",
+  "skills": ["fundi wa umeme"],
+  "location": "Nyeri",
+  "availability": "Part-time",
+  "rate_expectation": 2000
+}
+```
+
+**Response 201**
+
+```json
+{
+  "worker_id": "e5a7c1d2-…",
+  "worker": { "worker_id": "e5a7c1d2-…", "biography": "…", "skills": ["fundi wa umeme"],
+              "location": "Nyeri", "availability": "Part-time", "rate_expectation": 2000.0 },
+  "enrichment": { "terms": [{ "id": "term:fundi umeme", "label": "fundi wa umeme" }],
+                  "occupations": [{ "id": "http://data.europa.eu/esco/occupation/4910419f-…",
+                                    "label": "electrician" }],
+                  "unmapped": [] }
+}
+```
+
+When a signed-in worker creates a profile, the account claims it, and `/auth/session` then
+reports its `worker_profile_id`. An account may hold one profile: a second attempt is a 409
+`already_exists`. A client account creating a profile is a 403.
+
+The profile takes no name or contact field: it holds no personally identifying information (DR-07).
+A worker's name lives on their *account* (`POST /auth/accounts`) and is edited with `PUT /workers/me`.
+Duplicate skills entries are collapsed, keeping the first of each. A term the knowledge graph does
+not know appears in `enrichment.unmapped` and the profile is still stored (FR-10).
+
+## `GET /workers/me`
+
+The signed-in worker's own profile, in the same shape `POST /workers` returns, so the
+profile screen can show what the engine made of their words, plus their own contact details:
+
+```json
+{ "worker_id": "e5a7c1d2-…", "worker": { … }, "enrichment": { … },
+  "contact": { "first_name": "Amina", "last_name": "Wanjiru", "consent": true, "phone": "0712345678" } }
+```
+
+`first_name` and `last_name` are `null`, and `consent` is `false`, for an account made before names
+existed, until the worker adds them. This is the one place a worker's own name is decrypted for them.
+404 while the account has no profile; 403 for a client.
+
+## `PUT /workers/me`
+
+Replaces the signed-in worker's profile with the body, which takes exactly the fields and
+rules `POST /workers` takes. The replacement is whole, not partial: a field left out is
+cleared, so the edit form always submits all of them. The worker keeps their `worker_id`,
+so rankings already recorded stay attached to the same person; they are recomputed the
+next time matches are asked for, not here. Returns the profile in the shape
+`GET /workers/me` returns (including `contact`). 404 while the account has no profile; 403 for a
+client; 501 when the store cannot accept writes.
+
+**Name and consent are the exception to "replaced whole".** They belong to the account, so
+`first_name`, `last_name` and `contact_consent` may be sent with the profile fields, and **if left out
+they stay as they are**. Rules: a name is stored whole (both or neither); `contact_consent` must be a
+boolean; consent cannot be `true` while there is no first and last name (400, `field`
+`contact_consent`). `contact_consent: false` takes effect at once: the next request for the worker's
+profile answers 404, and their card goes back to anonymous.
+
+## `GET /workers/{public_id}`
+
+A consenting worker's profile and phone number, for a signed-in **client**. 401 without a session,
+403 for a worker. `public_id` is the random identifier a trade-list card carries
+(`worker_pool[].sample[].public_id`); it is not the internal `worker_id`, which is never returned to
+a client.
+
+```json
+{
+  "public_id": "3e2bc19b-aaf5-4365-9737-147958c886ae",
+  "first_name": "Amina", "last_name": "Wanjiru",
+  "trade": "plumber",
+  "skills": ["fundi bomba", "replace faucets"],
+  "biography": "Fundi bomba mwenye uzoefu wa miaka sita.",
+  "location": "Nairobi - Kasarani", "availability": "Full-time", "rate_expectation": 2400.0,
+  "contact": { "phone_e164": "+254700000001", "phone_local": "700000001" }
+}
+```
+
+Exactly those fields: no `worker_id`, no account identifier, no consent flag, no PIN, no score and no
+rank. `trade` is the first occupation the worker's own words reach, or `null`.
+
+**One 404 for every miss.** An unknown id, a malformed id, a worker who has not consented, a worker
+with no name, and a value that will not decrypt all answer the same 404 `not_found`, with the same
+body (`"This worker's profile is not available."`), so a client cannot tell a withdrawn worker from
+one who never existed.
+
+**Rate limited**, per signed-in account (so signing in again does not reset it): 30 views per 60
+seconds, counting misses as well as hits. Over the limit: **429 `rate_limited`** with a `Retry-After`
+header in seconds. The limit is in memory and per process (`docs/limitations.md` item 38).
+
+Every response carries `Cache-Control: no-store`.
+
+## `POST /jobs`
+
+Stores a job posting, adds it to the live candidate pool, and returns how the engine understood it.
+
+```json
+{
+  "title": "Rewire a small shop",
+  "description": "We need an electrician in Nyeri to rewire a small shop.",
+  "required_skills": ["install electricity sockets", "splice cable"],
+  "location": "Nyeri",
+  "availability": "Part-time",
+  "budget": 2600
+}
+```
+
+| Field | Type | Rules |
+|---|---|---|
+| `title` | string | Required, non-empty, at most 255 characters |
+| `description` | string | Required, non-empty, at most 4000 characters |
+| `required_skills` | string[] | Optional (default `[]`), at most 50 entries of 200 characters |
+| `location` | string \| null | Optional, at most 200 characters |
+| `availability` | `"Full-time"` \| `"Part-time"` \| `"Weekends"` \| null | Optional |
+| `budget` | number \| null | Optional, KES per day, ≥ 0 |
+
+`category` is **not** accepted, and sending it is a 400. The column exists in the schema, but
+matching never reads it, so the API does not invite a client to set it.
+
+**Response 201** (identical to `GET /jobs/{posting_id}`)
+
+```json
+{
+  "posting_id": "7c1f9b40-…",
+  "job": { "posting_id": "7c1f9b40-…", "title": "Rewire a small shop", "description": "…",
+           "required_skills": ["install electricity sockets", "splice cable"],
+           "location": "Nyeri", "availability": "Part-time", "budget": 2600.0 },
+  "interpretation": {
+    "terms": [],
+    "occupations": [{ "id": "http://data.europa.eu/esco/occupation/4910419f-…", "label": "electrician" }],
+    "unmapped": [],
+    "stated_skills": [
+      { "skill": "http://data.europa.eu/esco/skill/52d6eb67-…", "skill_label": "install electricity sockets",
+        "source": "listed" }
+    ],
+    "worker_pool": [
+      { "occupation": { "id": "http://data.europa.eu/esco/occupation/4910419f-…", "label": "electrician" },
+        "workers": 36,
+        "sample": [
+          { "describes_as": "fundi wa umeme", "location": "Nairobi - Kasarani",
+            "availability": "Part-time", "rate_expectation": 1800.0,
+            "public_id": "3e2bc19b-aaf5-4365-9737-147958c886ae", "name": "Amina Wanjiru" },
+          { "describes_as": "fundi wa umeme", "location": "Thika",
+            "availability": "Full-time", "rate_expectation": 2200.0 }
+        ] }
+    ]
+  },
+  "candidate_jobs": 281
+}
+```
+
+- **`stated_skills` are the posting's own requirements only**, each `listed` (an exact ESCO skill
+  label) or `text` (the client's own words). Skills the knowledge graph could infer from the
+  occupation are deliberately **not** reported here, because matching uses a posting's stated
+  requirements only (`docs/scoring-policy.md` §1). Reporting inferred skills would imply they
+  count towards a match when they do not.
+- **`worker_pool`** counts stored worker profiles whose own enrichment reaches each occupation this
+  posting reaches, so the right phrasing is "workers whose profiles match the *electrician*
+  occupation". It is computed from the profiles, never from the dataset's occupational area labels.
+  It is `[]` when the posting reaches no occupation.
+- **`worker_pool[].sample`** is at most 5 of those workers, as a client may see them: their own
+  words and the practical facts, trimmed to 120 characters at a word boundary. It carries **no
+  score and no ranking**, because a client posting a job has not been matched to anyone and must
+  not be shown a league table of workers. `describes_as` is the worker's listed skills, or their
+  biography when they listed none. The five are the first by `worker_id`, which is random, so the
+  sample is arbitrary and the same each time; who has consented never changes which workers are in
+  it, or the count.
+  **A worker who has a name and has consented also carries `public_id` and `name`** (both or
+  neither), so the client can open `GET /workers/{public_id}`. Everyone else is anonymous and has
+  no identifier at all. `public_id` says nothing about fit.
+- **`candidate_jobs`** is the pool size after this posting was added.
+
+## `GET /jobs`
+
+The signed-in client's own postings, newest first, as rows for the postings list. 403 for a
+worker. A client who has posted nothing gets `{ "postings": [] }`.
+
+```json
+{
+  "postings": [
+    { "posting_id": "7c1f9b40-…", "title": "Rewire a small shop", "location": "Nyeri",
+      "availability": "Part-time", "budget": 2600.0,
+      "trades": [{ "id": "http://data.europa.eu/esco/occupation/4910419f-…", "label": "electrician" }] }
+  ]
+}
+```
+
+`trades` is the occupations the posting reaches, and is `[]` when it reaches none. This
+endpoint returns **only the client's own** postings, never the 280 seeded ones.
+
+## `GET /jobs/{posting_id}`
+
+The same body as `POST /jobs` returns, for a posting that is already stored. 404 if there is none.
+
+## Errors
 
 Every error has the same shape, and no error ever includes a stack trace:
 
@@ -156,8 +562,27 @@ Every error has the same shape, and no error ever includes a stack trace:
 
 | Status | `code` | When | `field` |
 |---|---|---|---|
-| 400 | `invalid_request` | Body not a JSON object; both or neither of `worker_id` and `worker`; an invalid or unknown field | The offending field, when there is one (e.g. `k`, `worker.availability`) |
-| 404 | `not_found` | `worker_id` is not a stored worker; or an unknown URL | `worker_id` for unknown workers |
+| 400 | `invalid_request` | Body not a JSON object; an invalid or unknown field; a malformed phone number, PIN or role | The offending field, when there is one (e.g. `k`, `worker.availability`, `phone`) |
+| 401 | `unauthenticated` | The endpoint needs a session and there is none, or it has expired | — |
+| 401 | `invalid_credentials` | The phone number or PIN is wrong. The message is the same either way, so it never reveals whether a number is registered | — |
+| 403 | `forbidden` | Signed in as the other role, or a worker asking for matches before creating a profile | — |
+| 409 | `already_exists` | That phone number already has an account, or that account already has a profile | `phone` |
+| 423 | `locked` | Five wrong PINs; the account is locked for 15 minutes | — |
+| 429 | `rate_limited` | A client viewed worker profiles too quickly; `Retry-After` is set | — |
+| 404 | `not_found` | `worker_id` is not a stored worker, `posting_id` is not a stored posting, or the URL is unknown | `worker_id` or `posting_id` |
+| 501 | `not_supported` | `POST /workers` or `POST /jobs` while the server reads the frozen CSVs (`KAZIFORCE_PROFILE_SOURCE=csv`) | — |
 | 405 | `method_not_allowed` | E.g. `GET /recommend` | — |
 | 503 | `not_ready` | The engine is still loading; a `Retry-After: 5` header is set | — |
 | 500 | `internal_error` | Anything unexpected; the details go to the server log only | — |
+
+## Headers and CORS
+
+Every response carries `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`,
+`Referrer-Policy: no-referrer`, `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'`
+and `Cache-Control: no-store`. `Strict-Transport-Security` is added **only in production**
+(`KAZIFORCE_ENV` not `development` or `test`, and not unset), and the session cookie is `Secure` there.
+
+CORS allows the origins in `KAZIFORCE_CORS_ORIGIN` (comma-separated) and no others, with
+credentials. In development it defaults to the two `http://…:3000` loopback addresses. In production
+it is required (the app refuses to start without it) and `*` is refused. See
+`docs/privacy-and-keys.md` for the rest of the HTTPS preparation.

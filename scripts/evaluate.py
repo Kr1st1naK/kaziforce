@@ -1,5 +1,5 @@
 """
-Evaluates the recommendation configurations on the development split.
+Evaluates the recommendation configurations on the development split (the default) or, once, on the test split.
 
 Each development worker ranks all 280 postings under each configuration; P@3,
 P@5, P@10 and MRR are reported overall and per variant, with the
@@ -13,7 +13,9 @@ commit is the code that ran) unless --allow-dirty is given, which run.json
 records. Partial runs (--max-queries) go to results/scratch/, which is not
 committed.
 
-Usage: python scripts/evaluate.py [--configs full keyword ...] [--max-queries N] [--allow-dirty]
+Usage: python scripts/evaluate.py [--configs full keyword ...] [--split development|test] [--max-queries N] [--allow-dirty]
+
+--split test writes to results/test/. It is for the single final run (docs/test-split-preflight.md).
 """
 
 from __future__ import annotations
@@ -33,6 +35,7 @@ from pathlib import Path
 from kaziforce_api.data.data_loader import DataLoader
 from kaziforce_api.evaluation.evaluator import Evaluator
 from kaziforce_api.evaluation.report import write_run
+from kaziforce_api.explainability.explain import ExplanationGenerator
 from kaziforce_api.matching.hybrid import HybridWeights
 from kaziforce_api.matching.rule_based import RuleBasedWeights
 from kaziforce_api.matching.semantic import MODEL_NAME, MODEL_REVISION, SemanticScorer, job_text
@@ -60,7 +63,7 @@ def metadata(args, recommenders, startup: float, n_queries: int) -> dict:
     manifest = json.loads((synthetic / "manifest.json").read_text())
     return {
         "created_at": datetime.now().astimezone().isoformat(timespec="seconds"),
-        "split": "development", "queries": n_queries, "ks": [3, 5, 10], "seed": TIE_BREAK_SEED,
+        "split": args.split, "queries": n_queries, "ks": [3, 5, 10], "seed": TIE_BREAK_SEED,
         "partial": args.max_queries is not None,
         "configurations": {n: {"enricher": type(r.enricher).__name__, "scorer": type(r.scorer).__name__}
                            for n, r in recommenders.items()},
@@ -87,6 +90,7 @@ def main() -> None:
     parser.add_argument("--configs", nargs="+", default=list(CONFIGURATIONS), choices=list(CONFIGURATIONS))
     parser.add_argument("--max-queries", type=int, help="evaluate only the first N workers (written to results/scratch/)")
     parser.add_argument("--allow-dirty", action="store_true", help="run despite uncommitted changes (recorded)")
+    parser.add_argument("--split", default="development", choices=["development", "test"])
     args = parser.parse_args()
     if has_uncommitted_changes() and not args.allow_dirty:
         parser.error("uncommitted changes: commit first so the run maps to a commit, or pass --allow-dirty")
@@ -99,12 +103,13 @@ def main() -> None:
         semantic.embed([job_text(j) for j in next(iter(recommenders.values())).jobs])
     startup = time.perf_counter() - start
 
-    evaluator = Evaluator(loader, recommenders, max_queries=args.max_queries)
-    print(f"Evaluating {len(recommenders)} configurations on the development split (startup {startup:.1f} s)")
+    evaluator = Evaluator(loader, recommenders, split=args.split, max_queries=args.max_queries,
+                          explainer=ExplanationGenerator(kg))
+    print(f"Evaluating {len(recommenders)} configurations on the {args.split} split (startup {startup:.1f} s)")
     result = evaluator.run()
     n_queries = len({q.worker_id for q in result.queries})
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    base = REPO_ROOT / "results" / ("scratch" if args.max_queries else "dev")
+    base = REPO_ROOT / "results" / ("scratch" if args.max_queries else "test" if args.split == "test" else "dev")
     out = write_run(result, metadata(args, recommenders, startup, n_queries), base / f"{stamp}_{git_commit()[:7]}",
                     ablation_pairs=[p for p in KG_ABLATION_PAIRS if set(p) <= set(args.configs)])
     print((out / "metrics.md").read_text())

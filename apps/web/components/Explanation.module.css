@@ -1,0 +1,192 @@
+.heading {
+  margin: var(--space-xl) 0 var(--space-md);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 7px 0;
+  font-size: 16px;
+}
+
+.marker {
+  flex: none;
+  margin-top: 3px;
+}
+
+.tick {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-tag);
+  background: #dcfce7;
+  color: var(--strong);
+  font-size: 12px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  margin-top: 8px;
+  border-radius: 999px;
+  background: var(--weak);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.vocabulary {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: var(--space-lg);
+  padding: 14px var(--space-md);
+  background: var(--tint);
+  border: 1px solid var(--tint-line);
+  border-radius: var(--radius);
+  font-size: 15px;
+}
+
+.vocabularyIcon {
+  color: var(--muted);
+}
+
+.disclosure {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: var(--space-xl) 0 var(--space-md);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.scoreBlock {
+  margin-bottom: var(--space-lg);
+}
+
+.scoreLabel {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.track {
+  height: 8px;
+  border-radius: var(--radius-tag);
+  background: var(--tint-line);
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  background: #334155;
+}
+
+.caption {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+.subheading {
+  margin: var(--space-xl) 0 var(--space-sm);
+}
+
+.skills,
+.criteria {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.skillRow,
+.criterionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 15px;
+}
+
+.skillRow:last-child,
+.criterionRow:last-child {
+  border-bottom: none;
+}
+
+.criterionValue {
+  font-weight: 600;
+}
+
+.notAssessed {
+  color: var(--muted);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.provenance {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--radius-tag);
+  padding: 4px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.listed {
+  background: #dcfce7;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+}
+
+.text {
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  color: #1d4ed8;
+}
+
+.informal_term {
+  background: #fef9c3;
+  border: 1px solid #fde68a;
+  color: #a16207;
+}
+
+.occupation_label {
+  background: #f3e8ff;
+  border: 1px solid #e9d5ff;
+  color: #7e22ce;
+}
+
+.unknown {
+  background: var(--tint);
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.trace {
+  margin: var(--space-lg) 0 0;
+  padding: 14px;
+  background: #f1f5f9;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-tag);
+  color: var(--muted);
+  white-space: pre-wrap;
+  word-break: break-word;
+}

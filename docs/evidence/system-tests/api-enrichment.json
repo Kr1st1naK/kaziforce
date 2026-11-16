@@ -1,0 +1,152 @@
+{
+ "T-01": {
+  "request": {
+   "skills": [
+    "electrician",
+    "electrical installation",
+    "wiring",
+    "test electrical equipment"
+   ],
+   "location": "Nairobi - Kasarani"
+  },
+  "enrichment": {
+   "terms": [],
+   "occupations": [
+    {
+     "id": "http://data.europa.eu/esco/occupation/4910419f-b4af-4f59-b544-9dbebc8a74f0",
+     "label": "electrician"
+    }
+   ],
+   "unmapped": [
+    "electrician",
+    "electrical installation",
+    "wiring"
+   ]
+  },
+  "display_threshold": 55,
+  "top3": [
+   {
+    "rank": 1,
+    "title": null,
+    "composite": 86
+   },
+   {
+    "rank": 2,
+    "title": null,
+    "composite": 82
+   },
+   {
+    "rank": 3,
+    "title": null,
+    "composite": 82
+   }
+  ]
+ },
+ "T-04": {
+  "request": {
+   "skills": [
+    "vehicle technician",
+    "engine diagnostics",
+    "brake repair"
+   ],
+   "location": "Nairobi - Embakasi"
+  },
+  "enrichment": {
+   "terms": [],
+   "occupations": [],
+   "unmapped": [
+    "vehicle technician",
+    "engine diagnostics",
+    "brake repair"
+   ]
+  },
+  "display_threshold": 55,
+  "top3": [
+   {
+    "rank": 1,
+    "title": null,
+    "composite": 45
+   },
+   {
+    "rank": 2,
+    "title": null,
+    "composite": 45
+   },
+   {
+    "rank": 3,
+    "title": null,
+    "composite": 41
+   }
+  ]
+ },
+ "T-06": {
+  "request": {
+   "skills": [
+    "fundi wa stima"
+   ],
+   "location": "Nyeri"
+  },
+  "enrichment": {
+   "terms": [],
+   "occupations": [],
+   "unmapped": [
+    "fundi wa stima"
+   ]
+  },
+  "display_threshold": 55,
+  "top3": [
+   {
+    "rank": 1,
+    "title": null,
+    "composite": 43
+   },
+   {
+    "rank": 2,
+    "title": null,
+    "composite": 43
+   },
+   {
+    "rank": 3,
+    "title": null,
+    "composite": 38
+   }
+  ]
+ },
+ "T-08": {
+  "request": {
+   "skills": [
+    "welder",
+    "arc welding",
+    "metal fabrication"
+   ],
+   "location": "Nairobi - Industrial Area"
+  },
+  "enrichment": {
+   "terms": [],
+   "occupations": [],
+   "unmapped": [
+    "welder",
+    "arc welding",
+    "metal fabrication"
+   ]
+  },
+  "display_threshold": 55,
+  "top3": [
+   {
+    "rank": 1,
+    "title": null,
+    "composite": 41
+   },
+   {
+    "rank": 2,
+    "title": null,
+    "composite": 39
+   },
+   {
+    "rank": 3,
+    "title": null,
+    "composite": 37
+   }
+  ]
+ }
+}

@@ -1,0 +1,77 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.words {
+  margin: 0;
+  font-size: 17px;
+  line-height: 24px;
+  font-weight: 600;
+}
+
+.trade {
+  background: var(--tint);
+  border: 1px solid var(--tint-line);
+  border-radius: var(--radius-tag);
+  padding: 4px 10px;
+  font-size: 14px;
+}
+
+.facts {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px var(--space-md);
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.name {
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* A card that can be opened looks like something to press: the name link covers the whole card, the card
+   answers the pointer and the keyboard, and the target is well over 44 px high. Cards that cannot be opened
+   keep the plain style above. */
+.openable {
+  position: relative;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.openable:hover {
+  border-color: var(--primary);
+  background: var(--tint);
+}
+
+.openable:focus-within {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.name {
+  min-height: 24px;
+}
+
+.openable .name::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.open {
+  margin-top: var(--space-xs);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary-hover);
+}

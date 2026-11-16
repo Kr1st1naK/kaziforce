@@ -1,0 +1,646 @@
+/*
+ * The landing page, to docs/testing results/landing page (screen.png): a white top bar, a pale-blue hero, white and
+ * pale sections, and a solid blue closing band, in Inter, with orange for the worker side and blue for the client
+ * side. Flat throughout: no shadows and no gradients. It sits on the app's own tokens (globals.css); the only
+ * values set here are the blue, and a darker slate for small text, which the app's muted slate (#64748b) leaves just
+ * under 4.5:1 on the pale blue.
+ *
+ * The hero adds a picture drawn as inline SVG (components/LandingArt.tsx) and a blueprint dot grid and a measuring-tape
+ * edge, both SVG patterns, so there are still no gradients. Nothing moves, so there is nothing to switch off under
+ * prefers-reduced-motion.
+ */
+
+.landing {
+  --blue: #0051af;
+  --blue-hover: #004494;
+  --slate: #586377; /* 5.5:1 on #eff4ff, 6.1:1 on white */
+
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+.landing main {
+  flex: 1;
+}
+
+.shell {
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: 0 var(--space-xl);
+}
+
+/* Top bar */
+
+.top {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.topInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+.brand {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.topNav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.topLink {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.topButton {
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+/* Hero: the words on the left, the picture on the right, a measuring-tape edge underneath. */
+
+.hero {
+  position: relative;
+  background: var(--tint);
+  overflow: hidden;
+}
+
+.dots {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.heroGrid {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: var(--space-lg);
+  align-items: center;
+  padding-top: 3.5rem;
+  padding-bottom: 2.5rem;
+}
+
+.kicker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-mono), ui-monospace, Menlo, monospace;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--slate);
+}
+
+.kickerDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+  flex: none;
+}
+
+.heading {
+  margin: 0 0 var(--space-md);
+  font-size: 48px;
+  line-height: 52px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.headingBlue {
+  color: var(--blue);
+}
+
+.lead {
+  max-width: 34em;
+  margin: 0;
+  font-size: 18px;
+  line-height: 28px;
+  color: var(--slate);
+}
+
+.art {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 560px;
+  justify-self: end;
+}
+
+.tape {
+  position: relative;
+  display: block;
+  height: 22px;
+}
+
+.start {
+  padding: 2rem 0 3.5rem;
+}
+
+.entries {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-lg);
+  scroll-margin-top: var(--space-xl);
+}
+
+.entry {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--primary);
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+}
+
+.entry:nth-child(2) {
+  border-top-color: var(--blue);
+}
+
+.eyebrow {
+  margin: 0 0 var(--space-sm);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--slate);
+}
+
+.eyebrowOrange {
+  color: var(--primary);
+}
+
+.eyebrowBlue {
+  color: var(--blue);
+}
+
+.centred {
+  text-align: center;
+}
+
+.entryHeading {
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+  margin: 0 0 var(--space-sm);
+}
+
+.entryBody {
+  margin: 0 0 var(--space-lg);
+  flex: 1;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--slate);
+}
+
+.entryButton {
+  width: 100%;
+}
+
+.entryButtonBlue {
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+.entryButtonBlue:hover {
+  background: var(--blue-hover);
+  border-color: var(--blue-hover);
+}
+
+/* Trades */
+
+.trades {
+  background: var(--surface);
+  padding: 4rem 0;
+}
+
+.sectionHeading {
+  margin: 0 0 var(--space-sm);
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.sectionLead {
+  margin: 0 0 var(--space-lg);
+  max-width: 62ch;
+  color: var(--slate);
+}
+
+.chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  background: var(--tint);
+  border: 1px solid var(--tint-line);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.chipTerm {
+  font-weight: 600;
+}
+
+.chipTrade {
+  color: var(--slate);
+}
+
+.chipTrade::before {
+  content: "· ";
+}
+
+/* How it works */
+
+.how {
+  background: var(--tint);
+  padding: 4rem 0;
+}
+
+.how .sectionHeading {
+  margin-bottom: var(--space-xl);
+}
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-lg);
+}
+
+.step {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+}
+
+.stepNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-bottom: var(--space-md);
+  border-radius: var(--radius-control);
+  background: var(--tint);
+  border: 1px solid var(--tint-line);
+  color: var(--blue);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.stepHeading {
+  margin: 0 0 var(--space-sm);
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+}
+
+.stepBody {
+  margin: 0 0 var(--space-md);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--slate);
+}
+
+.example {
+  margin: 0;
+  background: #f1f5f9;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  padding: var(--space-sm) var(--space-md);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--slate);
+}
+
+.exampleLabel {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Audiences */
+
+.audiences {
+  background: var(--surface);
+  padding: 5rem 0;
+}
+
+.audienceGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-lg);
+  align-items: stretch;
+}
+
+.audience {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: var(--tint);
+  border: 1px solid var(--tint-line);
+  border-radius: var(--radius);
+  padding: var(--space-xl);
+}
+
+.pill {
+  display: inline-block;
+  margin-bottom: var(--space-md);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--on-primary);
+}
+
+.pillOrange {
+  background: var(--primary);
+}
+
+.pillBlue {
+  background: var(--blue);
+}
+
+.audienceHeading {
+  margin: 0 0 var(--space-md);
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.audienceLead {
+  margin: 0 0 var(--space-lg);
+  color: var(--slate);
+}
+
+.points {
+  list-style: none;
+  margin: 0 0 var(--space-lg);
+  padding: 0;
+  display: grid;
+  gap: var(--space-md);
+  flex: 1;
+}
+
+.points li {
+  display: flex;
+  gap: var(--space-md);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.checkOrange,
+.checkBlue {
+  flex: none;
+  display: inline-flex;
+  margin-top: 0;
+}
+
+.checkOrange {
+  color: var(--primary);
+}
+
+.checkBlue {
+  color: var(--blue);
+}
+
+.panelButton {
+  align-self: flex-start;
+}
+
+/* Closing band */
+
+.band {
+  background: var(--surface);
+  padding: 0 0 5rem;
+}
+
+.bandInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xl);
+  background: var(--blue);
+  color: #ffffff;
+  border-radius: var(--radius);
+  padding: var(--space-xl) 2.5rem;
+}
+
+.bandEyebrow {
+  margin: 0 0 var(--space-sm);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #d8e2ff;
+}
+
+.bandHeading {
+  margin: 0 0 var(--space-sm);
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.bandBody {
+  margin: 0;
+  max-width: 44ch;
+  color: #d8e2ff;
+}
+
+.bandActions {
+  display: flex;
+  flex: none;
+  gap: var(--space-md);
+}
+
+.bandPrimary,
+.bandPrimary:hover {
+  /* The orange button's own edge against the blue band is only 1.45:1; a white edge makes it 7.5:1. */
+  border-color: #ffffff;
+  white-space: nowrap;
+}
+
+.bandSecondary {
+  background: var(--surface);
+  border-color: var(--surface);
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.bandSecondary:hover {
+  background: #f1f5f9;
+  border-color: #f1f5f9;
+}
+
+/* Footer */
+
+.footer {
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  color: var(--slate);
+  font-size: 14px;
+  padding: var(--space-lg) 0;
+}
+
+/* Keyboard focus, on a page where several controls sit on coloured grounds */
+
+.landing a:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.band a:focus-visible {
+  outline-color: #ffffff;
+}
+
+/* Tablet */
+
+@media (max-width: 900px) {
+  .heroGrid {
+    grid-template-columns: 1fr;
+    padding-top: 2.5rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .art {
+    justify-self: center;
+  }
+
+  .steps {
+    grid-template-columns: 1fr;
+  }
+
+  .audienceGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .bandInner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 640px) {
+  .shell {
+    padding: 0 var(--space-md);
+  }
+
+  /* After .shell, whose shorthand would otherwise reset the hero's vertical padding. */
+  .heroGrid {
+    padding-top: 2rem;
+    padding-bottom: 1.25rem;
+  }
+
+  .start {
+    padding: 1.5rem 0 3rem;
+  }
+
+  .trades,
+  .how {
+    padding: 3rem 0;
+  }
+
+  .audiences {
+    padding: 3rem 0;
+  }
+
+  .band {
+    padding-bottom: 3rem;
+  }
+
+  .heading {
+    font-size: 34px;
+    line-height: 40px;
+    letter-spacing: -0.02em;
+  }
+
+  .lead {
+    font-size: 16px;
+    line-height: 26px;
+  }
+
+  .sectionHeading,
+  .audienceHeading,
+  .bandHeading {
+    font-size: 24px;
+    line-height: 32px;
+  }
+
+  .entries {
+    grid-template-columns: 1fr;
+  }
+
+  .audience {
+    padding: var(--space-lg);
+  }
+
+  .bandInner {
+    padding: var(--space-lg);
+  }
+
+  .bandActions {
+    flex-direction: column;
+    align-self: stretch;
+  }
+
+  .bandActions .button {
+    width: 100%;
+  }
+
+  .panelButton {
+    align-self: stretch;
+    width: 100%;
+  }
+
+  .chip {
+    flex-direction: column;
+    gap: 0;
+    border-radius: var(--radius);
+  }
+
+  .chipTrade::before {
+    content: "";
+  }
+}

@@ -1,0 +1,21 @@
+.subtitle {
+  margin: 8px 0 var(--space-xl);
+}
+
+.empty {
+  max-width: 720px;
+}
+
+.emptyHeading {
+  margin-bottom: var(--space-sm);
+}
+
+.emptyBody {
+  color: var(--ink);
+  margin-bottom: var(--space-lg);
+  max-width: 56ch;
+}
+
+.loading {
+  color: var(--muted);
+}

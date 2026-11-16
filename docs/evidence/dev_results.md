@@ -1,7 +1,9 @@
 # Development-split baseline results
 
-Source: [`results/dev/20261017-132422_6698b8a/`](../../results/dev/20261017-132422_6698b8a/), produced by `scripts/evaluate.py` from commit `6698b8a`
-(no uncommitted changes; 2026-10-17). 216 development workers each rank all 280
+Source: [`results/dev/20261116-160402_1a01573/`](../../results/dev/20261116-160402_1a01573/), produced by `scripts/evaluate.py` from commit `1a01573`
+(no uncommitted changes; 2026-11-16), the single development run behind the second freeze. Its metrics are identical, in
+every cell of `metrics.csv` and `per_query.csv` outside the timing columns, to the run of the first freeze (`20261116-002209_5c915fc`) and to `20261112-082720_64381de`, and
+the tables below are the same as the ones first produced on 2026-10-17 from `6698b8a`. Only the timing table differs. 216 development workers each rank all 280
 postings (80 synthetic, 200 Job Skill Set distractors); 8 postings are relevant
 to each worker. Single deterministic run (tie-break seed 42); no confidence intervals.
 Scoring rules: `docs/scoring-policy.md`, fixed before this run.
@@ -56,17 +58,17 @@ MRR with the knowledge graph minus MRR without it, for the same scorer (only the
 
 ## Response time per query (NFR-01)
 
-Startup, once per run: 20.9 s (graph, job enrichment, model load and job embeddings). Per query: enrich the worker, score all postings, rank.
+Startup, once per run: 21.5 s (graph, job enrichment, model load and job embeddings). Per query: enrich the worker, score all postings, rank.
 
 | Configuration | median ms | p95 ms | max ms |
 |---|---|---|---|
-| keyword | 3 | 9 | 174 |
-| rule_only | 5 | 9 | 18 |
-| rule_kg | 6 | 9 | 17 |
-| semantic_only | 17 | 29 | 41 |
-| semantic_kg | 35 | 51 | 63 |
-| hybrid_no_kg | 6 | 8 | 9 |
-| full | 7 | 9 | 13 |
+| keyword | 3 | 8 | 130 |
+| rule_only | 4 | 4 | 6 |
+| rule_kg | 5 | 5 | 7 |
+| semantic_only | 15 | 22 | 25 |
+| semantic_kg | 31 | 47 | 163 |
+| hybrid_no_kg | 5 | 8 | 9 |
+| full | 6 | 7 | 8 |
 
 ## Reading these numbers: caveats
 
@@ -98,4 +100,4 @@ Startup, once per run: 20.9 s (graph, job enrichment, model load and job embeddi
    held_out queries, so the "all" column weights those two trades more heavily.
 9. **Response time** is measured per query after startup (the model and job embeddings load once), on an
    8 GB Intel Core i5-8279U MacBook, CPU only. Every configuration's p95 is under 0.1 s and its maximum
-   under 0.2 s, against the 5-second NFR-01 target. Startup is reported separately: 20.9 s.
+   under 0.5 s (the largest is 163 ms, semantic_kg), against the 5-second NFR-01 target. Startup is reported separately: 21.5 s.

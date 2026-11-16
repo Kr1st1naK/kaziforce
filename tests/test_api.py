@@ -5,6 +5,7 @@ import pytest
 
 from kaziforce_api.app import create_app
 from kaziforce_api.matching.semantic import SemanticScorer
+from kaziforce_api.data.store import CsvProfileStore
 from kaziforce_api.service import RecommendationService
 
 EXAMPLE = "3917d39f-d0c0-46c2-aa34-9158711f68f3"  # development known_alias worker, fundi wa umeme
@@ -18,7 +19,7 @@ def _letters(texts):
 
 @pytest.fixture(scope="module")
 def service():
-    return RecommendationService(semantic_factory=lambda: SemanticScorer(encoder=_letters)).start(background=False)
+    return RecommendationService(CsvProfileStore(), semantic_factory=lambda: SemanticScorer(encoder=_letters)).start(background=False)
 
 
 @pytest.fixture()
@@ -32,24 +33,36 @@ def post(client, body, **kw):
 
 # Success
 
-def test_health_reports_readiness(client):
-    assert client.get("/health").get_json() == {"status": "ok", "ready": True}
-    not_started = create_app(RecommendationService(), start=False).test_client()
-    assert not_started.get("/health").get_json() == {"status": "ok", "ready": False}
+def test_health_reports_readiness_and_pool_size(client):
+    assert client.get("/health").get_json() == {"status": "ok", "ready": True, "candidate_jobs": 280}
+    not_started = create_app(RecommendationService(CsvProfileStore()), start=False).test_client()
+    assert not_started.get("/health").get_json() == {"status": "ok", "ready": False, "candidate_jobs": 0}
+
+
+def test_the_api_serves_a_generated_explanation(client):
+    """FR-09: the explanation is generated server-side, not assembled by the interface."""
+    r = client.post("/recommend", json={"worker_id": EXAMPLE, "k": 3})
+    explanation = r.get_json()["results"][0]["explanation"]
+    assert explanation["rank"] == 1 and explanation["posting_id"]
+    assert explanation["covered"] is True
+    assert explanation["reasons"] and all(reason["text"] for reason in explanation["reasons"])
+    assert {reason["kind"] for reason in explanation["reasons"]} <= {"graph_skill", "literal_skill", "criterion"}
+    # No similarity number is ever offered as a reason.
+    assert not any("semantic" in reason["text"].lower() for reason in explanation["reasons"])
 
 
 def test_stored_worker_returns_the_contract_shape(client):
     r = post(client, {"worker_id": EXAMPLE, "k": 3})
     assert r.status_code == 200
     d = r.get_json()
-    assert list(d) == ["configuration", "k", "worker", "enrichment", "results", "timing_ms"]
+    assert list(d) == ["configuration", "k", "worker", "enrichment", "results", "display_threshold", "timing_ms"]
     assert (d["configuration"], d["k"], d["worker"]["worker_id"]) == ("full", 3, EXAMPLE)
     assert d["enrichment"]["terms"] == [{"id": "term:fundi umeme", "label": "fundi wa umeme"}]
     assert [o["label"] for o in d["enrichment"]["occupations"]] == ["electrician"]
     assert [x["rank"] for x in d["results"]] == [1, 2, 3]
     top = d["results"][0]
     assert set(top) == {"rank", "posting_id", "title", "description", "location", "availability", "budget", "scores",
-                        "rule_components", "matched_skills"}
+                        "match_score", "band", "rule_components", "matched_skills", "explanation"}
     assert set(top["scores"]) == {"composite", "rule", "semantic"}
     assert set(top["rule_components"]) == {"skill_overlap", "location", "budget_fit", "availability"}
     skill = top["matched_skills"][0]
@@ -129,7 +142,7 @@ def test_unknown_or_other_split_worker_is_404(client):
 
 
 def test_not_ready_is_503_with_retry_after():
-    client = create_app(RecommendationService(), start=False).test_client()
+    client = create_app(RecommendationService(CsvProfileStore()), start=False).test_client()
     r = post(client, {"worker": TYPED})
     assert r.status_code == 503 and r.get_json()["error"]["code"] == "not_ready" and r.headers["Retry-After"] == "5"
 
@@ -148,8 +161,100 @@ def test_unknown_route_and_wrong_method_are_json(client):
     assert r.status_code == 405 and r.get_json()["error"]["code"] == "method_not_allowed"
 
 
-def test_cors_for_the_web_app_origin_only(client):
-    ok = client.options("/recommend", headers={"Origin": "http://localhost:3000"})
-    assert ok.status_code == 204 and ok.headers["Access-Control-Allow-Origin"] == "http://localhost:3000"
-    other = post(client, {"worker": TYPED}, headers={"Origin": "http://evil.example"})
-    assert "Access-Control-Allow-Origin" not in other.headers
+@pytest.mark.parametrize("origin", ["http://localhost:3000", "http://127.0.0.1:3000"])
+def test_cors_allows_each_spelling_of_the_web_app_origin(client, origin):
+    ok = client.options("/recommend", headers={"Origin": origin})
+    assert ok.status_code == 204 and ok.headers["Access-Control-Allow-Origin"] == origin
+    allowed = post(client, {"worker": TYPED}, headers={"Origin": origin})
+    assert allowed.headers["Access-Control-Allow-Origin"] == origin
+
+
+def test_cors_refuses_any_other_origin(client):
+    for origin in ("http://evil.example", "http://localhost:3001"):
+        other = post(client, {"worker": TYPED}, headers={"Origin": origin})
+        assert "Access-Control-Allow-Origin" not in other.headers
+
+
+def test_cors_origins_can_be_configured(monkeypatch, service):
+    monkeypatch.setenv("KAZIFORCE_CORS_ORIGIN", "https://example.test , http://localhost:4000")
+    configured = create_app(service).test_client()
+    for origin in ("https://example.test", "http://localhost:4000"):
+        response = configured.options("/recommend", headers={"Origin": origin})
+        assert response.headers["Access-Control-Allow-Origin"] == origin
+    assert "Access-Control-Allow-Origin" not in configured.options(
+        "/recommend", headers={"Origin": "http://localhost:3000"}
+    ).headers
+
+
+# POST /workers and POST /jobs: validation and the read-only store (storage itself is tested in test_api_db.py)
+
+JOB = {"title": "House wiring for a new flat", "description": "Need an electrician to wire a new flat in Nyeri.",
+       "required_skills": ["install electricity sockets"], "location": "Nyeri", "budget": 2500}
+
+
+@pytest.mark.parametrize("path, body, field", [
+    ("/workers", {"biography": "  "}, "worker.biography"),
+    ("/workers", {}, "worker.biography"),
+    ("/workers", {"biography": "x", "availability": "Sometimes"}, "worker.availability"),
+    ("/workers", {"biography": "x", "rate_expectation": -5}, "worker.rate_expectation"),
+    ("/workers", {"biography": "x", "skills": "fundi"}, "worker.skills"),
+    ("/workers", {"biography": "x", "worker_id": "abc"}, "worker"),
+    ("/workers", "not an object", "worker"),
+    ("/jobs", {**JOB, "title": ""}, "title"),
+    ("/jobs", {k: v for k, v in JOB.items() if k != "description"}, "description"),
+    ("/jobs", {**JOB, "budget": "2500"}, "budget"),
+    ("/jobs", {**JOB, "required_skills": [1, 2]}, "required_skills"),
+    ("/jobs", {**JOB, "availability": "Evenings"}, "availability"),
+    ("/jobs", {**JOB, "category": "Electrician"}, None),
+    ("/jobs", {**JOB, "title": "x" * 256}, "title"),
+])
+def test_profile_submission_validation(client, path, body, field):
+    r = client.post(path, json=body)
+    assert r.status_code == 400, r.get_json()
+    err = r.get_json()["error"]
+    assert err["code"] == "invalid_request" and err.get("field") == field
+
+
+def test_category_is_rejected_because_matching_never_uses_it(client):
+    r = client.post("/jobs", json={**JOB, "category": "Electrician"})
+    assert r.status_code == 400 and "category" in r.get_json()["error"]["message"]
+
+
+def test_storing_is_refused_when_the_store_is_read_only(client):
+    for path, body in (("/workers", {"biography": "Mimi ni fundi bomba"}), ("/jobs", JOB)):
+        r = client.post(path, json=body)
+        assert r.status_code == 501
+        assert r.get_json()["error"] == {"code": "not_supported",
+                                         "message": "this server cannot store new profiles "
+                                                    "(it is reading the frozen dataset, not a database)"}
+
+
+def test_job_interpretation_shows_stated_skills_only(client):
+    posting_id = "979d6da3-3b29-43cd-8e3f-8e612197d124"  # synthetic electrician posting
+    d = client.get(f"/jobs/{posting_id}").get_json()
+    assert d["posting_id"] == posting_id and d["candidate_jobs"] == 280
+    assert d["job"]["title"] == "Electrical fault-finding in an office"
+    interpretation = d["interpretation"]
+    assert [o["label"] for o in interpretation["occupations"]] == ["electrician"]
+    stated = interpretation["stated_skills"]
+    assert [s["skill_label"] for s in stated] == list(d["job"]["required_skills"])
+    assert all(s["source"] in ("listed", "text") for s in stated)
+    # the posting states 4 skills; its occupation would infer 21 essential ones, which are not reported
+    assert len(stated) == len(d["job"]["required_skills"]) == 4
+    assert [p["occupation"]["label"] for p in interpretation["worker_pool"]] == ["electrician"]
+
+
+def test_unknown_or_malformed_posting_is_404(client):
+    for posting_id in ("not-a-uuid", "11111111-1111-4111-8111-111111111111"):
+        r = client.get(f"/jobs/{posting_id}")
+        assert r.status_code == 404 and r.get_json()["error"]["field"] == "posting_id"
+
+
+def test_a_job_may_be_posted_with_no_skills():
+    """The interface no longer requires skills (usability finding U-7); the API never did."""
+    from kaziforce_api.app import parse_job
+
+    for body in ({"title": "Fix a tap", "description": "I need a plumber to fix a leaking tap"},
+                 {"title": "Fix a tap", "description": "I need a plumber to fix a leaking tap", "required_skills": []},
+                 {"title": "Fix a tap", "description": "I need a plumber", "required_skills": ["  ", ""]}):
+        assert parse_job(body).required_skills == ()
