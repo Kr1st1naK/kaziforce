@@ -20,6 +20,7 @@ import { AmountInput, Select, TextArea, TextInput } from "@/components/FormField
 import { ApiErrorMessage, isNetworkFailure, useGuard, useSession } from "@/components/SessionProvider";
 import { FormAlert } from "@/components/FormAlert";
 import { ApiError, api } from "@/lib/api";
+import { useIdleWhenHidden } from "@/lib/useIdleWhenHidden";
 import { SUGGESTED_LOCATIONS } from "@/lib/locations";
 import { AVAILABILITY, type Availability } from "@/lib/types";
 import styles from "./page.module.css";
@@ -43,6 +44,9 @@ export default function Page() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [retryable, setRetryable] = useState(false); // the last submit got no response: offer "Try again"
+  // A successful post leaves this page for the posting's result and stays mounted, hidden; "Post another job" then
+  // comes back to it. Clear busy when the page is left, or it returns saying "Posting…" with nothing submitted (U-10).
+  useIdleWhenHidden(() => setBusy(false));
   const [confirming, setConfirming] = useState(false);
 
   const clear = () => {

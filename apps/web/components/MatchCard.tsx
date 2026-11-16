@@ -34,6 +34,20 @@ export function MatchScoreBadge({ score, band }: { score: number; band: Band }) 
  * The first few matched skills as chips. When more matched than are shown, "+N more" is a link to
  * `moreHref` (the match's "Why this job?" page, which lists every one), not plain text that only looks tappable.
  */
+/**
+ * A short excerpt of a job's description for the match card: whitespace collapsed, cut at a word, plain text only
+ * (React escapes it; nothing here is ever HTML). The description can run to thousands of characters, so the card
+ * takes the first few words and the CSS clamps it to three lines; the full text is on "Why this job?".
+ */
+export const EXCERPT_CHARS = 240;
+export function excerpt(description: string | null | undefined, max = EXCERPT_CHARS): string {
+  const text = (description ?? "").replace(/\s+/g, " ").trim();
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max);
+  const space = cut.lastIndexOf(" ");
+  return `${(space > max * 0.6 ? cut.slice(0, space) : cut).trimEnd()}…`;
+}
+
 export function SkillChips({ skills, shown = CHIPS_SHOWN, moreHref }: { skills: string[]; shown?: number; moreHref?: string }) {
   const visible = skills.slice(0, shown);
   const hidden = skills.length - visible.length;
@@ -68,6 +82,7 @@ export function MatchCard({ result, href }: { result: MatchResult; href: string 
               " · ",
             )}
           </p>
+          {excerpt(result.description) && <p className={styles.excerpt}>{excerpt(result.description)}</p>}
         </div>
         <MatchScoreBadge score={result.match_score} band={result.band} />
       </div>

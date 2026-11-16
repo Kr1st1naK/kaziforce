@@ -214,7 +214,7 @@ KES 2,000 / day
 
 ## Findings
 
-Nine findings have come out of the sessions (U-7 to U-9 added after the first six). "Seen by" gives what `Testing.md` supports and what the author has since stated. Where neither says who met a thing, it says **not recorded**.
+Sixteen findings have come out of the sessions (U-7 to U-9 added after the first six, U-10 to U-16 from Round 2). "Seen by" gives what `Testing.md` supports and what the author has since stated. Where neither says who met a thing, it says **not recorded**.
 
 | # | Finding | Seen by | Kind | Status |
 |---|---|---|---|---|
@@ -227,6 +227,13 @@ Nine findings have come out of the sessions (U-7 to U-9 added after the first si
 | U-7 | Clients could not list the skills a job needs; most know only that they need a plumber or an electrician ("it was a bit of a problem for someone to create an account as a client and list the possible skills needed for a certain job", as reported by the author) | [CONFIRM: who ran the test, device, date] | the form asked for something clients could not supply; and what they could type (skills in their own words) matched nothing | **Fixed, pending retest, in `b313756`**: the form asks "What do you need done?" first, then a short title, and skills are optional; the result screen says plainly when none were listed. The ranking effect of a posting with no skills is accepted and documented (`docs/limitations.md`, items 41 and 42) |
 | U-8 | The availability field on the job form did not make sense for a client: "When is it needed?" reads as a date, but the field holds a working pattern (Full-time, Part-time, Weekends) that is compared with a worker's availability | [CONFIRM: tester, device, date] | wording of a field | **Fixed, pending retest, in `3975f71`**: the label reads "What working pattern does the job need?", the empty choice "No fixed pattern", with a hint that it is compared with when each worker is available. The stored values are unchanged and there is no date field |
 | U-9 | Clients could not open the workers shown in the trade list; most of those workers come from the evaluation dataset and have no name or contact details | [CONFIRM: tester, device, date] | expectation against the data: only a worker who named themselves and consented can be opened | **Fixed, pending retest, in `3975f71`**: a sentence under the heading says which workers can be opened and which cannot; an openable card looks openable (whole card a link, "Open profile" cue, visible focus, tall target); plain cards stay plain. Which workers appear, their number and their order are unchanged. The demo seed now has two consenting workers each in the carpenter, electrician and cook trades. See `docs/limitations.md` item 32 |
+| U-10 | The button on the client post page read "Posting…" when a second job was being posted after "Post another job" ("when posting another job the button was 'posting….'") | R2-C1 | defect: the same cause as U-2 (a busy flag set by a successful submit and never cleared, on a page Next keeps mounted) | **Fixed, pending retest, in `580dfac`** |
+| U-11 | No details of the job on the matches list ("have descriptions about the job. It's fine to have match but have the details about the job too"); Round 1's P1 had said "a worker might want to click the title of the job for more information" | R2-W1; also P1 (Round 1) | usability gap: the screens showed a title, place, pay and score but not what the job is | **Fixed, pending retest, in `fc731e9`**: an excerpt on each card and the full description on "Why this job?" |
+| U-12 | "Fundi wa stima" not recognised ("fundi was stima should work as fundi was umeme") | R2-W1 | limitation, by design: the term is withheld from the knowledge graph as the evaluation's held-out term | **Not fixed.** `docs/limitations.md`; known and expected (the pack says so) |
+| U-13 | Jobs chosen by pay and distance ("job 4 cause it pays more. Job 2 because it's close to home and pays more than the rate"); Round 1's P3 chose by pay too | R2-W1; also P3 (Round 1) | extends U-5: workers read pay and place first, and the match score does not follow them | **Open, not changed** (scoring) |
+| U-14 | Clients' own jobs outside the vocabulary: "looking for a mechanic for a car" (Round 1, P2), "Fix an analogue radio" (R2-C1), "Roof repairer" (R2-C2): each got "We couldn't match this to a trade we know" | P2 (Round 1), R2-C1, R2-C2 | limitation: the system knows ten trades; extends U-6 | **Not fixed.** `docs/limitations.md` |
+| U-15 | If the app fails to match, offer a dropdown to select the job ("if the app fails to match you can have a dropdown to select the job description") | R2-C2 | future work | **Not built.** A picker of trades would bring back the category field that was removed from postings (FR-02, DR-02) because it equals the relevance label; recorded in `docs/limitations.md` |
+| U-16 | A Swahili interface ("have the UI translate to Swahili") | R2-W1 | future work | **Not built.** `docs/limitations.md` |
 
 ---
 
@@ -272,6 +279,61 @@ What participants were told about being recorded: **not recorded**. The recordin
 
 ## Worker sessions, and the U-7 retest
 
-**No feedback has been received for the worker sessions.** Nothing about them is recorded here.
+**No feedback was received for the Round 1 worker sessions.** Nothing about them is recorded here. Round 2 has one worker session (R2-W1, below).
 
 **U-7 retest result (skills optional on the job form):** [CONFIRM: who retested, device, date, and what happened].
+
+---
+
+# Round 2
+
+Copied from `docs/context/Testing-Round 2.md`, as written. Nothing is corrected or interpreted. **Codes:** R2-W1 = T1 (worker), R2-C1 = T2 (client), R2-C2 = T3 (client). **Not recorded for any of the three** (so "[CONFIRM]" until the author supplies them): live or recorded; step times; hesitations; hints and their words; the Single Ease Question score; task success; the commit under test; the date and time; whether the session was moderated. (The Round 2 plan, `handoff/32-usability-pack-round2.md`, was live and moderated, but whether each session was is not written down.)
+
+## R2-W1 (T1): worker
+
+| Field | As recorded |
+|---|---|
+| Card | phone number 700 000 105, PIN 4821 (card D) |
+| First name | Baraka |
+| Last name | **Tester**. *The card says "Testa".* Entered as "Tester", and recorded so; whether the participant or the author typed it, and whether it was a slip, is [CONFIRM] |
+| Device, browser | laptop, Chrome |
+| Step times, hesitations, hints, SEQ, task success, live or recorded, commit | not recorded [CONFIRM] |
+
+**Comments made (verbatim):** fundi was stima should work as fundi was umeme.
+
+**Which job would you have chosen? (verbatim):** job 4 cause it pays more. Job 2 because it's close to home and pays more than the rate.
+
+**Was anything not understandable? (verbatim):** yes have descriptions about the job. It's fine to have match but have the details about the job too.
+
+**Future work (verbatim):** have the UI translate to Swahili
+
+## R2-C1 (T2): client
+
+| Field | As recorded |
+|---|---|
+| Card | phone number 700 000 202, PIN 4821 (card F) |
+| Device, browser | phone, Chrome |
+| Step times, hesitations, hints, SEQ, task success, live or recorded, commit | not recorded [CONFIRM] |
+
+**Comments made (verbatim):** when posting another job the button was "posting…."
+
+**Screenshot ("View screenshot sent"):** described, not committed (a phone screenshot's status bar shows personal details). It shows the "Your job has been posted." screen on a phone in Chrome for the job **"Fix an analogue radio"**: "We couldn't match this to a trade we know. Your posting is live and will still be matched on its wording.", then the sentence that no skills were listed and that the trade was read from the description, and the "Post another job" link at the foot. The stuck button itself is not in the picture.
+
+**Was anything not understandable? (verbatim):** No
+
+## R2-C2 (T3): client
+
+| Field | As recorded |
+|---|---|
+| Card | phone number 700 000 203, PIN 4821 (card G) |
+| Device, browser | phone, Chrome |
+| Step times, hesitations, hints, SEQ, task success, live or recorded, commit | not recorded [CONFIRM] |
+
+**Comments made (verbatim):** it's easy. If the app fails to match you can have a dropdown to select the job description
+
+**Screenshot ("View screenshot"):** described, not committed. It shows the same screen for the job **"Roof repairer"** with "We couldn't match this to a trade we know…", and the sentence "We match on the skills you listed above, and nothing else. We didn't recognise "Patch roof leaks", so we kept it exactly as you wrote it." (so this client had listed one skill, "Patch roof leaks").
+
+**Was anything not understandable? (verbatim):** No everything
+
+*Note on the wording "No everything": copied as written; whether it means "no, nothing" is not interpreted here.*
+

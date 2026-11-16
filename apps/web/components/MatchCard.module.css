@@ -28,6 +28,20 @@
   margin-bottom: 4px;
 }
 
+.excerpt {
+  margin: 6px 0 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink);
+  /* Three lines at most, however long the description is; a long unbroken word cannot push the card wider. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
 .facts {
   color: var(--muted);
   font-size: 15px;

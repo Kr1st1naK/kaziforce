@@ -93,7 +93,7 @@ test("a worker signs up, describes their work, and reads an explained match", as
   // The term the worker used, and the trade it reached, are named in words.
   await expect(page.getByText(/You described yourself as a/)).toBeVisible();
   await expect(view(page).getByText("fundi wa umeme")).toBeVisible();
-  await expect(view(page).getByText("electrician")).toBeVisible();
+  await expect(view(page).getByText("electrician", { exact: true })).toBeVisible(); // exact: the page now also shows the job's description, which says "electrician"
 
   // No component score, criterion table or raw graph path is shown to a worker.
   await expect(page.getByRole("button", { name: /technical detail/ })).toHaveCount(0);
@@ -175,7 +175,7 @@ test("a client's postings are listed, and only their own", async ({ page }) => {
   await page.getByRole("link", { name: "My postings" }).click();
   await expect(page).toHaveURL(/\/client\/postings$/);
   await expect(view(page).getByRole("link", { name: /Rewire a small shop/ })).toBeVisible();
-  await expect(view(page).getByText("electrician")).toBeVisible();
+  await expect(view(page).getByText("electrician", { exact: true })).toBeVisible(); // exact: the page now also shows the job's description, which says "electrician"
 });
 
 test("signing in returns a worker to their matches", async ({ page }) => {
@@ -454,4 +454,53 @@ test("the job form asks for a working pattern, not a date, and still stores the 
   await expect(page).toHaveURL(/\/client\/postings\/[0-9a-f-]+$/);
   await page.getByRole("link", { name: "My postings" }).click();
   await expect(view(page).getByText("Weekends")).toBeVisible();
+});
+
+test("after posting a job, \"Post another job\" opens a form whose button is idle, not \"Posting…\"", async ({ page }) => {
+  // Usability finding U-10: Next keeps the post page mounted, hidden, and a busy flag set by the successful post came back with it.
+  await createAccount(page, "client");
+  await view(page).getByLabel("What do you need done?").fill("I need a plumber to fix a leaking tap");
+  await view(page).getByLabel("Job title").fill("Fix a leaking tap");
+  await view(page).getByLabel(/Budget per day/).fill("2200");
+  await view(page).getByLabel(/Where is the job\?/).selectOption("Nairobi - Kawangware");
+  await view(page).getByRole("button", { name: /Post job/ }).click();
+  await expect(page).toHaveURL(/\/client\/postings\/[0-9a-f-]+$/);
+  await expect(page.getByRole("heading", { name: "Your job has been posted." })).toBeVisible();
+
+  await page.getByRole("link", { name: /Post another job/ }).click();
+  await expect(page).toHaveURL(/\/client\/post$/);
+  await expect(view(page).getByRole("button", { name: /Post job/ })).toBeEnabled();
+  await expect(view(page).getByText("Posting…")).toHaveCount(0);
+  await expect(view(page).getByLabel("What do you need done?")).toBeEnabled();
+});
+
+test("a match shows what the job is, and \"Why this job?\" shows the whole description", async ({ page }) => {
+  // Usability finding U-11 (R2-W1: "have descriptions about the job"). A phone, so the layout is tested as well.
+  await page.setViewportSize({ width: 375, height: 812 });
+  await createAccount(page, "worker");
+  await page.getByLabel(/What work do you do\?/).fill("fundi wa umeme, wiring, solar installation");
+  await page.getByLabel(/About you/).fill("Nina uzoefu wa miaka mitano. Domestic and commercial installations.");
+  await page.getByLabel(/Where do you work\?/).selectOption("Nairobi - Kasarani");
+  await page.getByRole("button", { name: "Create profile" }).click();
+  await expect(page).toHaveURL(/\/worker\/matches$/);
+
+  const card = view(page).locator("article").first();
+  const excerpt = card.locator("[class*=excerpt]");
+  await expect(excerpt).toBeVisible();
+  const shown = ((await excerpt.innerText()) ?? "").trim();
+  expect(shown.length).toBeGreaterThan(20);
+  expect((await excerpt.boundingBox())!.height).toBeLessThanOrEqual(3 * 22 + 2); // three lines at most
+  const noOverflow = await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth);
+  expect(noOverflow).toBe(true);
+
+  await card.getByRole("link", { name: "Why this job?" }).click();
+  await expect(page).toHaveURL(/\/worker\/matches\/[0-9a-f-]+$/);
+  await expect(view(page).getByRole("heading", { name: "About this job" })).toBeVisible();
+  const full = view(page).getByRole("region", { name: "Full job description" });
+  await expect(full).toBeVisible();
+  // The excerpt is the start of the same text (compared on its first words, whitespace collapsed).
+  const start = shown.replace(/…$/, "").split(" ").slice(0, 6).join(" ");
+  expect(((await full.innerText()) ?? "").replace(/\s+/g, " ")).toContain(start);
+  // The explanation is still there, unchanged.
+  await expect(page.getByRole("heading", { name: "What lined up" })).toBeVisible();
 });
