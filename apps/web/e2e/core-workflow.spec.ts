@@ -455,3 +455,21 @@ test("the job form asks for a working pattern, not a date, and still stores the 
   await page.getByRole("link", { name: "My postings" }).click();
   await expect(view(page).getByText("Weekends")).toBeVisible();
 });
+
+test("after posting a job, \"Post another job\" opens a form whose button is idle, not \"Posting…\"", async ({ page }) => {
+  // Usability finding U-10: Next keeps the post page mounted, hidden, and a busy flag set by the successful post came back with it.
+  await createAccount(page, "client");
+  await view(page).getByLabel("What do you need done?").fill("I need a plumber to fix a leaking tap");
+  await view(page).getByLabel("Job title").fill("Fix a leaking tap");
+  await view(page).getByLabel(/Budget per day/).fill("2200");
+  await view(page).getByLabel(/Where is the job\?/).selectOption("Nairobi - Kawangware");
+  await view(page).getByRole("button", { name: /Post job/ }).click();
+  await expect(page).toHaveURL(/\/client\/postings\/[0-9a-f-]+$/);
+  await expect(page.getByRole("heading", { name: "Your job has been posted." })).toBeVisible();
+
+  await page.getByRole("link", { name: /Post another job/ }).click();
+  await expect(page).toHaveURL(/\/client\/post$/);
+  await expect(view(page).getByRole("button", { name: /Post job/ })).toBeEnabled();
+  await expect(view(page).getByText("Posting…")).toHaveCount(0);
+  await expect(view(page).getByLabel("What do you need done?")).toBeEnabled();
+});

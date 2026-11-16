@@ -8,6 +8,7 @@
 
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { Activity } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import Page from "@/app/client/post/page";
 import { ApiError, NETWORK_MESSAGE } from "@/lib/api";
@@ -186,5 +187,34 @@ describe("the working-pattern field says what it is", () => {
 
     await waitFor(() => expect(createJob).toHaveBeenCalled());
     expect(createJob.mock.calls[0][0]).toMatchObject({ availability: "Weekends" });
+  });
+});
+
+describe("the button after a successful post (U-10)", () => {
+  it("is idle again when the page is shown once more, as \"Post another job\" does", async () => {
+    createJob.mockResolvedValue({ posting_id: "p-8" });
+    const { rerender } = render(
+      <Activity mode="visible">
+        <Page />
+      </Activity>,
+    );
+    await fillIn();
+    await userEvent.click(screen.getByRole("button", { name: /Post job/ }));
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/client/postings/p-8"));
+
+    // Next keeps the page mounted, hidden, once it has navigated to the result, and shows it again on the way back.
+    rerender(
+      <Activity mode="hidden">
+        <Page />
+      </Activity>,
+    );
+    rerender(
+      <Activity mode="visible">
+        <Page />
+      </Activity>,
+    );
+
+    expect(screen.queryByText(/Posting…/)).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Post job/ })).toBeEnabled();
   });
 });
