@@ -51,6 +51,21 @@ run.json        keys that differ: created_at, git.commit, scoring_policy_sha256,
 The scoring-policy checksum differs because `docs/scoring-policy.md` gained its "Deviations" section in `b44c924`
 (documentation; no rule changed). The dataset and knowledge-graph checksums are identical.
 
+### A fourth comparison, on the second freeze commit (2026-11-16)
+
+Run D, `results/dev/20261116-160402_1a01573` (commit `1a01573`, clean tree), against run C, `results/dev/20261116-002209_5c915fc` (commit `5c915fc`), taken hours earlier
+after two interface fixes (a button state and a job description on two screens; nothing under the scoring path):
+
+```
+metrics.csv     (35 rows)   differing cells outside the timing columns: 0
+per_query.csv   (1512 rows) differing cells outside the timing columns: 0
+run.json        keys that differ: created_at, git.commit, startup_seconds
+```
+
+`git diff 5c915fc 1a01573` over the matching, pipeline, evaluation and explainability code, the knowledge-graph package, the data,
+`scripts/evaluate.py` and `docs/scoring-policy.md` is empty, which is why the scoring-policy checksum, which differed in run C, is
+now the same.
+
 ### Composite scores, bit for bit
 
 The run comparison above shows identical rankings and metrics, but `per_query.csv` records

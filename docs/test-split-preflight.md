@@ -36,7 +36,8 @@ able to run on it. Allowing it is a deliberate, recorded code change, not a flag
 | `results/dev/20261112-012400_f5587b0` | development |
 | `results/dev/20261112-012811_cf644c3` | development |
 | `results/dev/20261112-082720_64381de` | development |
-| `results/dev/20261116-002209_5c915fc` | development (the freeze commit's own run, 2026-11-16) |
+| `results/dev/20261116-002209_5c915fc` | development (the first freeze's own run, 2026-11-16) |
+| `results/dev/20261116-160402_1a01573` | development (the second freeze's own run, 2026-11-16) |
 | `results/scratch/20261017-132231_7aef3e0` | development |
 
 No run on any other split exists (list updated 2026-11-16, before the freeze).
@@ -228,5 +229,19 @@ Everything in §5 step 2 was done **before** this record, on branch `freeze/test
 | Development run on `5c915fc` | `results/dev/20261116-002209_5c915fc`: identical in every metric (both CSVs, every cell outside the timing columns) to `results/dev/20261112-082720_64381de` |
 | What is frozen | The commit tagged `freeze-test-split` (the docs commit, which differs from `5c915fc` only in `docs/` and `results/`; the proof is in `handoff/27-freeze-report.md`) |
 | Command to run | `python scripts/evaluate.py --split test` from a clean tree on that tag (no `--allow-dirty`); then §5 step 4 |
+| Test split run? | **No.** |
+
+## 8. Second freeze record (filled 2026-11-16, after usability Round 2)
+
+The first freeze (tag `freeze-test-split`, docs commit `a5e6867`) is superseded and **left in place**. Round 2 found two interface faults, fixed as below, so the freeze was redone from `origin/dev` `57f4157` on branch `freeze/test-split-2`. **The test split has not been run.**
+
+| Item | Value |
+|---|---|
+| **Code commits** | `580dfac` (the client post page's stuck button), `fc731e9` (job descriptions on the matches list and on "Why this job?"), `1a01573` (one test assertion narrowed because of `fc731e9`). **`1a01573` is the code commit** and what every check below ran on |
+| Evaluation-path proof | `git diff 5c915fc 1a01573` over `apps/api/src/kaziforce_api/matching`, `pipeline.py`, `evaluation`, `explainability`, `packages`, `data`, `scripts/evaluate.py` and `docs/scoring-policy.md` is **empty** (0 bytes); nothing under `apps/api`, `packages`, `data`, `scripts` or `tests` differs from `5c915fc` at all |
+| Checks on `1a01573` (2026-11-16, clean tree) | ruff clean; pytest with a scratch database **529 passed**; without a database **402 passed, 127 skipped**; the two slow tests **2 passed**; tsc, eslint clean; vitest **178 passed**; e2e **74 passed (37 per engine)**. A first e2e run on `fc731e9` gave 72 passed and 2 failed (an assertion matched two elements once the page showed the job's description); the assertion was narrowed in `1a01573` and **every check was run again** |
+| Development run on `1a01573` | `results/dev/20261116-160402_1a01573`: identical in every cell of both CSVs outside the timing columns to `results/dev/20261116-002209_5c915fc` (0 differences); `run.json` differs only in `created_at`, `git.commit`, `startup_seconds` |
+| What is frozen | The commit tagged **`freeze-test-split-2`** (the docs commit; it differs from `1a01573` only in `docs/` and `results/`) |
+| Command to run | `git fetch --tags && git checkout freeze-test-split-2` then `python scripts/evaluate.py --split test` from a clean tree (no `--allow-dirty`); then §5 step 4 |
 | Test split run? | **No.** |
 

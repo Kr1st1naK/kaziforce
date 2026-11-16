@@ -13,11 +13,11 @@ after 3 discarded warm-up loads. The worker is the same throughout
 
 | Browser | end-to-end median | p95 | max | engine median | p95 | max | browser overhead (median) |
 |---|---|---|---|---|---|---|---|
-| chromium | 377 | 542 | 542 | 11 | 22.9 | 22.9 | 366 |
-| webkit | 337.5 | 375 | 375 | 8.45 | 11.3 | 11.3 | 329 |
+| chromium | 334.5 | 461 | 461 | 9.65 | 13.8 | 13.8 | 324.9 |
+| webkit | 332.5 | 344 | 344 | 9.45 | 10.4 | 10.4 | 323.1 |
 
 All figures in milliseconds. **Budget: 5,000 ms. The slowest single sample in either engine
-is 542 ms**, so NFR-01 is met with a wide margin. Measured on 2026-11-16 at commit `5c915fc` (the run in `docs/evidence/e2e_browsers.txt`); the raw samples are in `nfr01_browser_timing/`.
+is 461 ms**, so NFR-01 is met with a wide margin. Measured on 2026-11-16 at commit `1a01573` (the run in `docs/evidence/e2e_browsers.txt`); the raw samples are in `nfr01_browser_timing/`.
 
 ## Why both numbers are reported
 

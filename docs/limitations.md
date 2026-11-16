@@ -339,3 +339,30 @@
     the rule-based ones, and differences of at most 1.2e-7 in the embedding-based ones. The evaluation
     uses a fixed pool and is unaffected.
 
+44. **"Fundi wa stima" and other terms the system has not seen are not recognised.** A tester typed *fundi wa
+    stima*, a common word for an electrician, and expected it to work like *fundi wa umeme* (usability record
+    U-12). It does not: the term is the evaluation's deliberately **held-out** alias, kept out of the knowledge graph so
+    that the evaluation can measure what happens with a word the system has not seen (the `held_out` variant, MRR
+    0.32 for `full`; `docs/evidence/dev_results.md`). A worker who writes only such a word sees "No strong matches
+    yet". It is the example, found by a user, of the limit the held-out variant measures: the system knows the 14
+    informal terms in its vocabulary and nothing else. Adding the word would be a vocabulary change, which this
+    project does not make before the test run; after it, the vocabulary can grow.
+
+45. **A client whose job is outside the ten occupational areas is told so, and gets weak matching.** Three clients
+    in two rounds asked for work the system has no trade for: "looking for a mechanic for a car" (Round 1),
+    "Fix an analogue radio" and "Roof repairer" (Round 2). Each is told "We couldn't match this to a trade we
+    know"; the posting still joins the pool and is matched on its wording, which is weak evidence (item 42 for
+    why listed skills do not rescue it). The ten areas are those of the synthetic dataset and the knowledge graph.
+
+46. **The interface is in English only.** A worker or client may write in Swahili (the vocabulary maps some
+    terms), but every label, message and explanation is English. A tester asked for a Swahili interface (U-16). It
+    is future work, and a translation of explanation sentences would need the same care as the English ones
+    (`docs/scoring-policy.md` §7).
+
+47. **There is no fallback trade picker, and one was declined.** A tester suggested a dropdown to choose the job when
+    the app fails to match (U-15). It would reintroduce a category field on postings, which FR-02 and DR-02 removed:
+    in the evaluation data the category *is* the relevance label (the occupational area), so collecting it would put
+    the label into the posting data, and a client who picked a trade would be bypassing the very reading of their own
+    words that the system exists to show. The honest alternative is the plain message in item 45, and widening the
+    vocabulary (item 44).
+
