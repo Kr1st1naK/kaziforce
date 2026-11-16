@@ -227,8 +227,8 @@ Sixteen findings have come out of the sessions (U-7 to U-9 added after the first
 | U-7 | Clients could not list the skills a job needs; most know only that they need a plumber or an electrician ("it was a bit of a problem for someone to create an account as a client and list the possible skills needed for a certain job", as reported by the author) | [CONFIRM: who ran the test, device, date] | the form asked for something clients could not supply; and what they could type (skills in their own words) matched nothing | **Fixed, pending retest, in `b313756`**: the form asks "What do you need done?" first, then a short title, and skills are optional; the result screen says plainly when none were listed. The ranking effect of a posting with no skills is accepted and documented (`docs/limitations.md`, items 41 and 42) |
 | U-8 | The availability field on the job form did not make sense for a client: "When is it needed?" reads as a date, but the field holds a working pattern (Full-time, Part-time, Weekends) that is compared with a worker's availability | [CONFIRM: tester, device, date] | wording of a field | **Fixed, pending retest, in `3975f71`**: the label reads "What working pattern does the job need?", the empty choice "No fixed pattern", with a hint that it is compared with when each worker is available. The stored values are unchanged and there is no date field |
 | U-9 | Clients could not open the workers shown in the trade list; most of those workers come from the evaluation dataset and have no name or contact details | [CONFIRM: tester, device, date] | expectation against the data: only a worker who named themselves and consented can be opened | **Fixed, pending retest, in `3975f71`**: a sentence under the heading says which workers can be opened and which cannot; an openable card looks openable (whole card a link, "Open profile" cue, visible focus, tall target); plain cards stay plain. Which workers appear, their number and their order are unchanged. The demo seed now has two consenting workers each in the carpenter, electrician and cook trades. See `docs/limitations.md` item 32 |
-| U-10 | The button on the client post page read "Posting…" when a second job was being posted after "Post another job" ("when posting another job the button was 'posting….'") | R2-C1 | defect: the same cause as U-2 (a busy flag set by a successful submit and never cleared, on a page Next keeps mounted) | **Fixed, pending retest, in `580dfac`** |
-| U-11 | No details of the job on the matches list ("have descriptions about the job. It's fine to have match but have the details about the job too"); Round 1's P1 had said "a worker might want to click the title of the job for more information" | R2-W1; also P1 (Round 1) | usability gap: the screens showed a title, place, pay and score but not what the job is | **Fixed, pending retest, in `fc731e9`**: an excerpt on each card and the full description on "Why this job?" |
+| U-10 | The button on the client post page read "Posting…" when a second job was being posted after "Post another job" ("when posting another job the button was 'posting….'") | R2-C1 | defect: the same cause as U-2 (a busy flag set by a successful submit and never cleared, on a page Next keeps mounted) | **Fixed in `580dfac`; verified by automated tests and by the author, not retested with a participant** |
+| U-11 | No details of the job on the matches list ("have descriptions about the job. It's fine to have match but have the details about the job too"); Round 1's P1 had said "a worker might want to click the title of the job for more information" | R2-W1; also P1 (Round 1) | usability gap: the screens showed a title, place, pay and score but not what the job is | **Fixed in `fc731e9`; verified by automated tests and by the author, not retested with a participant**: an excerpt on each card and the full description on "Why this job?" |
 | U-12 | "Fundi wa stima" not recognised ("fundi was stima should work as fundi was umeme") | R2-W1 | limitation, by design: the term is withheld from the knowledge graph as the evaluation's held-out term | **Not fixed.** `docs/limitations.md`; known and expected (the pack says so) |
 | U-13 | Jobs chosen by pay and distance ("job 4 cause it pays more. Job 2 because it's close to home and pays more than the rate"); Round 1's P3 chose by pay too | R2-W1; also P3 (Round 1) | extends U-5: workers read pay and place first, and the match score does not follow them | **Open, not changed** (scoring) |
 | U-14 | Clients' own jobs outside the vocabulary: "looking for a mechanic for a car" (Round 1, P2), "Fix an analogue radio" (R2-C1), "Roof repairer" (R2-C2): each got "We couldn't match this to a trade we know" | P2 (Round 1), R2-C1, R2-C2 | limitation: the system knows ten trades; extends U-6 | **Not fixed.** `docs/limitations.md` |
@@ -281,7 +281,7 @@ What participants were told about being recorded: **not recorded**. The recordin
 
 **No feedback was received for the Round 1 worker sessions.** Nothing about them is recorded here. Round 2 has one worker session (R2-W1, below).
 
-**U-7 retest result (skills optional on the job form):** [CONFIRM: who retested, device, date, and what happened].
+**U-7 retest result (skills optional on the job form):** R1, 15 Nov 2026, laptop: completed a posting without listing skills. Commit under test: [CONFIRM]. Session format: [CONFIRM].
 
 ---
 
@@ -336,4 +336,18 @@ Copied from `docs/context/Testing-Round 2.md`, as written. Nothing is corrected 
 **Was anything not understandable? (verbatim):** No everything
 
 *Note on the wording "No everything": copied as written; whether it means "no, nothing" is not interpreted here.*
+
+## Round 2: how the sessions were run, and task success (stated by the author, 2026-11-16)
+
+These facts were supplied after the notes above were copied, and they replace the "[CONFIRM]" for *live or recorded* and for hints and times. **The sessions were in person and not recorded. No times were taken. Hints given: not recorded.** Step times, hesitations and SEQ scores remain not recorded.
+
+Task success, against the criteria fixed in advance (`handoff/32-usability-pack-round2.md`):
+
+| Code | Task success | Basis (as stated by the author) |
+|---|---|---|
+| R2-W1 | **Met** | reached the matches and opened "Why this job?" |
+| R2-C1 | **Met** | posted the job and saw how it was read (the tap job reached *plumber*), and opened a worker in the trade |
+| R2-C2 | **Not met** | the job posted, a roof repair, reached no trade, so no worker could be opened. [CONFIRM] |
+
+Not recorded for any of the three: the commit under test and the exact times. Findings U-10 and U-11, which came from these sessions, are fixed and verified by automated tests and by the author; they have **not** been retested with a participant.
 

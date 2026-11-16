@@ -1,5 +1,7 @@
 # Pre-flight checklist for the test-split evaluation
 
+**Status: the test split has been evaluated, once, on 2026-11-16 (see §9). It is not repeated.**
+
 The test split is evaluated **once**. The run is committed immediately, before the numbers
 are discussed, and is not repeated after seeing the results. This checklist is what must be
 frozen and recorded first, and the audit showing the split has not already been used.
@@ -40,7 +42,7 @@ able to run on it. Allowing it is a deliberate, recorded code change, not a flag
 | `results/dev/20261116-160402_1a01573` | development (the second freeze's own run, 2026-11-16) |
 | `results/scratch/20261017-132231_7aef3e0` | development |
 
-No run on any other split exists (list updated 2026-11-16, before the freeze).
+No run on any other split existed when this audit was made (list updated 2026-11-16, before the freeze). The one test-split run that now exists, `results/test/20261116-162048_7a12e4f`, is the run this checklist was written for; see §9.
 
 ### Every call site that selects a split
 
@@ -244,4 +246,19 @@ The first freeze (tag `freeze-test-split`, docs commit `a5e6867`) is superseded 
 | What is frozen | The commit tagged **`freeze-test-split-2`** (the docs commit; it differs from `1a01573` only in `docs/` and `results/`) |
 | Command to run | `git fetch --tags && git checkout freeze-test-split-2` then `python scripts/evaluate.py --split test` from a clean tree (no `--allow-dirty`); then §5 step 4 |
 | Test split run? | **No.** |
+
+## 9. The test run (completed 2026-11-16)
+
+| Item | Value |
+|---|---|
+| **Status** | **Completed. Run once. Not repeated, and not to be repeated.** |
+| Who ran it | The author, not the assistant that prepared the freeze |
+| When | 2026-11-16, about 16:20 EAT (`run.json`: `created_at` 2026-11-16T16:20:48+03:00) |
+| What was run | `python scripts/evaluate.py --split test` on the tag `freeze-test-split-2` (`7a12e4f`), from a clean tree, without `--allow-dirty` |
+| Run folder | `results/test/20261116-162048_7a12e4f` (`metrics.md`, `metrics.csv`, `per_query.csv`, `run.json`), committed unaltered in `958f56f` on branch `eval/test-split` |
+| Checked after the run, before the commit | `run.json`: `"split": "test"`, `"uncommitted_changes": false`, commit `7a12e4f`, seed 42, 216 queries; dataset, knowledge-graph, weights, model and scoring-policy checksums equal those of the development run `results/dev/20261116-160402_1a01573`; `per_query.csv`: 1,512 rows, 216 distinct worker IDs, every one in the test split (IDs only), none in development or validation, 0 shared with the development run. The sha256 of the four files was taken before anything touched them and matched after the commit |
+| **Departure from §5** | The preflight says to commit the run and then read it. **The output was printed to the terminal before the commit.** The files are unaltered, and nothing in the system, the vocabulary or the evaluation was changed in response to the numbers |
+| Paired comparisons, fixed in advance | `full` vs `keyword`, `full` vs `hybrid_no_kg`, `full` vs `rule_kg`; significance threshold 0.05 / 3 = 0.017 |
+| Results | In `docs/traceability.md` (NFR-02 and the evidence rows) and, in full, `handoff/28-test-results.md` and `handoff/26-numbers-for-ch5.md` section 13. `full` MRR 0.921 (development 0.918); NFR-02 `full` strict coverage 78.7%, **not met**, as on development (79.2%); `full` vs `rule_kg` not significant (p = 0.82) |
+| A re-run? | **None, for any reason.** A change to the system after this point is a new development-split result, never a revised test result (§4) |
 
