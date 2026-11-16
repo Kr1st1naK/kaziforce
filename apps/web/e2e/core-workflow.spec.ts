@@ -93,7 +93,7 @@ test("a worker signs up, describes their work, and reads an explained match", as
   // The term the worker used, and the trade it reached, are named in words.
   await expect(page.getByText(/You described yourself as a/)).toBeVisible();
   await expect(view(page).getByText("fundi wa umeme")).toBeVisible();
-  await expect(view(page).getByText("electrician")).toBeVisible();
+  await expect(view(page).getByText("electrician", { exact: true })).toBeVisible(); // exact: the page now also shows the job's description, which says "electrician"
 
   // No component score, criterion table or raw graph path is shown to a worker.
   await expect(page.getByRole("button", { name: /technical detail/ })).toHaveCount(0);
@@ -175,7 +175,7 @@ test("a client's postings are listed, and only their own", async ({ page }) => {
   await page.getByRole("link", { name: "My postings" }).click();
   await expect(page).toHaveURL(/\/client\/postings$/);
   await expect(view(page).getByRole("link", { name: /Rewire a small shop/ })).toBeVisible();
-  await expect(view(page).getByText("electrician")).toBeVisible();
+  await expect(view(page).getByText("electrician", { exact: true })).toBeVisible(); // exact: the page now also shows the job's description, which says "electrician"
 });
 
 test("signing in returns a worker to their matches", async ({ page }) => {
